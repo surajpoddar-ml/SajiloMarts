@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { healthService } from './services';
+import { ENV, FEATURE_FLAGS, PUBLIC_CONFIG } from './config';
 import './App.css';
 
 function App() {
@@ -39,30 +40,30 @@ function App() {
       <header className="header">
         <div className="logo-badge">
           <span className="logo-dot"></span>
-          <span className="logo-text">SastoMarts</span>
+          <span className="logo-text">{PUBLIC_CONFIG.BRAND_NAME}</span>
         </div>
-        <span className="step-pill">Prompt 3 of 100 &bull; Architecture &amp; Coding Rules</span>
+        <span className="step-pill">Prompt 4 of 100 &bull; Configuration &amp; Environment</span>
       </header>
 
       <main className="hero-section">
         <h1 className="title">
-          India &rarr; Nepal Cross-Border E-Commerce & Sourcing
+          {PUBLIC_CONFIG.TAGLINE}
         </h1>
         <p className="subtitle">
-          Production-grade architecture rules, layer contracts, security boundaries, and centralized error handling established.
+          Configuration boundaries, environment validation, public vs. private separation, and startup sequencing verified.
         </p>
 
         <div className="status-card-grid">
           <div className="status-card">
             <div className="card-header">
               <span className="indicator active"></span>
-              <span className="card-tag">React Frontend</span>
+              <span className="card-tag">React Frontend ({ENV.NODE_ENV})</span>
             </div>
-            <h3 className="card-title">Vite + React (SPA)</h3>
-            <p className="card-detail">Running on <code>http://localhost:5173</code></p>
+            <h3 className="card-title">Client Configuration</h3>
+            <p className="card-detail">Target API: <code>{ENV.API_BASE_URL}</code></p>
             <div className="badge-list">
-              <span className="badge">Decoupled Services Layer</span>
-              <span className="badge">Centralized HTTP Client</span>
+              <span className="badge">Public Config Isolated</span>
+              <span className="badge">Flags Active: {Object.keys(FEATURE_FLAGS).length}</span>
             </div>
           </div>
 
@@ -71,14 +72,14 @@ function App() {
               <span className={`indicator ${backendStatus.connected ? 'active' : backendStatus.loading ? 'loading' : 'offline'}`}></span>
               <span className="card-tag">Express Backend</span>
             </div>
-            <h3 className="card-title">Node.js + Express API</h3>
+            <h3 className="card-title">Server Configuration</h3>
             <p className="card-detail">Target: <code>/api/v1/health</code></p>
             <div className="connection-info">
               {backendStatus.loading ? (
-                <span className="status-text loading-text">Checking backend connection...</span>
+                <span className="status-text loading-text">Validating configuration &amp; connecting...</span>
               ) : backendStatus.connected ? (
                 <div className="backend-meta">
-                  <span className="status-text success-text">&check; Backend Online & Healthy</span>
+                  <span className="status-text success-text">&check; Validated &amp; Online</span>
                   {backendStatus.data?.uptime && (
                     <small className="uptime-info">Uptime: {backendStatus.data.uptime} | Env: {backendStatus.data.environment}</small>
                   )}
@@ -97,18 +98,18 @@ function App() {
         </div>
 
         <div className="foundation-box">
-          <h3>Production Architecture Rules</h3>
+          <h3>Configuration Foundation Standards</h3>
           <ul className="arch-list">
-            <li><strong>Server-Authoritative:</strong> Prices, quotes, taxes, and exchange rates validated and calculated strictly on backend.</li>
-            <li><strong>Layered Pipeline:</strong> Route &rarr; Middleware &rarr; Controller &rarr; Service &rarr; Model / Database.</li>
-            <li><strong>Security Boundaries:</strong> Authentication, RBAC, input sanitization, rate limiting, and CORS isolation.</li>
-            <li><strong>Centralized Errors:</strong> Standardized error envelope with secure stack trace suppression in production.</li>
+            <li><strong>Zero Secrets in Code:</strong> Private variables accessed exclusively via <code>server/src/config/</code>.</li>
+            <li><strong>Environment Validation:</strong> Startup halted gracefully if required configuration fails validation.</li>
+            <li><strong>Public / Private Boundary:</strong> Frontend restricted strictly to public <code>VITE_*</code> variables and public config.</li>
+            <li><strong>Production Safe Defaults:</strong> Safe fallback defaults in development; strict validation in production.</li>
           </ul>
         </div>
       </main>
 
       <footer className="footer">
-        <p>SastoMarts Foundation &copy; {new Date().getFullYear()} &bull; Ready for next development phases</p>
+        <p>{PUBLIC_CONFIG.BRAND_NAME} Foundation &copy; {new Date().getFullYear()} &bull; Ready for next development phases</p>
       </footer>
     </div>
   );
