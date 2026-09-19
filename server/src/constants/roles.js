@@ -6,3 +6,5 @@ export const USER_ROLES = {
 };
 
 export const ALL_ROLES = Object.values(USER_ROLES);
+
+export const isValidRole = (role) => ALL_ROLES.includes(role);
