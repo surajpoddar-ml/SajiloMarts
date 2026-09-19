@@ -38,3 +38,17 @@ SastoMarts facilitates cross-border e-commerce and product sourcing between Indi
                           ↘ FAILED / EXPIRED / REFUNDED
    ```
 5. **Immutable Audit Trail**: All gateway requests, raw payloads, IP addresses, and response codes are stored in the database for compliance.
+
+---
+
+## 4. Gateway Verification & Webhook Handling Protocol
+
+### eSewa EPAY v2 Signature Flow
+- Payload parameters: `total_amount`, `transaction_uuid`, `product_code`.
+- Signature generated via HMAC-SHA256 using `ESEWA_SECRET_KEY`.
+- On callback, backend validates signature before transitioning order to `PAID`.
+
+### Khalti v2 Server Verification Flow
+- Client triggers KPG widget and receives `pidx` token.
+- Server invokes `POST https://khalti.com/api/v2/epayment/lookup/` with `Authorization: Key <secret_key>` and verifies status `Completed`.
+- Server marks order `PAID` only upon verified lookup response.
