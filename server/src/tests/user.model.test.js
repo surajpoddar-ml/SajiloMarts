@@ -276,6 +276,59 @@ export const runDuplicateEmailTests = async () => {
   console.log('✅ Duplicate email and error handling tests passed successfully');
 };
 
+/**
+ * Integration test suite for live MongoDB Atlas User persistence and lifecycle.
+ */
+export const runMongoUserIntegrationTests = async () => {
+  console.log('🧪 Running MongoDB User Integration Tests...');
+  const { connectDatabase } = await import('../database/connection.js');
+  const mongoose = (await import('mongoose')).default;
+
+  // Connect if not already connected
+  if (mongoose.connection.readyState !== 1) {
+    await connectDatabase();
+  }
+
+  const uniqueSuffix = Date.now();
+  const testEmail = `test_atlas_${uniqueSuffix}@example.com`;
+  const rawPassword = 'SecureAtlasTestPass123!';
+
+  let createdUser;
+  try {
+    // 1. Create and save user
+    createdUser = new User({
+      name: 'Atlas Test User',
+      email: testEmail,
+      password: rawPassword,
+      phone: '+977 9800000000',
+    });
+
+    const savedUser = await createdUser.save();
+    assert.ok(savedUser._id, 'Saved user must have a MongoDB ObjectId');
+    assert.ok(savedUser.password.startsWith('$2a$') || savedUser.password.startsWith('$2b$'), 'Password must be hashed on save');
+
+    // 2. Query user without password (default projection)
+    const fetchedUser = await User.findOne({ email: testEmail });
+    assert.ok(fetchedUser, 'Should find user by normalized email');
+    assert.equal(fetchedUser.password, undefined, 'Password field must not be selected by default');
+
+    // 3. Query user with explicit password selection
+    const fetchedWithPass = await User.findOne({ email: testEmail }).select('+password');
+    assert.ok(fetchedWithPass.password, 'Password field must be accessible with select(+password)');
+    const isPassValid = await fetchedWithPass.comparePassword(rawPassword);
+    assert.equal(isPassValid, true, 'comparePassword on fetched user must match plaintext');
+
+    console.log('✅ MongoDB User integration tests passed successfully');
+  } finally {
+    // Clean up test document safely
+    if (createdUser && createdUser._id) {
+      await User.deleteOne({ _id: createdUser._id });
+      console.log('🧹 Cleaned up isolated test record');
+    }
+  }
+};
+
+
 
 
 
