@@ -328,6 +328,35 @@ export const runMongoUserIntegrationTests = async () => {
   }
 };
 
+/**
+ * Test suite to confirm database indexes on the User model/collection.
+ */
+export const runIndexVerificationTests = async () => {
+  console.log('🧪 Running User Database Index Verification Tests...');
+  const { connectDatabase } = await import('../database/connection.js');
+  const mongoose = (await import('mongoose')).default;
+
+  if (mongoose.connection.readyState !== 1) {
+    await connectDatabase();
+  }
+
+  // 1. Verify schema level index definitions
+  const schemaIndexes = User.schema.indexes();
+  const emailSchemaIndex = schemaIndexes.find(([fields]) => fields.email === 1);
+  const emailPath = User.schema.path('email');
+  const isEmailUnique = emailPath.options.unique || (emailSchemaIndex && emailSchemaIndex[1]?.unique);
+  assert.ok(isEmailUnique, 'Email field must have unique index configuration in schema');
+
+  // 2. Ensure / sync indexes on Atlas collection
+  await User.syncIndexes();
+  const dbIndexes = await User.collection.indexes();
+  const hasDbEmailUniqueIndex = dbIndexes.some((idx) => idx.key.email === 1 && idx.unique === true);
+  assert.ok(hasDbEmailUniqueIndex, 'Database collection must contain unique email index');
+
+  console.log('✅ User database indexes verified successfully');
+};
+
+
 
 
 
