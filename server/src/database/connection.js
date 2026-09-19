@@ -19,6 +19,7 @@ class DatabaseConnection {
     this.connection = null;
     this.isConnected = false;
     this.eventsBound = false;
+    this.connectingPromise = null;
   }
 
   /**
@@ -75,6 +76,7 @@ class DatabaseConnection {
 
   /**
    * Connects to MongoDB Atlas / instance using configured database options.
+   * Prevents concurrent duplicated connection attempts via in-flight promise sharing.
    * @param {string} [uri] - Optional MongoDB connection string override
    * @param {object} [options] - Optional Mongoose connection options override
    * @returns {Promise<mongoose.Connection>}
@@ -82,6 +84,10 @@ class DatabaseConnection {
   async connect(uri = databaseConfig.uri, options = databaseConfig.options) {
     if (this.connection && mongoose.connection.readyState === 1) {
       return this.connection;
+    }
+
+    if (this.connectingPromise) {
+      return this.connectingPromise;
     }
 
     if (!uri) {
@@ -92,20 +98,26 @@ class DatabaseConnection {
 
     this.bindEvents();
 
-    try {
-      const conn = await mongoose.connect(uri, options);
-      this.connection = conn.connection;
-      this.isConnected = true;
-      return this.connection;
-    } catch (err) {
-      this.connection = null;
-      this.isConnected = false;
-      const safeErrorMessage = sanitizeMongoUri(err.message);
-      const connectionErr = new Error(`Failed to connect to MongoDB: ${safeErrorMessage}`);
-      connectionErr.name = 'DatabaseConnectionError';
-      connectionErr.originalError = err;
-      throw connectionErr;
-    }
+    this.connectingPromise = (async () => {
+      try {
+        const conn = await mongoose.connect(uri, options);
+        this.connection = conn.connection;
+        this.isConnected = true;
+        this.connectingPromise = null;
+        return this.connection;
+      } catch (err) {
+        this.connection = null;
+        this.isConnected = false;
+        this.connectingPromise = null;
+        const safeErrorMessage = sanitizeMongoUri(err.message);
+        const connectionErr = new Error(`Failed to connect to MongoDB: ${safeErrorMessage}`);
+        connectionErr.name = 'DatabaseConnectionError';
+        connectionErr.originalError = err;
+        throw connectionErr;
+      }
+    })();
+
+    return this.connectingPromise;
   }
 
   /**
@@ -118,6 +130,7 @@ class DatabaseConnection {
       await mongoose.disconnect();
       this.connection = null;
       this.isConnected = false;
+      this.connectingPromise = null;
       console.log('🛑 MongoDB connection closed cleanly');
     }
   }
