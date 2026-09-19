@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { config, corsOptions } from './config/index.js';
+import { config, corsOptions, appConfig } from './config/index.js';
 import apiRoutes from './routes/index.js';
-import { notFound, errorHandler, requestLogger } from './middlewares/index.js';
+import { notFound, errorHandler, requestLogger, sanitizeInput } from './middlewares/index.js';
 
 const app = express();
 
@@ -11,8 +11,9 @@ app.use(helmet());
 app.use(cors(corsOptions));
 app.use(requestLogger);
 
-app.use(express.json({ limit: '16kb' }));
-app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+app.use(express.json({ limit: appConfig.bodyLimit }));
+app.use(express.urlencoded({ extended: true, limit: appConfig.bodyLimit }));
+app.use(sanitizeInput);
 
 app.get('/', (req, res) => {
   res.json({
