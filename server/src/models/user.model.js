@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 export const USER_ROLES = {
   CUSTOMER: 'customer',
@@ -7,6 +8,7 @@ export const USER_ROLES = {
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
+const BCRYPT_SALT_ROUNDS = 12;
 
 const userSchema = new mongoose.Schema(
   {
@@ -76,6 +78,12 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+  const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 
 export const User = mongoose.model('User', userSchema);
 export default User;
