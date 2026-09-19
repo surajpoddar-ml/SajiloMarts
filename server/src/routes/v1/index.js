@@ -29,4 +29,20 @@ router.use('/coupons', couponRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/admin', adminRoutes);
 
+export const getV1RoutesList = () => [
+  '/health',
+  '/auth',
+  '/users',
+  '/products',
+  '/categories',
+  '/quotes',
+  '/orders',
+  '/payments',
+  '/shipping',
+  '/reviews',
+  '/coupons',
+  '/notifications',
+  '/admin',
+];
+
 export default router;
