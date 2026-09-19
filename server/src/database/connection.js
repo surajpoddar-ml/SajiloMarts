@@ -104,9 +104,24 @@ class DatabaseConnection {
       throw connectionErr;
     }
   }
+
+  /**
+   * Disconnects and closes the active Mongoose connection cleanly.
+   * @param {boolean} [force=false] - Force immediate close without waiting for pending ops
+   * @returns {Promise<void>}
+   */
+  async disconnect(force = false) {
+    if (mongoose.connection && mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+      this.connection = null;
+      this.isConnected = false;
+      console.log('🛑 MongoDB connection closed cleanly');
+    }
+  }
 }
 
 export const dbConnection = new DatabaseConnection();
 export const connectDatabase = (uri, options) => dbConnection.connect(uri, options);
+export const disconnectDatabase = (force) => dbConnection.disconnect(force);
 export const getDatabaseState = () => dbConnection.getState();
 export const isDatabaseConnected = () => dbConnection.isReady();
