@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { databaseConfig } from '../config/index.js';
+import { sanitizeMongoUri } from '../utils/index.js';
 
 export const MONGO_READY_STATES = {
   0: 'disconnected',
@@ -43,7 +44,8 @@ class DatabaseConnection {
 
     mongoose.connection.on('error', (err) => {
       this.isConnected = false;
-      console.error('❌ MongoDB connection error occurred:', err.message || 'Connection error');
+      const sanitizedMessage = sanitizeMongoUri(err.message || 'Connection error');
+      console.error('❌ MongoDB connection error occurred:', sanitizedMessage);
     });
 
     this.eventsBound = true;
@@ -83,7 +85,7 @@ class DatabaseConnection {
     }
 
     if (!uri) {
-      const missingUriErr = new Error('MongoDB URI is not configured in database configuration');
+      const missingUriErr = new Error('MONGODB_URI is required to initialize database connection');
       missingUriErr.name = 'DatabaseConfigurationError';
       throw missingUriErr;
     }
@@ -98,7 +100,8 @@ class DatabaseConnection {
     } catch (err) {
       this.connection = null;
       this.isConnected = false;
-      const connectionErr = new Error(`Failed to connect to MongoDB database: ${err.message}`);
+      const safeErrorMessage = sanitizeMongoUri(err.message);
+      const connectionErr = new Error(`Failed to connect to MongoDB: ${safeErrorMessage}`);
       connectionErr.name = 'DatabaseConnectionError';
       connectionErr.originalError = err;
       throw connectionErr;
