@@ -8,6 +8,7 @@ export const databaseConfig = {
     minPoolSize: 2,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
+    heartbeatFrequencyMS: 10000,
     family: 4,
   },
 };
