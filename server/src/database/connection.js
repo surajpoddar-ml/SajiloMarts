@@ -17,6 +17,36 @@ class DatabaseConnection {
   constructor() {
     this.connection = null;
     this.isConnected = false;
+    this.eventsBound = false;
+  }
+
+  /**
+   * Binds Mongoose connection event listeners.
+   */
+  bindEvents() {
+    if (this.eventsBound) return;
+
+    mongoose.connection.on('connected', () => {
+      this.isConnected = true;
+      console.log('📦 MongoDB connection established successfully');
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      this.isConnected = false;
+      console.warn('⚠️ MongoDB connection lost/disconnected');
+    });
+
+    mongoose.connection.on('reconnected', () => {
+      this.isConnected = true;
+      console.log('🔄 MongoDB connection re-established');
+    });
+
+    mongoose.connection.on('error', (err) => {
+      this.isConnected = false;
+      console.error('❌ MongoDB connection error occurred:', err.message || 'Connection error');
+    });
+
+    this.eventsBound = true;
   }
 
   /**
@@ -55,6 +85,8 @@ class DatabaseConnection {
     if (!uri) {
       throw new Error('MongoDB URI is not configured in database configuration');
     }
+
+    this.bindEvents();
 
     const conn = await mongoose.connect(uri, options);
     this.connection = conn.connection;
