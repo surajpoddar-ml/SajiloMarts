@@ -1,51 +1,62 @@
-# SastoMarts — Future Development Sequence & Roadmap
+# SastoMarts — Future Development Sequence & Engineering Roadmap
 
-This document outlines the systematic, professional implementation roadmap for SastoMarts from the current foundational phase through production launch.
-
----
-
-## 1. Sequence of Implementation
-
-```
-Foundational Layer (Prompts 1-7) — COMPLETED
-   ↓
-Phase 1: Persistence & Identity
-1. Database Integration (MongoDB connection & lifecycle management)
-2. Database Models & Schemas (Mongoose schemas & validation rules)
-3. Authentication System (JWT access/refresh tokens, password hashing)
-4. Authorization & RBAC (Role-based access control: customer, agent, admin)
-5. User & Account Management (Profiles, addresses, KYC verification)
-   ↓
-Phase 2: Sourcing Engine & Catalog
-6. Product & Category System (Catalog, variations, inventory tracking)
-7. Marketplace URL Validation (SSRF-protected link scraping & normalization)
-8. Sourcing Quote Engine (Real-time India-to-Nepal landed cost calculator)
-   ↓
-Phase 3: Commerce & Fulfillment
-9. Cart & Saved Items (Persistent server-synced customer cart)
-10. Checkout Flow (Address selection, customs documentation, delivery options)
-11. Payment Gateways (eSewa, Khalti, Fonepay, Stripe, signature verification)
-12. Orders Management (Order creation, state machine, lifecycle tracking)
-13. Cross-Border Tracking (India hub to Nepal customs to local delivery)
-14. Real-time Notifications (Email, SMS, WebSocket status updates)
-   ↓
-Phase 4: Operations & Growth
-15. Admin & Operations Dashboard (Quote reviews, catalog management, financials)
-16. Product Reviews & Ratings (Verified purchase reviews, moderation)
-17. Promotions & Coupon System (Discounts, affiliate codes, referral rules)
-18. Customer Support & Ticket System (Dispute resolution, inquiry management)
-   ↓
-Phase 5: Quality & Production
-19. Security Hardening & Audit (Rate limiting, helmet, SSRF lockdown, audit logs)
-20. Automated Testing Suite (Unit tests, integration tests, E2E flows)
-21. Production Deployment & Cloudflare Setup (CI/CD, CDN, SSL, Atlas, monitoring)
-```
+This document outlines the systematic 36-step production implementation sequence for SastoMarts from the current foundational architecture through production launch.
 
 ---
 
-## 2. Guiding Architectural Principles
+## 1. Complete 36-Step Implementation Roadmap
 
-- **Strict Isolation**: Each prompt focuses exclusively on its designated milestone.
-- **No Early Assumptions**: Features are built only when their prerequisites are fully tested and stable.
-- **JavaScript Only**: All code across all future stages will remain standard JavaScript (`.js`, `.jsx`).
-- **Clean Root Constraint**: All future files will reside exclusively inside `client/` and `server/`.
+```text
+Phase 1: Persistence, Identity & Access (Prompts 8-13)
+  1. MongoDB Atlas setup & cluster provisioning
+  2. Database connection foundation & lifecycle handling
+  3. Database models & Mongoose schemas
+  4. Authentication system (JWT, password hashing)
+  5. Role-Based Access Control (RBAC)
+  6. User profile and account management
+
+Phase 2: Product Catalog & Sourcing Engine (Prompts 14-19)
+  7. Category hierarchy and customs taxonomy
+  8. Product catalog and inventory management
+  9. Marketplace URL validation & SSRF protection
+ 10. Sourcing quote calculation engine (INR-to-NPR peg)
+ 11. Sourcing quote approval & adjustment workflow
+ 12. Cart and saved items system
+
+Phase 3: Commerce & Payment Integrations (Prompts 20-26)
+ 13. Checkout flow and address validation
+ 14. eSewa payment gateway integration
+ 15. Khalti payment gateway integration
+ 16. Direct bank transfer & receipt upload
+ 17. Cash on Delivery (COD) verification
+ 18. Payment webhook listeners & HMAC verification
+ 19. Order creation and management system
+
+Phase 4: Operations, Logistics & Engagement (Prompts 27-34)
+ 20. Order state machine & transition rules
+ 21. Cross-border package tracking system
+ 22. Notification engine (Email, SMS)
+ 23. Admin operations dashboard
+ 24. Product reviews and rating system
+ 25. Promotional coupon and discount system
+ 26. Customer support and ticketing system
+ 27. Administrative audit logging
+
+Phase 5: Quality, Hardening & Deployment (Prompts 35-42)
+ 28. Comprehensive security audit
+ 29. Automated unit, integration, and E2E testing
+ 30. Performance optimization and caching
+ 31. Search Engine Optimization (SEO)
+ 32. Accessibility (a11y) WCAG AA compliance
+ 33. Production cloud deployment
+ 34. Custom domain configuration
+ 35. Cloudflare CDN, SSL & WAF setup
+ 36. Final production audit and readiness certification
+```
+
+---
+
+## 2. Core Implementation Directives
+- **Zero Premature Implementations**: Features are built strictly within their designated roadmap phase.
+- **JavaScript Only**: Every phase preserves the strict standard pure JavaScript (`.js`, `.jsx`) invariant.
+- **Continuous Quality**: Every step requires verification of build, lint, health check, and security before merging.
