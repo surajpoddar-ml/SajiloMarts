@@ -12,7 +12,9 @@ export const getSystemHealth = () => {
     service: 'SastoMarts Backend API',
     database: {
       status: dbState.status,
+      code: dbState.code,
       connected: dbState.isConnected,
+      ready: dbState.isConnected,
     },
   };
 };
