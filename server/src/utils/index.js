@@ -1,5 +1,6 @@
 export * from './apiResponse.js';
 export * from './apiError.js';
+export * from './configError.js';
 export * from './badRequestError.js';
 export * from './unauthorizedError.js';
 export * from './forbiddenError.js';
