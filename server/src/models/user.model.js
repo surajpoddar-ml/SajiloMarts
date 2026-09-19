@@ -5,6 +5,8 @@ export const USER_ROLES = {
   ADMIN: 'admin',
 };
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -25,6 +27,12 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Email address is required'],
       trim: true,
       lowercase: true,
+      validate: {
+        validator: function (v) {
+          return EMAIL_REGEX.test(v);
+        },
+        message: 'Please provide a valid email address',
+      },
     },
     password: {
       type: String,
