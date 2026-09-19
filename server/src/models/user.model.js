@@ -11,6 +11,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'User name is required'],
       trim: true,
+      minlength: [2, 'Name must be at least 2 characters long'],
+      maxlength: [100, 'Name cannot exceed 100 characters'],
+      validate: {
+        validator: function (v) {
+          return typeof v === 'string' && v.trim().length >= 2;
+        },
+        message: 'Name cannot be empty or whitespace only',
+      },
     },
     email: {
       type: String,
