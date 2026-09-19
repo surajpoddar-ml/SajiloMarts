@@ -1,5 +1,13 @@
 import app from './app.js';
-import { config } from './config/index.js';
+import { config, validateEnvironment } from './config/index.js';
+
+try {
+  validateEnvironment();
+} catch (error) {
+  console.error('CRITICAL: Environment validation failed!');
+  console.error(error.message);
+  process.exit(1);
+}
 
 const PORT = config.port;
 
