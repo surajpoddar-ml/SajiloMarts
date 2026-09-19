@@ -1,8 +1,9 @@
 export class ApiResponse {
-  constructor(statusCode, data, message = 'Success') {
+  constructor(statusCode, data = null, message = 'Success') {
     this.success = statusCode < 400;
     this.statusCode = statusCode;
     this.message = message;
     this.data = data;
+    this.timestamp = new Date().toISOString();
   }
 }
