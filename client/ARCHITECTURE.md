@@ -1,47 +1,50 @@
-# Client Architecture & Development Guide
+# Client Architecture & Engineering Guidelines
 
-## Architectural Flow
+---
+
+## 1. Architectural Flow
 ```text
 React Page (Route View)
       ↓
 Reusable UI Components (common / layout / feedback / forms)
       ↓
-Custom Hooks / Services Layer (http, healthService, storage)
+Custom Hooks / Client State
+      ↓
+API Services Layer (http, apiClient)
       ↓
 Backend REST API (/api/v1/*)
 ```
 
-## Folder Responsibilities
+---
 
-### `src/components/`
-- **`common/`**: Reusable primitive UI elements (Buttons, Inputs, StatusCards, Badges, Modals). Focused strictly on presentation and user interaction.
-- **`layout/`**: Structural layout components (Header, Footer, Navigation Bar, Sidebar).
-- **`feedback/`**: Notification toasts, alert banners, loading spinners, skeleton placeholders.
-- **`forms/`**: Input fields, search bars, filter groups, validation feedback wrappers.
+## 2. Directory Mapping & Layer Responsibilities
 
-### `src/pages/`
-Route-level components that compose reusable components together to form complete views (Home, Shop, Quotes, Cart, Checkout, Orders, Account, Admin).
+| Area | Status | Primary Responsibility |
+| :--- | :--- | :--- |
+| **`src/components/`** | **Implemented** | Reusable presentation UI elements (common buttons, inputs, cards, layouts, feedback modals). |
+| **`src/pages/`** | **Implemented** | Route-level view composition connecting components, hooks, and services into full screens. |
+| **`src/layouts/`** | **Implemented** | Structural shells (Header, Footer, Navigation, Dashboard Sidebars). |
+| **`src/hooks/`** | **Implemented** | Reusable React stateful logic (custom hooks for network calls, debouncing, local storage). |
+| **`src/services/`** | **Implemented** | Network communication abstraction (`apiClient.js`, `http.js`, domain API clients). |
+| **`src/state/`** | **Planned** | Global application state management (cart context, auth session store, notification queue). |
+| **`src/utils/`** | **Implemented** | Pure stateless helper functions (currency formatters, date utilities, string sanitizers). |
+| **`src/constants/`** | **Implemented** | Static constants (route definitions, API endpoints, app storage keys, UI theme tokens). |
+| **`src/validation/`** | **Planned** | Client-side form validation schemas (Zod/custom validators) for fast user feedback. |
+| **`src/auth/`** | **Planned** | Client-side authentication tokens, session listeners, and route protection guards. |
 
-### `src/services/`
-The centralized network layer:
-- `apiClient.js`: Low-level fetch wrapper with bearer token injection and error interception.
-- `http.js`: High-level convenience methods (`http.get`, `http.post`, `http.put`, `http.patch`, `http.delete`).
-- `health.service.js`: Domain-specific API service modules.
+---
 
-### `src/hooks/`
-Reusable stateful logic (e.g., `useDebounce`, `useLocalStorage`, `useMediaQuery`).
+## 3. Strict Non-Authoritative Client Boundary Rule
 
-### `src/config/`
-Public client configuration, environment flag readers (`env.js`), public feature toggles (`features.js`), and branding definitions (`public.js`).
+> [!IMPORTANT]
+> **The frontend must NEVER be considered authoritative for security-sensitive business rules.**
 
-### `src/constants/`
-System constants including route paths (`routes.js`), endpoint URIs (`apiEndpoints.js`), and app storage keys (`appConstants.js`).
+The browser client is strictly a presentation and interaction layer. It must **never** be trusted as the source of truth for:
+- Product prices or quote landed-cost calculations.
+- Exchange rate calculations (INR to NPR conversion must be verified by backend).
+- User permissions, roles, or authorization status.
+- Payment status, gateway transaction verification, or invoice totals.
+- Discount amounts, promo codes, or referral earnings.
+- Final order confirmation amounts and shipping tariffs.
 
-### `src/utils/`
-Pure utility functions (currency conversions, date formatters, phone validators, local storage managers).
-
-## Development Workflow for New Frontend Features
-1. **Create Service:** Add domain API caller in `src/services/[domain].service.js` using `http`.
-2. **Create Components:** Build small, focused presentation components in `src/components/common/` or `src/components/layout/`.
-3. **Assemble Page:** Create route view in `src/pages/[Feature]/[Feature].jsx`.
-4. **Register Route:** Add URL mapping in `src/constants/routes.js` and `src/routes/AppRoutes.jsx`.
+All security-sensitive validations, computations, and state changes are computed and verified server-side.
