@@ -1,6 +1,6 @@
 import app from './app.js';
 import { config, validateEnvironment } from './config/index.js';
-import { connectDatabase } from './database/index.js';
+import { connectDatabase, disconnectDatabase } from './database/index.js';
 
 try {
   validateEnvironment();
@@ -26,16 +26,29 @@ const startServer = async () => {
       console.log(`=================================`);
     });
 
-    process.on('unhandledRejection', (err) => {
-      console.error('UNHANDLED REJECTION! 💥 Shutting down gracefully...', err);
-      server.close(() => {
-        process.exit(1);
+    const shutdown = async (signal, exitCode = 0) => {
+      console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
+      server.close(async () => {
+        console.log('🔌 HTTP server closed.');
+        try {
+          await disconnectDatabase();
+          console.log('✨ All resources released cleanly. Exiting.');
+          process.exit(exitCode);
+        } catch (dbErr) {
+          console.error('Error during database disconnect:', dbErr.message);
+          process.exit(1);
+        }
       });
+    };
+
+    process.on('unhandledRejection', async (err) => {
+      console.error('UNHANDLED REJECTION! 💥 Shutting down gracefully...', err);
+      await shutdown('unhandledRejection', 1);
     });
 
-    process.on('uncaughtException', (err) => {
+    process.on('uncaughtException', async (err) => {
       console.error('UNCAUGHT EXCEPTION! 💥 Shutting down immediately...', err);
-      process.exit(1);
+      await shutdown('uncaughtException', 1);
     });
 
     return server;
