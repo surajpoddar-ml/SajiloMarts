@@ -80,6 +80,8 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    strict: true,
+    strictQuery: true,
     toJSON: {
       transform: function (doc, ret) {
         delete ret.password;
