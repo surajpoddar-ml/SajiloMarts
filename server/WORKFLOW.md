@@ -8,3 +8,13 @@
 5. **No Force Push:** Never run `git push --force` or rewrite published remote history.
 6. **Pre-Push Quality Verification:** Always test `npm run build`, `npm run lint`, and verify backend health before pushing.
 7. **Clean Push:** Push completed commits to the configured remote repository on the active branch.
+
+## Commit Message Standards
+- **Style:** Direct, plain English description of what was accomplished.
+- **Convention:** Do NOT use conventional prefixes (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`, `style:`, `test:`).
+- **Good Examples:**
+  - `Add database configuration`
+  - `Create user model`
+  - `Improve authentication validation`
+  - `Update order service`
+  - `Document API structure`
