@@ -1,4 +1,4 @@
-# Client Architecture
+# Client Architecture & Development Guide
 
 ## Architectural Flow
 ```text
@@ -39,3 +39,9 @@ System constants including route paths (`routes.js`), endpoint URIs (`apiEndpoin
 
 ### `src/utils/`
 Pure utility functions (currency conversions, date formatters, phone validators, local storage managers).
+
+## Development Workflow for New Frontend Features
+1. **Create Service:** Add domain API caller in `src/services/[domain].service.js` using `http`.
+2. **Create Components:** Build small, focused presentation components in `src/components/common/` or `src/components/layout/`.
+3. **Assemble Page:** Create route view in `src/pages/[Feature]/[Feature].jsx`.
+4. **Register Route:** Add URL mapping in `src/constants/routes.js` and `src/routes/AppRoutes.jsx`.
