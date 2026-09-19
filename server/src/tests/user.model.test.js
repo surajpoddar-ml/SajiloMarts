@@ -145,4 +145,39 @@ export const runPasswordProtectionTests = async () => {
   console.log('✅ Password protection and hashing tests passed successfully');
 };
 
+/**
+ * Unit test suite for safe User serialization (toJSON / toObject transforms).
+ */
+export const runSerializationTests = async () => {
+  console.log('🧪 Running User Serialization Tests...');
+
+  const user = new User({
+    name: 'Manish Adhikari',
+    email: 'manish@example.com',
+    password: 'SecretPassword123!',
+    phone: '+977 9812345678',
+    role: 'customer',
+  });
+
+  // Test toJSON transform
+  const userJson = user.toJSON();
+  assert.equal(userJson.password, undefined, 'toJSON must strip password');
+  assert.equal(userJson.__v, undefined, 'toJSON must strip __v');
+  assert.equal(userJson.name, 'Manish Adhikari', 'toJSON must preserve name');
+  assert.equal(userJson.email, 'manish@example.com', 'toJSON must preserve email');
+  assert.equal(userJson.role, 'customer', 'toJSON must preserve role');
+  assert.equal(userJson.isActive, true, 'toJSON must preserve isActive');
+  assert.equal(userJson.isEmailVerified, false, 'toJSON must preserve isEmailVerified');
+  assert.equal(userJson.phone, '+977 9812345678', 'toJSON must preserve phone');
+
+  // Test toObject transform
+  const userObj = user.toObject();
+  assert.equal(userObj.password, undefined, 'toObject must strip password');
+  assert.equal(userObj.__v, undefined, 'toObject must strip __v');
+  assert.equal(userObj.email, 'manish@example.com', 'toObject must preserve email');
+
+  console.log('✅ User serialization tests passed successfully');
+};
+
+
 
