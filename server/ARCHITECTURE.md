@@ -59,3 +59,34 @@ HTTP Standardized Response (ApiResponse / ApiError)
 ### 5. Model / Database Layer (`src/models/`) — *Planned*
 - **Responsibility:** Defines Mongoose schemas, data types, indexes, relational references, and validation rules for persistent MongoDB collections.
 - **Strict Prohibition:** Models must not be accessed directly by controllers. All database interactions will flow through domain services.
+
+---
+
+## 3. Server Request Lifecycle & Authoritative Execution Flow
+
+```text
+Incoming HTTP Request
+      ↓
+Route Matching (/api/v1/<domain>)
+      ↓
+Security Middleware (Helmet, CORS validation, Rate limiting)
+      ↓
+Authentication & RBAC Middleware (Extract JWT, verify signature, hydrate user role)
+      ↓
+Input Validation Middleware (Schema validation on req.body, req.query, req.params)
+      ↓
+Controller Orchestration (Extract clean parameters, invoke domain service)
+      ↓
+Domain Service Business Logic (Authoritative calculations: landed cost, peg rate, order total)
+      ↓
+Database / External API Layer (MongoDB queries via Mongoose / gateway webhooks)
+      ↓
+Response Formatting (Dispatched via ApiResponse envelope with HTTP status)
+```
+
+### Server-Owned Authoritative Responsibilities
+1. **Pricing Calculations**: Landed cost calculations in NPR, INR conversion (1.6 peg), customs tariffs, weight-based logistics fees.
+2. **Quote Generation**: Validating marketplace URL items and producing guaranteed pricing quotes.
+3. **Order State Machine**: Enforcing valid state transitions (`PENDING` → `CONFIRMED` → `IN_TRANSIT` → `DELIVERED`).
+4. **Payment Integrity**: Verifying webhook HMAC signatures and reconciling payment transactions.
+5. **Role & Permission Enforcement**: Validating admin actions, staff privileges, and customer data boundaries.
