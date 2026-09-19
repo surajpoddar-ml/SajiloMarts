@@ -41,6 +41,14 @@ HTTP Standardized Response (ApiResponse / ApiError)
 ### 5. Model Layer (`src/models/`) *(Future)*
 - Defines schema structures, indexes, and persistence methods for MongoDB collections.
 
+## Application Responsibility Boundaries
+
+| System Layer | Core Responsibilities | Prohibited Actions |
+| :--- | :--- | :--- |
+| **Browser (Client)** | Render UI, capture interactions, manage local UI state, call REST API | Direct DB access, pricing authority, secret storage |
+| **Server (API)** | Authentication, RBAC, validation, pricing authority, quote math, tax estimation, order state transitions | Trusting unvalidated client calculations, exposing stack traces |
+| **Database (Data)** | Durable data persistence, indexed queries, relational document integrity | Direct exposure to public internet |
+
 ## Development Workflow for New Backend Endpoints
 1. **Define Service Method:** Write business logic in `src/services/[domain].service.js`.
 2. **Define Controller:** Handle `req`/`res` in `src/controllers/[domain].controller.js` using `asyncHandler`.
