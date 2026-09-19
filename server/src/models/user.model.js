@@ -70,6 +70,7 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      required: true,
     },
     isEmailVerified: {
       type: Boolean,
