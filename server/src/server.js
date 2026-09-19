@@ -6,7 +6,7 @@ try {
   validateEnvironment();
 } catch (error) {
   console.error('CRITICAL: Environment validation failed!');
-  console.error(error.message);
+  console.error(`- ${error.message}`);
   process.exit(1);
 }
 
@@ -40,7 +40,12 @@ const startServer = async () => {
 
     return server;
   } catch (error) {
-    console.error('CRITICAL: Server initialization error:', error.message);
+    if (error.name === 'DatabaseConnectionError' || error.name === 'DatabaseConfigurationError') {
+      console.error('CRITICAL DATABASE STARTUP ERROR:');
+      console.error(`- ${error.message}`);
+    } else {
+      console.error('CRITICAL SERVER STARTUP ERROR:', error.message);
+    }
     process.exit(1);
   }
 };
