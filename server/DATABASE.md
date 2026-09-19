@@ -32,3 +32,15 @@
 1. **Compound Indexing**: Frequently queried compound keys (e.g. `{ userId: 1, createdAt: -1 }` on `Order` and `Quote`) will be indexed for fast retrieval.
 2. **Unique Constraints**: Unique indexes on `User.email`, `Order.orderNumber`, `Coupon.code`, and `Category.slug`.
 3. **Soft Deletes**: Key records (`User`, `Product`, `Order`) will use soft-deletion flags (`deletedAt`) to preserve historical audit integrity.
+
+---
+
+## 4. Entity Relationships & Document Flow
+```text
+User (1) ─── has many ───> Address (N)
+User (1) ─── requests ───> Quote (N)
+User (1) ─── places ─────> Order (N) ─── has one ───> Payment (1)
+                                      └── has many ──> Review (N)
+Category (1) ─── categorizes ───> Product (N)
+```
+- **Embedding vs Referencing**: High-cardinality items (e.g. `Order.items`) are embedded as sub-documents with snapshot pricing to preserve historical integrity even if base product catalog prices change.
