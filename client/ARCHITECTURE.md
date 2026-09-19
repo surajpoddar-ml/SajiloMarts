@@ -48,3 +48,23 @@ The browser client is strictly a presentation and interaction layer. It must **n
 - Final order confirmation amounts and shipping tariffs.
 
 All security-sensitive validations, computations, and state changes are computed and verified server-side.
+
+---
+
+## 4. Client Request Lifecycle & User Interaction Flow
+
+```text
+User Interaction (e.g. submit quote form, click checkout)
+      ↓
+Client-Side Validation (instant UX feedback on required fields, formats)
+      ↓
+Service / API Request (dispatched via src/services/* with auth headers)
+      ↓
+Loading State (spinners, skeletons, button disabled to prevent duplicate submit)
+      ↓
+Server Response (standardized JSON ApiResponse or ApiError)
+      ↓
+Success / Error Handling (toast alert, error boundary, or redirection)
+      ↓
+UI State Update (re-render React view with updated server data)
+```
