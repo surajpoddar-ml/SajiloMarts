@@ -65,6 +65,7 @@ const userSchema = new mongoose.Schema(
         message: '{VALUE} is not a supported account role',
       },
       default: USER_ROLES.CUSTOMER,
+      required: true,
     },
     isActive: {
       type: Boolean,
