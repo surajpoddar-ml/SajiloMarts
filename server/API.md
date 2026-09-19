@@ -82,3 +82,17 @@ Standardized pagination metadata will be included in the envelope:
   }
 }
 ```
+
+---
+
+## 5. Endpoints Evaluation & Status
+
+| Route Path | HTTP Method | Implementation Status | Purpose |
+| :--- | :--- | :--- | :--- |
+| `/api/v1/health` | `GET` | **Implemented** | System health, server uptime, environment info. |
+| `/api/v1/auth/register` | `POST` | *Planned* | Customer account registration. |
+| `/api/v1/auth/login` | `POST` | *Planned* | User credential authentication. |
+| `/api/v1/quotes` | `POST` | *Planned* | Indian marketplace URL quote calculation. |
+| `/api/v1/products` | `GET` | *Planned* | Sourced Indian products catalog query. |
+| `/api/v1/orders` | `POST` | *Planned* | Cross-border order checkout and creation. |
+| `/api/v1/payments/initiate`| `POST` | *Planned* | eSewa/Khalti payment payload initialization. |
