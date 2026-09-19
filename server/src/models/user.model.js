@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: Object.values(USER_ROLES),
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 export const User = mongoose.model('User', userSchema);
