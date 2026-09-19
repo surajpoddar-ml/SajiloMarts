@@ -14,8 +14,10 @@ const PORT = config.port;
 
 const startServer = async () => {
   try {
+    console.log('⏳ Connecting to MongoDB Atlas / Database...');
     await connectDatabase();
-    
+    console.log('✅ Database connection verified');
+
     const server = app.listen(PORT, () => {
       console.log(`=================================`);
       console.log(`🚀 SastoMarts Backend Running!`);
