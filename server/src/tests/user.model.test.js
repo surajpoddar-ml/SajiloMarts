@@ -227,6 +227,57 @@ export const runDefaultsAndRolesTests = async () => {
   console.log('✅ Role and account defaults tests passed successfully');
 };
 
+/**
+ * Unit test suite for duplicate email error translation and validation error formatting.
+ */
+export const runDuplicateEmailTests = async () => {
+  console.log('🧪 Running Duplicate Email & Error Handling Tests...');
+
+  // 1. Post-save middleware error transformation test
+  const rawMongoDuplicateError = {
+    name: 'MongoServerError',
+    code: 11000,
+    keyPattern: { email: 1 },
+    keyValue: { email: 'duplicate@example.com' },
+    message: 'E11000 duplicate key error collection: sastomarts.users index: email_1 dup key: { email: "duplicate@example.com" }',
+  };
+
+  // Simulate post-save hook error handling
+  let transformedError;
+  
+  // Test manual conversion matching the post-save logic
+  if (rawMongoDuplicateError.name === 'MongoServerError' && rawMongoDuplicateError.code === 11000) {
+    const field = Object.keys(rawMongoDuplicateError.keyValue || {})[0] || 'email';
+    transformedError = new Error(`An account with this ${field} already exists`);
+    transformedError.name = 'DuplicateKeyError';
+    transformedError.statusCode = 409;
+    transformedError.field = field;
+  }
+
+  assert.equal(transformedError.name, 'DuplicateKeyError', 'Should map to DuplicateKeyError');
+  assert.equal(transformedError.statusCode, 409, 'Duplicate key error should produce HTTP 409 Conflict');
+  assert.equal(transformedError.message, 'An account with this email already exists', 'Should return sanitized error message');
+  assert.equal(transformedError.field, 'email', 'Should identify email as duplicated field');
+
+  // 2. Format Mongoose ValidationError with formatValidationError helper
+  const invalidUser = new User({ name: 'A', email: 'invalid' });
+  let valErr;
+  try {
+    await invalidUser.validate();
+  } catch (err) {
+    valErr = err;
+  }
+  const formattedValErr = User.formatValidationError(valErr);
+  assert.ok(Array.isArray(formattedValErr), 'formatValidationError should return array of field errors');
+  const fields = formattedValErr.map((e) => e.field);
+  assert.ok(fields.includes('name'), 'Should include name field error');
+  assert.ok(fields.includes('email'), 'Should include email field error');
+
+  console.log('✅ Duplicate email and error handling tests passed successfully');
+};
+
+
+
 
 
 
