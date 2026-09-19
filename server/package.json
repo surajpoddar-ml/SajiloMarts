@@ -7,14 +7,16 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "lint": "node --check src/server.js src/app.js"
+    "lint": "node --check src/server.js src/app.js src/database/connection.js"
   },
   "keywords": [
     "ecommerce",
     "sourcing",
     "india-nepal",
     "mern",
-    "express"
+    "express",
+    "mongoose",
+    "mongodb"
   ],
   "author": "",
   "license": "ISC",
