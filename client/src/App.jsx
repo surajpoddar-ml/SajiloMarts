@@ -11,20 +11,20 @@ const ARCHITECTURE_RULES = [
     description: 'Strict pure JavaScript (ES2022+ / JSX) across frontend and backend layers.',
   },
   {
-    label: 'Single Responsibility',
-    description: 'Separation of concerns across Pages, UI Components, Custom Hooks, and API Services.',
+    label: 'Architectural Boundaries',
+    description: 'Separation of concerns across UI Presentation, Layered Server API, and MongoDB persistence.',
   },
   {
     label: 'Server Authoritative',
-    description: 'Critical business rules, calculations, and exchange rates enforced server-side.',
+    description: 'Critical business rules, quote calculations, and INR-to-NPR peg conversions enforced server-side.',
   },
   {
     label: 'Centralized Configuration',
     description: 'Zero hardcoded secrets, validated runtime environments, and public/private scope isolation.',
   },
   {
-    label: 'Code Quality Controls',
-    description: 'Centralized error handling, standard API envelopes, lightweight linting, and formatting rules.',
+    label: 'Documentation & Workflow',
+    description: 'Institutionalized Git standards, security guidelines, and 36-step future implementation roadmap.',
   },
 ];
 
