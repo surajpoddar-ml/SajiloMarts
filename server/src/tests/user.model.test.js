@@ -388,6 +388,40 @@ export const runSecurityHardeningTests = async () => {
   console.log('✅ Security hardening tests passed successfully');
 };
 
+/**
+ * Master test runner executing all unit and integration test suites.
+ */
+export const runAllUserTests = async () => {
+  console.log('====================================================');
+  console.log('🚀 Executing Complete User Model Test Suite');
+  console.log('====================================================');
+
+  await runUserValidationTests();
+  await runEmailNormalizationTests();
+  await runPasswordProtectionTests();
+  await runSerializationTests();
+  await runDefaultsAndRolesTests();
+  await runDuplicateEmailTests();
+  await runSecurityHardeningTests();
+  await runMongoUserIntegrationTests();
+  await runIndexVerificationTests();
+
+  console.log('====================================================');
+  console.log('🎉 All User Model unit & Atlas integration tests PASSED!');
+  console.log('====================================================');
+};
+
+// Auto-run if executed directly via node
+if (process.argv[1]?.includes('user.model.test.js')) {
+  runAllUserTests()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('❌ Test suite failed:', err);
+      process.exit(1);
+    });
+}
+
+
 
 
 
