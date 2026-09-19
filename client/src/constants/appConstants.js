@@ -12,5 +12,13 @@ export const APP_CONSTANTS = {
   PAGINATION: {
     DEFAULT_PAGE: 1,
     DEFAULT_LIMIT: 20,
+    MAX_LIMIT: 100,
+  },
+  HTTP_METHODS: {
+    GET: 'GET',
+    POST: 'POST',
+    PUT: 'PUT',
+    PATCH: 'PATCH',
+    DELETE: 'DELETE',
   },
 };
