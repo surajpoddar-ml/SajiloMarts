@@ -22,6 +22,18 @@ export const validateEnvironment = () => {
     missingKeys.push('CLIENT_URL');
   }
 
+  // Validate MongoDB Connection URI Settings
+  if (!envConfig.mongodbUri) {
+    errors.push('MONGODB_URI is required for database connectivity (e.g. mongodb+srv://... or mongodb://localhost:27017/...)');
+    missingKeys.push('MONGODB_URI');
+  } else if (
+    !envConfig.mongodbUri.startsWith('mongodb://') &&
+    !envConfig.mongodbUri.startsWith('mongodb+srv://')
+  ) {
+    errors.push('MONGODB_URI must start with "mongodb://" or "mongodb+srv://"');
+    missingKeys.push('MONGODB_URI');
+  }
+
   if (errors.length > 0) {
     throw new ConfigError(
       `Environment validation failed:\n- ${errors.join('\n- ')}`,
