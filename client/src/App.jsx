@@ -70,13 +70,13 @@ function App() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 7 &bull; Internal Documentation &amp; Workflow Foundation"
+        stepLabel="Prompt 8 &bull; MongoDB Atlas &amp; Mongoose Database Foundation"
       />
 
       <main className="hero-section">
         <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
         <p className="subtitle">
-          Internal documentation, developer workflows, security principles, API standards, and roadmap foundations established.
+          MongoDB Atlas &amp; Mongoose database lifecycle, connection pooling, graceful shutdown, and database health check integration established.
         </p>
 
         <div className="status-card-grid">
