@@ -1,17 +1,46 @@
-# Authentication & Authorization Planning Guide
+# Authentication & Access Control Architecture Strategy
 
-> **Current Status:** Planned for future prompt. Authentication is NOT currently implemented in the active codebase.
+> **Current Status:** Architecture & Design Phase (Auth is NOT yet implemented in code).
 
-## Planned Authentication Architecture
-1. **Password Security:** Passwords hashed with bcrypt (salt rounds: 10) before persisting to database.
-2. **Access Tokens:** Short-lived JSON Web Tokens (15-minute expiry) passed in the `Authorization: Bearer <token>` header.
-3. **Refresh Tokens:** Long-lived tokens (7-day expiry) stored securely for session renewal.
-4. **Token Revocation:** Database or Redis blacklist checking for invalidated refresh tokens.
+---
 
-## Planned Authorization (RBAC) Architecture
-- **Roles:**
-  - `customer`: Default role. Can view catalog, request quotes, manage own cart, checkout, view own orders.
-  - `vendor`: Can manage inventory and fulfill allocated sourcing items.
-  - `sourcing_agent`: Can evaluate sourcing quotes, verify Indian marketplace prices, and input customs calculations.
-  - `admin`: Full system access, pricing overrides, audit logs, and user management.
-- **Middleware Guard:** `requireAuth` verifies token validity; `requireRole(...allowedRoles)` enforces role permissions before controller execution.
+## 1. Authentication Lifecycle & Token Strategy
+
+```text
+User Registration / Login Request
+      ↓
+Password Hashing / Comparison (bcrypt work factor 12)
+      ↓
+JWT Access Token (15 min TTL) + Secure Refresh Token (7 days TTL)
+      ↓
+Access Token returned in JSON response payload
+Refresh Token stored in Secure, httpOnly, SameSite=Strict Cookie
+      ↓
+Authenticated API Requests (Bearer Token header in client services)
+      ↓
+Auth Middleware Verification (Decodes payload, verifies signature, hydrates req.user)
+```
+
+---
+
+## 2. Security Controls & Credential Safety
+1. **Zero Plaintext Passwords**: Passwords hashed using bcrypt with salt rounds 12 prior to database storage.
+2. **Token Rotation**: Each refresh request issues a new refresh token and invalidates the previous one to detect token theft.
+3. **Session Revocation**: User logout or password reset clears the refresh token cookie and blacklists active session IDs.
+4. **Password Reset Flow**: Time-limited (15-minute), cryptographically signed single-use reset tokens dispatched via email.
+
+---
+
+## 3. Role-Based Access Control (RBAC) Strategy
+
+| Role | Access Permissions |
+| :--- | :--- |
+| **`customer`** | Search products, submit quote URLs, manage cart, checkout, view own orders and tracking. |
+| **`sourcing_agent`** | Review pending Indian marketplace quote requests, adjust logistics rates, verify supplier links. |
+| **`admin`** | Full platform management: user administration, pricing overrides, financial analytics, audit logs. |
+
+---
+
+## 4. Planned Middleware Pipeline
+- `authenticate`: Extracts Bearer token, validates cryptographic signature using `JWT_SECRET`, checks token expiration, and attaches `req.user`.
+- `authorize(...roles)`: Verifies if `req.user.role` matches allowed roles for the targeted route; returns HTTP 403 Forbidden on mismatch.
