@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiClient } from './services/api';
 import './App.css';
 
 function App() {
@@ -9,16 +10,10 @@ function App() {
     error: null,
   });
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
-
   const checkHealth = async () => {
     setBackendStatus((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const response = await fetch(`${apiBaseUrl}/health`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const json = await response.json();
+      const json = await apiClient('/health');
       setBackendStatus({
         loading: false,
         connected: true,
@@ -46,7 +41,7 @@ function App() {
           <span className="logo-dot"></span>
           <span className="logo-text">SastoMarts</span>
         </div>
-        <span className="step-pill">Prompt 1 of 100 &bull; Project Foundation</span>
+        <span className="step-pill">Prompt 2 of 100 &bull; Architecture &amp; Folder Structure</span>
       </header>
 
       <main className="hero-section">
@@ -54,7 +49,7 @@ function App() {
           India &rarr; Nepal Cross-Border E-Commerce & Sourcing
         </h1>
         <p className="subtitle">
-          Production-grade MERN architecture foundation initialized successfully. Clean separation of frontend and backend services.
+          Modular, scalable architecture established. Clean separation of responsibilities across frontend and backend layers.
         </p>
 
         <div className="status-card-grid">
@@ -66,8 +61,8 @@ function App() {
             <h3 className="card-title">Vite + React (SPA)</h3>
             <p className="card-detail">Running on <code>http://localhost:5173</code></p>
             <div className="badge-list">
-              <span className="badge">Clean Component Architecture</span>
-              <span className="badge">Vite HMR</span>
+              <span className="badge">Modular Folder Structure</span>
+              <span className="badge">API Client Service Layer</span>
             </div>
           </div>
 
@@ -77,7 +72,7 @@ function App() {
               <span className="card-tag">Express Backend</span>
             </div>
             <h3 className="card-title">Node.js + Express API</h3>
-            <p className="card-detail">Target: <code>{apiBaseUrl}/health</code></p>
+            <p className="card-detail">Target: <code>/api/v1/health</code></p>
             <div className="connection-info">
               {backendStatus.loading ? (
                 <span className="status-text loading-text">Checking backend connection...</span>
@@ -105,9 +100,9 @@ function App() {
           <h3>Architecture Highlights</h3>
           <ul className="arch-list">
             <li><strong>Root Isolation:</strong> Strict root containing only <code>client/</code>, <code>server/</code>, and <code>.gitignore</code>.</li>
-            <li><strong>Modular Backend:</strong> Layered MVC architecture (Routes &rarr; Controllers &rarr; Services &rarr; Middlewares &rarr; Config).</li>
-            <li><strong>Security First:</strong> Helmet security headers, CORS origin whitelist, standardized error and response wrappers.</li>
-            <li><strong>Zero Hardcoded Secrets:</strong> Configured via environment variables with template definitions.</li>
+            <li><strong>Backend Pipeline:</strong> Route &rarr; Controller &rarr; Service &rarr; Model / Database.</li>
+            <li><strong>Frontend Organization:</strong> Components, Pages, Services, Context, Hooks, Utils, Constants.</li>
+            <li><strong>Zero Business Logic Leaks:</strong> Business rules isolated strictly in backend Services.</li>
           </ul>
         </div>
       </main>
