@@ -44,3 +44,18 @@ Auth Middleware Verification (Decodes payload, verifies signature, hydrates req.
 ## 4. Planned Middleware Pipeline
 - `authenticate`: Extracts Bearer token, validates cryptographic signature using `JWT_SECRET`, checks token expiration, and attaches `req.user`.
 - `authorize(...roles)`: Verifies if `req.user.role` matches allowed roles for the targeted route; returns HTTP 403 Forbidden on mismatch.
+
+---
+
+## 5. JWT Payload Claims & Verification Specification
+```json
+{
+  "sub": "65f2a1b9e4b0a1a2c3d4e5f6",
+  "email": "user@example.com",
+  "role": "customer",
+  "sessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "iat": 1774051200,
+  "exp": 1774052100
+}
+```
+- Tokens without valid signatures or expired timestamps will trigger standard `401 Unauthorized` responses via `ApiError`.
