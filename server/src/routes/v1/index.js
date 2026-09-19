@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import v1Routes from './v1/index.js';
+import healthRoutes from './health.routes.js';
 
 const router = Router();
 
-router.use('/', v1Routes);
+router.use('/health', healthRoutes);
 
 export default router;

@@ -1,6 +1,7 @@
-import { ApiError } from '../utils/apiError.js';
+import { ApiError } from '../utils/index.js';
+import { HTTP_STATUS } from '../constants/index.js';
 
 export const notFound = (req, res, next) => {
-  const error = new ApiError(404, `Route not found - ${req.originalUrl}`);
+  const error = new ApiError(HTTP_STATUS.NOT_FOUND, `Route not found - ${req.originalUrl}`);
   next(error);
 };

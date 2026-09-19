@@ -1,11 +1,10 @@
-import { ApiResponse } from '../utils/apiResponse.js';
-import { getSystemHealth } from '../services/health.service.js';
+import { ApiResponse, asyncHandler } from '../utils/index.js';
+import { getSystemHealth } from '../services/index.js';
+import { HTTP_STATUS } from '../constants/index.js';
 
-export const getHealthStatus = (req, res, next) => {
-  try {
-    const healthData = getSystemHealth();
-    return res.status(200).json(new ApiResponse(200, healthData, 'Server is healthy and running'));
-  } catch (error) {
-    next(error);
-  }
-};
+export const getHealthStatus = asyncHandler(async (req, res) => {
+  const healthData = getSystemHealth();
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(HTTP_STATUS.OK, healthData, 'Server is healthy and running')
+  );
+});
