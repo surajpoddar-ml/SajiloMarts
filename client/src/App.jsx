@@ -41,7 +41,6 @@ function App() {
 
   return (
     <div className="container">
-      {/* Header */}
       <header className="header">
         <div className="logo-badge">
           <span className="logo-dot"></span>
@@ -50,7 +49,6 @@ function App() {
         <span className="step-pill">Prompt 1 of 100 &bull; Project Foundation</span>
       </header>
 
-      {/* Hero */}
       <main className="hero-section">
         <h1 className="title">
           India &rarr; Nepal Cross-Border E-Commerce & Sourcing
@@ -59,9 +57,7 @@ function App() {
           Production-grade MERN architecture foundation initialized successfully. Clean separation of frontend and backend services.
         </p>
 
-        {/* Status Dashboard */}
         <div className="status-card-grid">
-          {/* Frontend Status */}
           <div className="status-card">
             <div className="card-header">
               <span className="indicator active"></span>
@@ -75,7 +71,6 @@ function App() {
             </div>
           </div>
 
-          {/* Backend Status */}
           <div className="status-card">
             <div className="card-header">
               <span className={`indicator ${backendStatus.connected ? 'active' : backendStatus.loading ? 'loading' : 'offline'}`}></span>
@@ -106,7 +101,6 @@ function App() {
           </div>
         </div>
 
-        {/* Foundation Architecture Highlights */}
         <div className="foundation-box">
           <h3>Architecture Highlights</h3>
           <ul className="arch-list">
@@ -118,7 +112,6 @@ function App() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="footer">
         <p>SastoMarts Foundation &copy; {new Date().getFullYear()} &bull; Ready for next development phases</p>
       </footer>

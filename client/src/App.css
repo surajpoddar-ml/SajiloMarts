@@ -8,7 +8,6 @@
   justify-content: space-between;
 }
 
-/* Header */
 .header {
   display: flex;
   align-items: center;
@@ -50,7 +49,6 @@
   font-weight: 500;
 }
 
-/* Hero Section */
 .hero-section {
   padding: 3rem 0;
   text-align: center;
@@ -74,7 +72,6 @@
   margin: 0 auto 2.5rem;
 }
 
-/* Status Cards */
 .status-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -224,7 +221,6 @@
   color: #000;
 }
 
-/* Architecture Highlight Box */
 .foundation-box {
   background: rgba(18, 21, 28, 0.8);
   border: 1px solid var(--border-color);
@@ -260,7 +256,6 @@
   color: var(--accent-cyan);
 }
 
-/* Footer */
 .footer {
   text-align: center;
   padding-top: 2rem;

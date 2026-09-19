@@ -9,7 +9,6 @@ import { errorHandler } from './middlewares/errorHandler.middleware.js';
 
 const app = express();
 
-// Security Middlewares
 app.use(helmet());
 app.use(
   cors({
@@ -18,18 +17,15 @@ app.use(
   })
 );
 
-// Request Logger
 if (config.nodeEnv === 'development') {
   app.use(morgan('dev'));
 } else {
   app.use(morgan('combined'));
 }
 
-// Body parsers
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 
-// Root health check endpoint for quick ping
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to SastoMarts Backend API',
@@ -38,10 +34,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// API Routes
 app.use(config.apiPrefix, apiRoutes);
 
-// Error handling middlewares
 app.use(notFound);
 app.use(errorHandler);
 
