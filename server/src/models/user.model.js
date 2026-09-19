@@ -110,6 +110,21 @@ userSchema.pre('save', async function () {
 });
 
 /**
+ * Post-save middleware: Intercepts MongoDB E11000 duplicate key error and formats a safe message.
+ */
+userSchema.post('save', function (error, doc, next) {
+  if (error.name === 'MongoServerError' && error.code === 11000) {
+    const field = Object.keys(error.keyValue || {})[0] || 'email';
+    const duplicateError = new Error(`An account with this ${field} already exists`);
+    duplicateError.name = 'DuplicateKeyError';
+    duplicateError.statusCode = 409;
+    duplicateError.field = field;
+    return next(duplicateError);
+  }
+  next(error);
+});
+
+/**
  * Compares candidate plaintext password with stored bcrypt hash.
  * @param {string} candidatePassword - Plaintext password to test
  * @returns {Promise<boolean>} - True if match, false otherwise
