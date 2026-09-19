@@ -79,8 +79,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+/**
+ * Pre-save middleware: Hashes password if created or modified.
+ * Preserves existing hash untouched during profile, email, or role updates.
+ */
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
+  if (!this.isModified('password')) {
+    return;
+  }
   const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
   this.password = await bcrypt.hash(this.password, salt);
 });
