@@ -41,7 +41,7 @@ function App() {
           <span className="logo-dot"></span>
           <span className="logo-text">SastoMarts</span>
         </div>
-        <span className="step-pill">Prompt 2 of 100 &bull; Architecture &amp; Folder Structure</span>
+        <span className="step-pill">Prompt 3 of 100 &bull; Architecture &amp; Coding Rules</span>
       </header>
 
       <main className="hero-section">
@@ -49,7 +49,7 @@ function App() {
           India &rarr; Nepal Cross-Border E-Commerce & Sourcing
         </h1>
         <p className="subtitle">
-          Modular, scalable architecture established. Clean separation of responsibilities across frontend and backend layers.
+          Production-grade architecture rules, layer contracts, security boundaries, and centralized error handling established.
         </p>
 
         <div className="status-card-grid">
@@ -61,8 +61,8 @@ function App() {
             <h3 className="card-title">Vite + React (SPA)</h3>
             <p className="card-detail">Running on <code>http://localhost:5173</code></p>
             <div className="badge-list">
-              <span className="badge">Modular Folder Structure</span>
-              <span className="badge">API Client Service Layer</span>
+              <span className="badge">Decoupled Services Layer</span>
+              <span className="badge">Centralized HTTP Client</span>
             </div>
           </div>
 
@@ -97,12 +97,12 @@ function App() {
         </div>
 
         <div className="foundation-box">
-          <h3>Architecture Highlights</h3>
+          <h3>Production Architecture Rules</h3>
           <ul className="arch-list">
-            <li><strong>Root Isolation:</strong> Strict root containing only <code>client/</code>, <code>server/</code>, and <code>.gitignore</code>.</li>
-            <li><strong>Backend Pipeline:</strong> Route &rarr; Controller &rarr; Service &rarr; Model / Database.</li>
-            <li><strong>Frontend Organization:</strong> Components, Pages, Services, Context, Hooks, Utils, Constants.</li>
-            <li><strong>Zero Business Logic Leaks:</strong> Business rules isolated strictly in backend Services.</li>
+            <li><strong>Server-Authoritative:</strong> Prices, quotes, taxes, and exchange rates validated and calculated strictly on backend.</li>
+            <li><strong>Layered Pipeline:</strong> Route &rarr; Middleware &rarr; Controller &rarr; Service &rarr; Model / Database.</li>
+            <li><strong>Security Boundaries:</strong> Authentication, RBAC, input sanitization, rate limiting, and CORS isolation.</li>
+            <li><strong>Centralized Errors:</strong> Standardized error envelope with secure stack trace suppression in production.</li>
           </ul>
         </div>
       </main>
