@@ -72,3 +72,36 @@ export const runUserValidationTests = async () => {
   console.log('✅ Core User validation tests passed successfully');
 };
 
+/**
+ * Unit test suite for User Model email normalization.
+ */
+export const runEmailNormalizationTests = async () => {
+  console.log('🧪 Running Email Normalization Tests...');
+
+  // 1. Email lowercase conversion
+  const upperCaseUser = new User({
+    name: 'Priya Patel',
+    email: 'Priya.Patel@EXAMPLE.COM',
+    password: 'Password123!',
+  });
+  assert.equal(upperCaseUser.email, 'priya.patel@example.com', 'Email should be normalized to lowercase');
+
+  // 2. Email whitespace trimming
+  const paddedUser = new User({
+    name: 'Priya Patel',
+    email: '   user.test@example.com   ',
+    password: 'Password123!',
+  });
+  assert.equal(paddedUser.email, 'user.test@example.com', 'Email should be trimmed of whitespace');
+
+  // 3. Combined mixed case with leading/trailing spaces
+  const mixedUser = new User({
+    name: 'Priya Patel',
+    email: '  User@Example.COM  ',
+    password: 'Password123!',
+  });
+  assert.equal(mixedUser.email, 'user@example.com', 'Mixed-case whitespace-padded email should normalize');
+
+  console.log('✅ Email normalization tests passed successfully');
+};
+
