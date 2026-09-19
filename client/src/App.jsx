@@ -1,7 +1,28 @@
 import { useState, useEffect } from 'react';
 import { healthService } from './services';
 import { ENV, FEATURE_FLAGS, PUBLIC_CONFIG } from './config';
+import { Header, Footer } from './components/layout';
+import { StatusCard, FoundationHighlights } from './components/common';
 import './App.css';
+
+const ARCHITECTURE_RULES = [
+  {
+    label: 'JavaScript Only',
+    description: 'Strict pure JavaScript (ES2022+ / JSX) across frontend and backend layers.',
+  },
+  {
+    label: 'Single Responsibility',
+    description: 'Separation of concerns across Pages, UI Components, Custom Hooks, and API Services.',
+  },
+  {
+    label: 'Server Authoritative',
+    description: 'Critical business rules, calculations, and exchange rates enforced server-side.',
+  },
+  {
+    label: 'Centralized Configuration',
+    description: 'Zero hardcoded secrets, validated runtime environments, and public/private scope isolation.',
+  },
+];
 
 function App() {
   const [backendStatus, setBackendStatus] = useState({
@@ -35,82 +56,76 @@ function App() {
     checkHealth();
   }, []);
 
+  const backendIndicator = backendStatus.connected
+    ? 'active'
+    : backendStatus.loading
+    ? 'loading'
+    : 'offline';
+
   return (
     <div className="container">
-      <header className="header">
-        <div className="logo-badge">
-          <span className="logo-dot"></span>
-          <span className="logo-text">{PUBLIC_CONFIG.BRAND_NAME}</span>
-        </div>
-        <span className="step-pill">Prompt 4 of 100 &bull; Configuration &amp; Environment</span>
-      </header>
+      <Header
+        brandName={PUBLIC_CONFIG.BRAND_NAME}
+        stepLabel="Prompt 5 &bull; JavaScript &amp; Code Quality Standards"
+      />
 
       <main className="hero-section">
-        <h1 className="title">
-          {PUBLIC_CONFIG.TAGLINE}
-        </h1>
+        <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
         <p className="subtitle">
-          Configuration boundaries, environment validation, public vs. private separation, and startup sequencing verified.
+          Pure JavaScript development standards, modular component composition, centralized error handling, and quality controls applied.
         </p>
 
         <div className="status-card-grid">
-          <div className="status-card">
-            <div className="card-header">
-              <span className="indicator active"></span>
-              <span className="card-tag">React Frontend ({ENV.NODE_ENV})</span>
-            </div>
-            <h3 className="card-title">Client Configuration</h3>
-            <p className="card-detail">Target API: <code>{ENV.API_BASE_URL}</code></p>
+          <StatusCard
+            statusIndicator="active"
+            tag={`React Frontend (${ENV.NODE_ENV})`}
+            title="Modular Component Layer"
+            detail={`Target API: ${ENV.API_BASE_URL}`}
+          >
             <div className="badge-list">
-              <span className="badge">Public Config Isolated</span>
-              <span className="badge">Flags Active: {Object.keys(FEATURE_FLAGS).length}</span>
+              <span className="badge">Pure JavaScript / JSX</span>
+              <span className="badge">Active Flags: {Object.keys(FEATURE_FLAGS).length}</span>
             </div>
-          </div>
+          </StatusCard>
 
-          <div className="status-card">
-            <div className="card-header">
-              <span className={`indicator ${backendStatus.connected ? 'active' : backendStatus.loading ? 'loading' : 'offline'}`}></span>
-              <span className="card-tag">Express Backend</span>
-            </div>
-            <h3 className="card-title">Server Configuration</h3>
-            <p className="card-detail">Target: <code>/api/v1/health</code></p>
+          <StatusCard
+            statusIndicator={backendIndicator}
+            tag="Express Backend"
+            title="Layered Architecture API"
+            detail="Target: /api/v1/health"
+          >
             <div className="connection-info">
               {backendStatus.loading ? (
-                <span className="status-text loading-text">Validating configuration &amp; connecting...</span>
+                <span className="status-text loading-text">Connecting &amp; checking health...</span>
               ) : backendStatus.connected ? (
                 <div className="backend-meta">
-                  <span className="status-text success-text">&check; Validated &amp; Online</span>
+                  <span className="status-text success-text">&check; Server Online &amp; Healthy</span>
                   {backendStatus.data?.uptime && (
-                    <small className="uptime-info">Uptime: {backendStatus.data.uptime} | Env: {backendStatus.data.environment}</small>
+                    <small className="uptime-info">
+                      Uptime: {backendStatus.data.uptime} | Env: {backendStatus.data.environment}
+                    </small>
                   )}
                 </div>
               ) : (
                 <div className="backend-meta">
-                  <span className="status-text error-text">&cross; Backend Not Detected</span>
-                  <small className="uptime-info">Run <code>npm run dev</code> inside <code>server/</code></small>
+                  <span className="status-text error-text">&cross; Backend Offline</span>
+                  <small className="uptime-info">Run <code>npm run dev</code> in <code>server/</code></small>
                 </div>
               )}
             </div>
             <button className="refresh-btn" onClick={checkHealth} type="button">
               Recheck Health
             </button>
-          </div>
+          </StatusCard>
         </div>
 
-        <div className="foundation-box">
-          <h3>Configuration Foundation Standards</h3>
-          <ul className="arch-list">
-            <li><strong>Zero Secrets in Code:</strong> Private variables accessed exclusively via <code>server/src/config/</code>.</li>
-            <li><strong>Environment Validation:</strong> Startup halted gracefully if required configuration fails validation.</li>
-            <li><strong>Public / Private Boundary:</strong> Frontend restricted strictly to public <code>VITE_*</code> variables and public config.</li>
-            <li><strong>Production Safe Defaults:</strong> Safe fallback defaults in development; strict validation in production.</li>
-          </ul>
-        </div>
+        <FoundationHighlights
+          title="Code Quality &amp; Development Standards"
+          items={ARCHITECTURE_RULES}
+        />
       </main>
 
-      <footer className="footer">
-        <p>{PUBLIC_CONFIG.BRAND_NAME} Foundation &copy; {new Date().getFullYear()} &bull; Ready for next development phases</p>
-      </footer>
+      <Footer brandName={PUBLIC_CONFIG.BRAND_NAME} />
     </div>
   );
 }
