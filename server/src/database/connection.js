@@ -112,6 +112,7 @@ class DatabaseConnection {
         const safeErrorMessage = sanitizeMongoUri(err.message);
         const connectionErr = new Error(`Failed to connect to MongoDB: ${safeErrorMessage}`);
         connectionErr.name = 'DatabaseConnectionError';
+        connectionErr.code = err.code || 'CONNECTION_FAILED';
         connectionErr.originalError = err;
         throw connectionErr;
       }
