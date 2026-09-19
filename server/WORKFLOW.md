@@ -21,3 +21,26 @@ All contributors must adhere to this standardized Git discipline:
    - Backend: Verify syntax and lint pass (`npm --prefix server run lint`).
    - Health Check: Verify local health endpoint responds with HTTP 200 OK.
 7. **Clean Remote Push**: Push verified commits directly to the current tracking branch (`origin main`).
+
+---
+
+## 2. Commit Message Standards & Conventions
+
+### Format & Language
+Commit messages must be written in **clear, plain English** using the imperative mood (e.g. `Add`, `Create`, `Update`, `Document`, `Refine`).
+
+### Conventional Prefix Prohibition
+Do **NOT** use conventional commit prefixes:
+- ❌ `feat: add user model`
+- ❌ `fix: resolve auth validation bug`
+- ❌ `chore: update dependencies`
+- ❌ `refactor(client): simplify hook`
+- ❌ `docs: write api specification`
+
+### Approved Commit Message Examples
+- ✅ `Add database configuration`
+- ✅ `Create user model`
+- ✅ `Improve authentication validation`
+- ✅ `Update order service`
+- ✅ `Document API structure`
+- ✅ `Refine payment error handling`
