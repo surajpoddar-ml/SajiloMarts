@@ -30,23 +30,14 @@ The platform enables customers and businesses in Nepal to source and purchase pr
 
 ---
 
-## 3. Development Commands
-```bash
-# Navigate to server
-cd server
+## 4. Verified Development Commands
 
-# Install dependencies
-npm install
-
-# Start development server with live reload (nodemon)
-npm run dev
-
-# Start production server
-npm start
-
-# Run syntax/lint check
-npm run lint
-```
+| Command | Action / Behavior |
+| :--- | :--- |
+| `npm install` | Installs backend production and development dependencies. |
+| `npm run dev` | Launches local development server with auto-restart on file change via `nodemon`. |
+| `npm start` | Runs the production entrypoint (`node src/server.js`). |
+| `npm run lint` | Performs Node.js syntax checks (`node --check`) across server entry files. |
 
 ---
 

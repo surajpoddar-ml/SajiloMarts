@@ -15,32 +15,23 @@ SastoMarts solves this by providing:
 2. **Local Payment Integration**: Seamless checkout via eSewa, Khalti, bank transfers, and domestic cards.
 3. **End-to-End Cross-Border Tracking**: Real-time status updates from India fulfillment hubs through Nepal customs to customer doorstep.
 
-## Technology Stack
+## 2. Technology Stack
 - **Framework:** React 19 (JavaScript / JSX)
 - **Build Tool:** Vite 8
-- **Linter:** Oxlint (JavaScript/JSX rules only)
-- **Styling:** CSS variables & modular CSS architecture
+- **Linter:** Oxlint (Pure JavaScript / JSX rules)
+- **Styling:** CSS variables & modular component styling
 
-## Development Commands
-```bash
-# Navigate to client
-cd client
+---
 
-# Install packages
-npm install
+## 3. Verified Development Commands
 
-# Start Vite development server (http://localhost:5173)
-npm run dev
-
-# Run JavaScript/JSX linter
-npm run lint
-
-# Build production bundle
-npm run build
-
-# Preview production build locally
-npm run preview
-```
+| Command | Action / Behavior |
+| :--- | :--- |
+| `npm install` | Installs all client dependencies from `package.json`. |
+| `npm run dev` | Launches the local Vite development server at `http://localhost:5173` with Hot Module Replacement (HMR). |
+| `npm run build` | Compiles optimized static assets into `dist/` directory. |
+| `npm run preview` | Runs a local static web server to preview the production bundle. |
+| `npm run lint` | Executes fast syntax & linting checks using Oxlint. |
 
 ## Directory Overview
 ```text
