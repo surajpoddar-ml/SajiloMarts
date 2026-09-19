@@ -26,3 +26,12 @@
 2. **Never Trust the Client**: All prices, discount percentages, exchange rates, and permissions must be computed and verified by the server.
 3. **No Direct Database Exposure**: Database ports are firewalled from the public internet; all data queries originate strictly from the backend server.
 4. **Least Privilege Principle**: API services and database users will operate with the minimal permissions required for their specific function.
+
+---
+
+## 3. Attack Vector Mitigations & Safe Logging Rules
+- **Cross-Site Scripting (XSS)**: Strict React JSX auto-escaping; dangerous APIs (`dangerouslySetInnerHTML`) are strictly forbidden.
+- **Cross-Site Request Forgery (CSRF)**: State-changing requests require Bearer tokens or `SameSite=Strict` cookies.
+- **Server-Side Request Forgery (SSRF)**: Sourcing URL parser validates domain against an explicit allowlist (e.g. `amazon.in`, `flipkart.com`) and resolves DNS before fetching to block internal private IP ranges (`127.0.0.1`, `10.0.0.0/8`, `192.168.0.0/16`).
+- **NoSQL Injection**: Express body parser and Mongoose schema casting prevent malicious MongoDB operator injection (`$gt`, `$where`).
+- **Sensitive Data Logging**: Loggers must filter out passwords, credit card numbers, CVVs, and JWT authorization headers from server console logs.
