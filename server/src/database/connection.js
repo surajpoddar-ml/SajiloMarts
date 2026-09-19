@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import dns from 'node:dns';
 import { databaseConfig } from '../config/index.js';
 import { sanitizeMongoUri } from '../utils/index.js';
 
@@ -77,6 +78,7 @@ class DatabaseConnection {
   /**
    * Connects to MongoDB Atlas / instance using configured database options.
    * Prevents concurrent duplicated connection attempts via in-flight promise sharing.
+   * Handles Windows/ISP SRV DNS resolution issues automatically.
    * @param {string} [uri] - Optional MongoDB connection string override
    * @param {object} [options] - Optional Mongoose connection options override
    * @returns {Promise<mongoose.Connection>}
@@ -96,6 +98,15 @@ class DatabaseConnection {
       throw missingUriErr;
     }
 
+    // Ensure reliable DNS resolution for MongoDB Atlas SRV URIs on Windows
+    if (uri.startsWith('mongodb+srv://')) {
+      try {
+        dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+      } catch {
+        // Fallback to default system DNS if setServers is restricted
+      }
+    }
+
     this.bindEvents();
 
     this.connectingPromise = (async () => {
@@ -106,6 +117,20 @@ class DatabaseConnection {
         this.connectingPromise = null;
         return this.connection;
       } catch (err) {
+        // If initial attempt failed with querySrv error, retry once with public DNS servers
+        if (err.message && err.message.includes('querySrv')) {
+          try {
+            dns.setServers(['8.8.8.8', '1.1.1.1']);
+            const retryConn = await mongoose.connect(uri, options);
+            this.connection = retryConn.connection;
+            this.isConnected = true;
+            this.connectingPromise = null;
+            return this.connection;
+          } catch (retryErr) {
+            err = retryErr;
+          }
+        }
+
         this.connection = null;
         this.isConnected = false;
         this.connectingPromise = null;
