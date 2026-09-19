@@ -4,7 +4,16 @@ SastoMarts API is the backend engine powering the India-to-Nepal cross-border e-
 
 ---
 
-## 1. Platform Purpose
+## 1. Documentation Assessment & System Scope
+This repository houses the internal engineering and architectural documentation for SastoMarts. All architectural standards and workflows have been assessed to ensure:
+- Strict adherence to standard pure JavaScript (ES2022+ / JSX).
+- Zero root-level clutter (bounded strictly to `client/`, `server/`, `.gitignore`).
+- Clear delineation between currently implemented capabilities and future planned modules.
+- Beginner-friendly explanations paired with enterprise production engineering standards.
+
+---
+
+## 2. Platform Purpose
 The platform enables customers and businesses in Nepal to source and purchase products directly from major Indian marketplaces and suppliers with:
 - Automated INR-to-NPR fixed peg currency calculations (1 INR = 1.6 NPR).
 - Customs duty, service charges, and cross-border logistics estimation.
