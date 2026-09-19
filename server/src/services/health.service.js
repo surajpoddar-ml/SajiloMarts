@@ -16,5 +16,6 @@ export const getSystemHealth = () => {
       connected: dbState.isConnected,
       ready: dbState.isConnected,
     },
+    version: '1.0.0',
   };
 };
