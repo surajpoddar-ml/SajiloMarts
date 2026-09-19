@@ -1,16 +1,30 @@
-# React + Vite
+# SastoMarts Frontend (Client)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+SastoMarts is a cross-border India-to-Nepal B2B/B2C e-commerce and product-sourcing platform. This repository contains the Single Page Application (SPA) built with **React 19** and **Vite**.
 
-Currently, two official plugins are available:
+## Technology Stack
+- **Framework:** React 19 (JavaScript / JSX)
+- **Build Tool:** Vite 8
+- **Linter:** Oxlint (JavaScript/JSX rules only)
+- **Styling:** CSS variables & modular CSS architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Directory Overview
+```text
+client/
+├── public/                 # Public static assets (favicon, icons)
+├── src/
+│   ├── assets/             # Bundled static images and media
+│   ├── components/         # Reusable UI component library (common, layout, feedback, forms)
+│   ├── config/             # Public client configuration & feature flags
+│   ├── constants/          # Route constants, API endpoints, application storage keys
+│   ├── context/            # React Context global state providers
+│   ├── hooks/              # Custom reusable React hooks
+│   ├── layouts/            # Page layout wrappers (MainLayout)
+│   ├── pages/              # Route view directories
+│   ├── services/           # Centralized HTTP network client (http, health.service)
+│   ├── styles/             # Design tokens and global stylesheets
+│   └── utils/              # Pure utility functions (currency, storage, validators)
+├── index.html              # HTML entry point
+├── package.json            # Scripts and dependencies
+└── vite.config.js          # Vite config with '@' alias
+```
