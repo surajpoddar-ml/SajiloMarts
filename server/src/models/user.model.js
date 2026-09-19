@@ -138,5 +138,20 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+/**
+ * Static helper: Formats raw Mongoose validation errors into clean key-message mappings.
+ * @param {Error} error - Mongoose validation error
+ * @returns {Array<{field: string, message: string}>}
+ */
+userSchema.statics.formatValidationError = function (error) {
+  if (!error || error.name !== 'ValidationError') {
+    return [{ field: 'general', message: error ? error.message : 'Unknown validation failure' }];
+  }
+  return Object.keys(error.errors || {}).map((key) => ({
+    field: key,
+    message: error.errors[key].message,
+  }));
+};
+
 export const User = mongoose.model('User', userSchema);
 export default User;
