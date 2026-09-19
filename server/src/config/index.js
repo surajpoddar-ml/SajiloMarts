@@ -6,4 +6,5 @@ export * from './security.js';
 export * from './logger.js';
 export * from './payment.js';
 export * from './email.js';
+export * from './validator.js';
 export { envConfig as config } from './environment.js';
