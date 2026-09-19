@@ -1,4 +1,4 @@
-# Server Architecture
+# Server Architecture & Development Guide
 
 ## Layered Pipeline Flow
 ```text
@@ -40,3 +40,9 @@ HTTP Standardized Response (ApiResponse / ApiError)
 
 ### 5. Model Layer (`src/models/`) *(Future)*
 - Defines schema structures, indexes, and persistence methods for MongoDB collections.
+
+## Development Workflow for New Backend Endpoints
+1. **Define Service Method:** Write business logic in `src/services/[domain].service.js`.
+2. **Define Controller:** Handle `req`/`res` in `src/controllers/[domain].controller.js` using `asyncHandler`.
+3. **Define Route:** Declare endpoint in `src/routes/v1/[domain].routes.js` and mount in `routes/v1/index.js`.
+4. **Attach Middleware:** Attach `requireAuth` / `requireRole` where access control is needed.
