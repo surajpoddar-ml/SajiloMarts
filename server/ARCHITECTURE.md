@@ -84,9 +84,15 @@ Database / External API Layer (MongoDB queries via Mongoose / gateway webhooks)
 Response Formatting (Dispatched via ApiResponse envelope with HTTP status)
 ```
 
-### Server-Owned Authoritative Responsibilities
-1. **Pricing Calculations**: Landed cost calculations in NPR, INR conversion (1.6 peg), customs tariffs, weight-based logistics fees.
-2. **Quote Generation**: Validating marketplace URL items and producing guaranteed pricing quotes.
-3. **Order State Machine**: Enforcing valid state transitions (`PENDING` → `CONFIRMED` → `IN_TRANSIT` → `DELIVERED`).
-4. **Payment Integrity**: Verifying webhook HMAC signatures and reconciling payment transactions.
-5. **Role & Permission Enforcement**: Validating admin actions, staff privileges, and customer data boundaries.
+---
+
+## 4. Application Boundary Matrix
+
+> [!IMPORTANT]
+> **Core Architectural Principle:** The backend server is strictly authoritative for business rules, calculations, permissions, and security-sensitive decisions.
+
+| System Layer | Core Responsibilities | Prohibited Actions |
+| :--- | :--- | :--- |
+| **Frontend (Browser)** | • Rendering interactive UI components<br>• Capturing user inputs & feedback<br>• Local form validation (UX only)<br>• Managing client presentation state<br>• Communicating via REST API | • Direct database connections<br>• Determining prices or currency rates<br>• Deciding user permissions or roles<br>• Verifying payment transactions<br>• Storing private API keys / secrets |
+| **Backend (Express API)** | • Authentication & RBAC enforcement<br>• Pricing, customs duty, & quote math<br>• Order totals, discounts, & coupons<br>• Payment initiation & webhook verification<br>• Database queries via Mongoose<br>• Error sanitization & audit logging | • Trusting unverified client totals<br>• Exposing internal stack traces<br>• Bypassing input validation layers<br>• Committing plaintext secrets |
+| **Database (MongoDB)** | • Durable document persistence<br>• Unique index constraints & relationships<br>• Atomic document updates<br>• Audit trail preservation | • Public internet exposure<br>• Unauthenticated connections |
