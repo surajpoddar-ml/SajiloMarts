@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiClient } from './services';
+import { healthService } from './services';
 import './App.css';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
   const checkHealth = async () => {
     setBackendStatus((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      const json = await apiClient('/health');
+      const json = await healthService.checkHealth();
       setBackendStatus({
         loading: false,
         connected: true,
