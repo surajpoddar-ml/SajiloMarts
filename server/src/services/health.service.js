@@ -3,9 +3,10 @@ import { getDatabaseState } from '../database/index.js';
 
 export const getSystemHealth = () => {
   const dbState = getDatabaseState();
+  const isDbConnected = Boolean(dbState && dbState.isConnected);
 
   return {
-    status: dbState.isConnected ? 'healthy' : 'degraded',
+    status: isDbConnected ? 'healthy' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: `${process.uptime().toFixed(2)}s`,
     environment: envConfig.nodeEnv,
@@ -13,8 +14,8 @@ export const getSystemHealth = () => {
     database: {
       status: dbState.status,
       code: dbState.code,
-      connected: dbState.isConnected,
-      ready: dbState.isConnected,
+      connected: isDbConnected,
+      ready: isDbConnected,
     },
     version: '1.0.0',
   };
