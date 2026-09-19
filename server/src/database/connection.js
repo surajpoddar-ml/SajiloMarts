@@ -83,15 +83,26 @@ class DatabaseConnection {
     }
 
     if (!uri) {
-      throw new Error('MongoDB URI is not configured in database configuration');
+      const missingUriErr = new Error('MongoDB URI is not configured in database configuration');
+      missingUriErr.name = 'DatabaseConfigurationError';
+      throw missingUriErr;
     }
 
     this.bindEvents();
 
-    const conn = await mongoose.connect(uri, options);
-    this.connection = conn.connection;
-    this.isConnected = true;
-    return this.connection;
+    try {
+      const conn = await mongoose.connect(uri, options);
+      this.connection = conn.connection;
+      this.isConnected = true;
+      return this.connection;
+    } catch (err) {
+      this.connection = null;
+      this.isConnected = false;
+      const connectionErr = new Error(`Failed to connect to MongoDB database: ${err.message}`);
+      connectionErr.name = 'DatabaseConnectionError';
+      connectionErr.originalError = err;
+      throw connectionErr;
+    }
   }
 }
 
