@@ -356,6 +356,39 @@ export const runIndexVerificationTests = async () => {
   console.log('✅ User database indexes verified successfully');
 };
 
+/**
+ * Test suite to verify hardened security behaviors under edge cases.
+ */
+export const runSecurityHardeningTests = async () => {
+  console.log('🧪 Running Security Hardening Tests...');
+
+  // 1. comparePassword with missing candidatePassword
+  const user = new User({ name: 'Security User', email: 'sec@example.com', password: 'Password123!' });
+  const bcrypt = await import('bcryptjs');
+  user.password = await bcrypt.default.hash('Password123!', 10);
+
+  const resEmpty = await user.comparePassword('');
+  assert.equal(resEmpty, false, 'comparePassword with empty string should return false');
+
+  const resNull = await user.comparePassword(null);
+  assert.equal(resNull, false, 'comparePassword with null should return false');
+
+  const resUndefined = await user.comparePassword(undefined);
+  assert.equal(resUndefined, false, 'comparePassword with undefined should return false');
+
+  // 2. comparePassword on unselected password document
+  const strippedUser = new User({ name: 'Stripped User', email: 'stripped@example.com' });
+  const resNoHash = await strippedUser.comparePassword('SomePassword123!');
+  assert.equal(resNoHash, false, 'comparePassword on doc without password hash must return false');
+
+  // 3. formatValidationError edge cases
+  const nullErrRes = User.formatValidationError(null);
+  assert.ok(Array.isArray(nullErrRes), 'Should return array for null error');
+
+  console.log('✅ Security hardening tests passed successfully');
+};
+
+
 
 
 
