@@ -1,22 +1,25 @@
-# Client JavaScript Coding Standards
+# Client Engineering & Development Standards
 
-## 1. Strict Technology Rule: Pure JavaScript Only
-- **Extensions:** `.js` and `.jsx` exclusively.
-- **Prohibited:** TypeScript (`.ts`, `.tsx`), `tsconfig.json`, TypeScript compilers, or `@types/*` packages.
-- **Standard:** Modern ECMAScript (ES2022+) with native modules (`import`/`export`).
+---
 
-## 2. React Component Standards
-- **Single Responsibility:** A component must focus on rendering UI and handling user events.
-- **Composition over Inheritance:** Complex screens must compose smaller components (e.g. `App.jsx` composing `Header`, `StatusCard`, `FoundationHighlights`, `Footer`).
-- **No Direct DB Access:** React must never query databases or access server-only resources.
-- **Centralized API Calls:** Do not scatter `fetch()` across components. Use `healthService` and `http` from `@/services`.
+## 1. Global JavaScript Only Rule
+- This project strictly uses **JavaScript (ES2022+ / JSX)**.
+- Allowed file extensions: `.js`, `.jsx`.
+- Disallowed: TypeScript (`.ts`, `.tsx`, `tsconfig.json`, `@types/*`).
 
-## 3. State Management Standards
-- **Intentional State:** Keep local state minimal. Derive values during render where possible.
-- **No Heavy Redundant Libraries:** Use React built-in state (`useState`, `useEffect`, `useContext`) and custom hooks (`useLocalStorage`, `useDebounce`).
+---
 
-## 4. Naming Conventions
-- **Components:** PascalCase (e.g. `MainLayout.jsx`, `StatusCard.jsx`).
-- **Hooks:** camelCase with `use` prefix (e.g. `useDebounce.js`).
-- **Services & Utils:** camelCase (e.g. `apiClient.js`, `currency.js`).
-- **Constants:** UPPER_SNAKE_CASE (e.g. `APP_CONSTANTS`, `ROUTES`).
+## 2. Component Design & Composition Standards
+1. **Single Responsibility**: Each UI component must render exactly one logical piece of interface.
+2. **Pure Presentation**: Components in `src/components/common/` must be presentation-only and receive data via props.
+3. **Hook Extraction**: When component state logic exceeds 20-30 lines, extract it into a reusable custom hook in `src/hooks/`.
+4. **No Inline Business Logic**: Pricing conversions, customs math, or data mutations must never be written inside JSX components. Delegate to `src/utils/` or `src/services/`.
+
+---
+
+## 3. Code Hygiene & Maintainability Principles
+- **Clarity over Cleverness**: Write readable, self-documenting code with meaningful variable and function names.
+- **Avoid Premature Optimization**: Optimize only after identifying measured performance bottlenecks.
+- **Avoid Unnecessary Abstraction**: Do not build complex generic wrappers until a pattern has repeated at least 3 times.
+- **Consistent Error Handling**: Always capture asynchronous errors and present user-friendly error feedback states.
+- **Centralized Constants**: Never hardcode route strings, API paths, or localStorage keys inline. Use `src/constants/`.
