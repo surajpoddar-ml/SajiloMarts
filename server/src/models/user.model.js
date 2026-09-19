@@ -6,6 +6,7 @@ export const USER_ROLES = {
 };
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
 
 const userSchema = new mongoose.Schema(
   {
@@ -44,6 +45,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: null,
+      validate: {
+        validator: function (v) {
+          if (v === null || v === undefined || v === '') return true;
+          return PHONE_REGEX.test(v.replace(/[\s-]/g, ''));
+        },
+        message: 'Please provide a valid phone number (Nepal / India mobile format)',
+      },
     },
     role: {
       type: String,
