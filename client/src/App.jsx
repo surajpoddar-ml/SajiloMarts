@@ -70,13 +70,13 @@ function App() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 8 &bull; MongoDB Atlas &amp; Mongoose Database Foundation"
+        stepLabel="Prompt 9 &bull; Production User Database Foundation"
       />
 
       <main className="hero-section">
         <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
         <p className="subtitle">
-          MongoDB Atlas &amp; Mongoose database lifecycle, connection pooling, graceful shutdown, and database health check integration established.
+          Secure, normalized, validated User schema with bcrypt password protection, safe serialization, and unique index enforcement.
         </p>
 
         <div className="status-card-grid">
