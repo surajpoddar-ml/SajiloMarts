@@ -17,10 +17,14 @@ export const isConfigValid = () => {
   }
 };
 
+/**
+ * Returns safe, non-sensitive configuration summary with credentials strictly omitted.
+ */
 export const getSafeConfigSummary = () => {
   return {
     environment: process.env.NODE_ENV || 'development',
     port: parseInt(process.env.PORT, 10) || 5000,
     apiPrefix: process.env.API_PREFIX || '/api/v1',
+    hasDatabaseConfigured: Boolean(process.env.MONGODB_URI || process.env.DATABASE_URL),
   };
 };
