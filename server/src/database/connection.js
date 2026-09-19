@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { databaseConfig } from '../config/index.js';
 
 /**
  * MongoDB Connection Service
@@ -11,18 +12,18 @@ class DatabaseConnection {
   }
 
   /**
-   * Connects to MongoDB Atlas / instance using provided URI and options.
-   * @param {string} uri - MongoDB connection string
-   * @param {object} options - Mongoose connection options
+   * Connects to MongoDB Atlas / instance using configured database options.
+   * @param {string} [uri] - Optional MongoDB connection string override
+   * @param {object} [options] - Optional Mongoose connection options override
    * @returns {Promise<mongoose.Connection>}
    */
-  async connect(uri, options = {}) {
+  async connect(uri = databaseConfig.uri, options = databaseConfig.options) {
     if (this.connection && mongoose.connection.readyState === 1) {
       return this.connection;
     }
 
     if (!uri) {
-      throw new Error('MongoDB URI is required to initialize database connection');
+      throw new Error('MongoDB URI is not configured in database configuration');
     }
 
     const conn = await mongoose.connect(uri, options);
