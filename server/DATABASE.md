@@ -1,22 +1,34 @@
-# Database Architecture & Planning Guide
+# Database Architecture & Entity Planning Guide
 
-> **Current Status:** Planned for future prompt. MongoDB and Mongoose are NOT currently connected or installed in the active codebase.
+> **Current Status:** Architecture & Design Phase (MongoDB and Mongoose are NOT yet connected or instantiated).
 
-## Planned Technology
-- **Database Engine:** MongoDB (via MongoDB Atlas or local instance)
-- **ODM:** Mongoose (Pure JavaScript schemas)
+---
 
-## Planned Collection Schemas
-1. **`users`**: Authentication credentials, profile details, saved addresses, role (`customer`, `admin`, `vendor`, `sourcing_agent`).
-2. **`products`**: Sourced Indian catalog data, original INR price, category ID, images, descriptions.
-3. **`quotes`**: User-submitted sourcing URL requests, estimated INR prices, converted NPR costs, customs fees, service fees, quote status (`pending`, `quoted`, `accepted`, `rejected`, `ordered`).
-4. **`orders`**: Customer order items, delivery addresses in Nepal, shipping fee, tax breakdown, final NPR total, status tracking.
-5. **`payments`**: Payment transaction logs, gateway identifier (`esewa`, `khalti`, `fonepay`, `stripe`), reference IDs, verification signatures, payment status.
-6. **`categories`**: E-commerce catalog taxonomy hierarchy.
-7. **`coupons`**: Discount promo codes, percentage/fixed deductions, expiration timestamps, usage limits.
-8. **`audit_logs`**: Administrative audit trail recording privileged configuration changes and price overrides.
+## 1. Planned Technology Stack
+- **Database Engine:** MongoDB 7.0+ (MongoDB Atlas Multi-AZ cluster)
+- **Object Data Modeling (ODM):** Mongoose (Strict JavaScript Schemas)
+- **Lifecycle Management:** Connection pool singleton with automatic reconnection and graceful shutdown on `SIGINT`/`SIGTERM`.
 
-## Schema Design Rules
-- Always define compound indexes on frequently queried fields (e.g. `userId` + `createdAt`).
-- Enforce schema-level field validation and defaults.
-- Always validate ObjectIds before executing database queries to prevent invalid query cast errors.
+---
+
+## 2. Planned Domain Entities Blueprint
+
+| Entity / Collection | Primary Role & Purpose | Key Planned Fields |
+| :--- | :--- | :--- |
+| **`User`** | Customer & staff identity profiles, auth credentials, KYC status. | `name`, `email`, `passwordHash`, `phone`, `role` (`customer`/`agent`/`admin`), `isVerified`, `isActive`. |
+| **`Address`** | Nepal delivery locations and Indian sourcing warehouse hubs. | `userId`, `recipientName`, `phone`, `province`, `district`, `city`, `streetAddress`, `isDefault`. |
+| **`Category`** | Taxonomy hierarchy for catalog navigation and customs duty mapping. | `name`, `slug`, `parentId`, `customsDutyRate`, `iconUrl`, `isActive`. |
+| **`Product`** | Curated Indian marketplace catalog cache with localized pricing. | `title`, `sourceUrl`, `sourcePlatform`, `priceInr`, `priceNpr`, `categoryId`, `images`, `stockStatus`. |
+| **`Quote`** | Sourcing requests initiated by users submitting external marketplace links. | `userId`, `sourceUrl`, `estimatedInr`, `landedNpr`, `customsFee`, `logisticsFee`, `status` (`PENDING`/`APPROVED`/`REJECTED`). |
+| **`Order`** | Final customer purchase orders containing cross-border item bundles. | `orderNumber`, `userId`, `items`, `shippingAddressId`, `subtotalNpr`, `customsDutyNpr`, `totalNpr`, `orderStatus`. |
+| **`Payment`** | Payment transaction records and gateway audit trails. | `orderId`, `gateway` (`esewa`/`khalti`/`fonepay`/`stripe`), `transactionRef`, `amountNpr`, `status` (`INITIATED`/`SUCCESS`/`FAILED`). |
+| **`Review`** | Verified customer reviews and ratings on sourced products. | `userId`, `productId`, `orderId`, `rating` (1-5), `comment`, `images`, `isVerifiedPurchase`. |
+| **`Coupon`** | Promotional discount codes and referral discounts. | `code`, `discountType` (`PERCENTAGE`/`FLAT`), `discountValue`, `minOrderAmount`, `expiresAt`, `usageCount`. |
+| **`AuditLog`** | Immutable security trail for privileged administrative operations. | `actorId`, `action`, `targetResource`, `ipAddress`, `userAgent`, `metadata`, `createdAt`. |
+
+---
+
+## 3. Indexing & Data Integrity Strategies
+1. **Compound Indexing**: Frequently queried compound keys (e.g. `{ userId: 1, createdAt: -1 }` on `Order` and `Quote`) will be indexed for fast retrieval.
+2. **Unique Constraints**: Unique indexes on `User.email`, `Order.orderNumber`, `Coupon.code`, and `Category.slug`.
+3. **Soft Deletes**: Key records (`User`, `Product`, `Order`) will use soft-deletion flags (`deletedAt`) to preserve historical audit integrity.
