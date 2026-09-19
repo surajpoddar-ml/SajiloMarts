@@ -18,3 +18,10 @@
   - `Improve authentication validation`
   - `Update order service`
   - `Document API structure`
+
+## Production Deployment Principles
+- **Frontend SPA Hosting:** Static CDN distribution (e.g. Vercel, Netlify, or Cloudflare Pages) with client-side routing fallback.
+- **Backend API Hosting:** Managed Node.js container environment with HTTPS enforcement and PM2 process management.
+- **Database:** Managed MongoDB Atlas replica set with TLS encryption at rest and in transit.
+- **Edge Layer:** Cloudflare CDN & WAF for DDoS mitigation, edge caching, and DNS management.
+- **Secrets Management:** Environment variables injected directly by the hosting platform without touching source control.
