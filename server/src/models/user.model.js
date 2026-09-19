@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Email address is required'],
+      unique: true,
       trim: true,
       lowercase: true,
       set: (val) => (typeof val === 'string' ? val.trim().toLowerCase() : val),
