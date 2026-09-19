@@ -24,14 +24,16 @@ export const validateEnvironment = () => {
 
   // Validate MongoDB Connection URI Settings
   if (!envConfig.mongodbUri) {
-    errors.push('MONGODB_URI is required for database connectivity (e.g. mongodb+srv://... or mongodb://localhost:27017/...)');
+    errors.push('MONGODB_URI is required for database connectivity (e.g. mongodb+srv://<user>:<password>@cluster.mongodb.net/sastomarts or mongodb://localhost:27017/sastomarts)');
     missingKeys.push('MONGODB_URI');
-  } else if (
-    !envConfig.mongodbUri.startsWith('mongodb://') &&
-    !envConfig.mongodbUri.startsWith('mongodb+srv://')
-  ) {
-    errors.push('MONGODB_URI must start with "mongodb://" or "mongodb+srv://"');
-    missingKeys.push('MONGODB_URI');
+  } else {
+    const isStandardUri = envConfig.mongodbUri.startsWith('mongodb://');
+    const isSrvUri = envConfig.mongodbUri.startsWith('mongodb+srv://');
+
+    if (!isStandardUri && !isSrvUri) {
+      errors.push('MONGODB_URI must start with "mongodb://" or "mongodb+srv://"');
+      missingKeys.push('MONGODB_URI');
+    }
   }
 
   if (errors.length > 0) {
