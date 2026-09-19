@@ -26,29 +26,47 @@ const startServer = async () => {
       console.log(`=================================`);
     });
 
-    const shutdown = async (signal, exitCode = 0) => {
+    let isShuttingDown = false;
+
+    const gracefulShutdown = async (signal, exitCode = 0) => {
+      if (isShuttingDown) return;
+      isShuttingDown = true;
+
       console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
+
+      // Force exit after 10s if graceful shutdown hangs
+      const forceTimeout = setTimeout(() => {
+        console.error('⚠️ Forcefully terminating after timeout!');
+        process.exit(1);
+      }, 10000);
+      forceTimeout.unref();
+
       server.close(async () => {
         console.log('🔌 HTTP server closed.');
         try {
           await disconnectDatabase();
           console.log('✨ All resources released cleanly. Exiting.');
+          clearTimeout(forceTimeout);
           process.exit(exitCode);
         } catch (dbErr) {
           console.error('Error during database disconnect:', dbErr.message);
+          clearTimeout(forceTimeout);
           process.exit(1);
         }
       });
     };
 
+    process.on('SIGINT', () => gracefulShutdown('SIGINT', 0));
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM', 0));
+
     process.on('unhandledRejection', async (err) => {
       console.error('UNHANDLED REJECTION! 💥 Shutting down gracefully...', err);
-      await shutdown('unhandledRejection', 1);
+      await gracefulShutdown('unhandledRejection', 1);
     });
 
     process.on('uncaughtException', async (err) => {
       console.error('UNCAUGHT EXCEPTION! 💥 Shutting down immediately...', err);
-      await shutdown('uncaughtException', 1);
+      await gracefulShutdown('uncaughtException', 1);
     });
 
     return server;
