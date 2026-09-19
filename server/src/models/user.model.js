@@ -91,5 +91,17 @@ userSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+/**
+ * Compares candidate plaintext password with stored bcrypt hash.
+ * @param {string} candidatePassword - Plaintext password to test
+ * @returns {Promise<boolean>} - True if match, false otherwise
+ */
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!candidatePassword || !this.password) {
+    return false;
+  }
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
 export const User = mongoose.model('User', userSchema);
 export default User;
