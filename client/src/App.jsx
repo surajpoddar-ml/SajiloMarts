@@ -70,13 +70,13 @@ function App() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 6 &bull; Code Quality &amp; Development Standards"
+        stepLabel="Prompt 7 &bull; Internal Documentation &amp; Workflow Foundation"
       />
 
       <main className="hero-section">
         <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
         <p className="subtitle">
-          Pure JavaScript development standards, modular component composition, centralized error handling, and quality controls applied.
+          Internal documentation, developer workflows, security principles, API standards, and roadmap foundations established.
         </p>
 
         <div className="status-card-grid">
