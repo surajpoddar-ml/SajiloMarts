@@ -84,6 +84,13 @@ const userSchema = new mongoose.Schema(
         return ret;
       },
     },
+    toObject: {
+      transform: function (doc, ret) {
+        delete ret.password;
+        delete ret.__v;
+        return ret;
+      },
+    },
   }
 );
 
