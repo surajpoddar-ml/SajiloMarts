@@ -60,3 +60,14 @@ When deploying SastoMarts to production in future phases, the following infrastr
 | **Secrets Management** | Production environment variables injected at deployment runtime via hosting secrets manager (never checked in). |
 | **Monitoring & Logging** | Structured JSON logs, error tracking (Sentry), and uptime alerting on `/api/v1/health`. |
 | **SEO & Accessibility** | Server-side metadata tags, semantic HTML5, and WCAG AA accessibility compliance across all e-commerce flows. |
+
+---
+
+## 4. Optimized Pre-Commit & Verification Checklist
+
+Before executing any commit:
+- [ ] `git status` verifies only expected files are staged.
+- [ ] `git diff --staged` verified for unwanted debug code or secrets.
+- [ ] No `.env` or credential files staged.
+- [ ] Commit message matches plain English imperative format.
+- [ ] App builds cleanly without errors.
