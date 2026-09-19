@@ -1,5 +1,5 @@
-import { ENV } from '../config/env';
-import { APP_CONSTANTS } from '../constants/appConstants';
+import { ENV } from '../config/index.js';
+import { APP_CONSTANTS } from '../constants/index.js';
 
 export const apiClient = async (endpoint, options = {}) => {
   const defaultHeaders = {
