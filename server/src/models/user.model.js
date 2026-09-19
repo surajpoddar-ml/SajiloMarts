@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 
+export const USER_ROLES = {
+  CUSTOMER: 'customer',
+  ADMIN: 'admin',
+};
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -20,6 +25,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: null,
+  },
+  role: {
+    type: String,
+    enum: Object.values(USER_ROLES),
   },
 });
 
