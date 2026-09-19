@@ -22,6 +22,10 @@ const ARCHITECTURE_RULES = [
     label: 'Centralized Configuration',
     description: 'Zero hardcoded secrets, validated runtime environments, and public/private scope isolation.',
   },
+  {
+    label: 'Code Quality Controls',
+    description: 'Centralized error handling, standard API envelopes, lightweight linting, and formatting rules.',
+  },
 ];
 
 function App() {
@@ -66,7 +70,7 @@ function App() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 5 &bull; JavaScript &amp; Code Quality Standards"
+        stepLabel="Prompt 6 &bull; Code Quality &amp; Development Standards"
       />
 
       <main className="hero-section">
