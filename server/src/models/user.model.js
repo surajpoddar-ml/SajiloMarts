@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Email address is required'],
       trim: true,
       lowercase: true,
+      set: (val) => (typeof val === 'string' ? val.trim().toLowerCase() : val),
       validate: {
         validator: function (v) {
           return EMAIL_REGEX.test(v);
