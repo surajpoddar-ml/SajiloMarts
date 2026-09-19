@@ -15,6 +15,8 @@ SastoMarts solves this by providing:
 2. **Local Payment Integration**: Seamless checkout via eSewa, Khalti, bank transfers, and domestic cards.
 3. **End-to-End Cross-Border Tracking**: Real-time status updates from India fulfillment hubs through Nepal customs to customer doorstep.
 
+---
+
 ## 2. Technology Stack
 - **Framework:** React 19 (JavaScript / JSX)
 - **Build Tool:** Vite 8
@@ -33,7 +35,26 @@ SastoMarts solves this by providing:
 | `npm run preview` | Runs a local static web server to preview the production bundle. |
 | `npm run lint` | Executes fast syntax & linting checks using Oxlint. |
 
-## Directory Overview
+---
+
+## 4. Harmonized Full-Stack Development Workflow
+
+To develop features across the frontend and backend concurrently:
+1. **Terminal 1 (Backend API):**
+   ```bash
+   cd server
+   npm run dev   # Runs on http://localhost:5000 (auto-reloads on edits)
+   ```
+2. **Terminal 2 (Frontend Client):**
+   ```bash
+   cd client
+   npm run dev   # Runs on http://localhost:5173 with HMR
+   ```
+3. **API Connectivity:** The client connects to `http://localhost:5000/api/v1` via `src/services/apiClient.js` with CORS origin verification.
+
+---
+
+## 5. Directory Overview
 ```text
 client/
 ├── public/                 # Public static assets (favicon, icons)
