@@ -5,40 +5,45 @@ export const USER_ROLES = {
   ADMIN: 'admin',
 };
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'User name is required'],
-    trim: true,
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'User name is required'],
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: [true, 'Email address is required'],
+      trim: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    role: {
+      type: String,
+      enum: Object.values(USER_ROLES),
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
-  email: {
-    type: String,
-    required: [true, 'Email address is required'],
-    trim: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-  },
-  phone: {
-    type: String,
-    trim: true,
-    default: null,
-  },
-  role: {
-    type: String,
-    enum: Object.values(USER_ROLES),
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-  isEmailVerified: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 export const User = mongoose.model('User', userSchema);
 export default User;
