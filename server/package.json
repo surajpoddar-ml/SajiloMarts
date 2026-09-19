@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "lint": "node --check src/server.js src/app.js src/database/connection.js"
+    "lint": "node --check src/server.js src/app.js src/database/connection.js src/models/user.model.js src/models/index.js"
   },
   "keywords": [
     "ecommerce",
