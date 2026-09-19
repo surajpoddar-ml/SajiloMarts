@@ -44,3 +44,19 @@ Do **NOT** use conventional commit prefixes:
 - ✅ `Update order service`
 - ✅ `Document API structure`
 - ✅ `Refine payment error handling`
+
+---
+
+## 3. Production Readiness & Infrastructure Standards (Planning)
+
+When deploying SastoMarts to production in future phases, the following infrastructure standards apply:
+
+| Domain | Standard / Target Architecture |
+| :--- | :--- |
+| **Frontend Hosting** | Global Edge CDN (Cloudflare Pages / Vercel) with asset compression and caching headers. |
+| **Backend API** | Containerized Node.js runtime managed with process supervision (PM2 / Docker) behind a reverse proxy. |
+| **Database** | MongoDB Atlas multi-region replica set with encrypted storage, automated daily backups, and VPC peering. |
+| **DNS & Edge Protection** | Cloudflare CDN + Web Application Firewall (WAF) enforcing TLS 1.3, DDoS mitigation, and HTTP to HTTPS redirects. |
+| **Secrets Management** | Production environment variables injected at deployment runtime via hosting secrets manager (never checked in). |
+| **Monitoring & Logging** | Structured JSON logs, error tracking (Sentry), and uptime alerting on `/api/v1/health`. |
+| **SEO & Accessibility** | Server-side metadata tags, semantic HTML5, and WCAG AA accessibility compliance across all e-commerce flows. |
