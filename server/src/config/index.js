@@ -16,3 +16,11 @@ export const isConfigValid = () => {
     return false;
   }
 };
+
+export const getSafeConfigSummary = () => {
+  return {
+    environment: process.env.NODE_ENV || 'development',
+    port: parseInt(process.env.PORT, 10) || 5000,
+    apiPrefix: process.env.API_PREFIX || '/api/v1',
+  };
+};
