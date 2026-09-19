@@ -1,20 +1,22 @@
-# Client JavaScript Standards
+# Client JavaScript Coding Standards
 
-## Technology Rules
-- **Strictly JavaScript & JSX**: Use `.js` and `.jsx` extensions only. No TypeScript (`.ts`, `.tsx`).
-- **Framework**: React 19 + Vite.
+## 1. Strict Technology Rule: Pure JavaScript Only
+- **Extensions:** `.js` and `.jsx` exclusively.
+- **Prohibited:** TypeScript (`.ts`, `.tsx`), `tsconfig.json`, TypeScript compilers, or `@types/*` packages.
+- **Standard:** Modern ECMAScript (ES2022+) with native modules (`import`/`export`).
 
-## Architecture Layers
-`Page → Reusable Component → Hook / Service → API Client`
+## 2. React Component Standards
+- **Single Responsibility:** A component must focus on rendering UI and handling user events.
+- **Composition over Inheritance:** Complex screens must compose smaller components (e.g. `App.jsx` composing `Header`, `StatusCard`, `FoundationHighlights`, `Footer`).
+- **No Direct DB Access:** React must never query databases or access server-only resources.
+- **Centralized API Calls:** Do not scatter `fetch()` across components. Use `healthService` and `http` from `@/services`.
 
-1. **Pages**: Route-level layout coordinators.
-2. **Components**: UI presentation and interaction. Small, focused, single responsibility.
-3. **Hooks**: Reusable stateful React logic.
-4. **Services**: Centralized HTTP requests and backend communication.
-5. **Utils**: Pure helper functions without UI or state dependencies.
+## 3. State Management Standards
+- **Intentional State:** Keep local state minimal. Derive values during render where possible.
+- **No Heavy Redundant Libraries:** Use React built-in state (`useState`, `useEffect`, `useContext`) and custom hooks (`useLocalStorage`, `useDebounce`).
 
-## Coding Conventions
-- **Components/Layouts**: PascalCase (`MainLayout.jsx`, `App.jsx`).
-- **Hooks**: camelCase with `use` prefix (`useDebounce.js`, `useLocalStorage.js`).
-- **Services/Utils**: camelCase (`health.service.js`, `currency.js`, `formatters.js`).
-- **Constants**: UPPER_SNAKE_CASE (`ROUTES`, `API_ENDPOINTS`, `APP_CONSTANTS`).
+## 4. Naming Conventions
+- **Components:** PascalCase (e.g. `MainLayout.jsx`, `StatusCard.jsx`).
+- **Hooks:** camelCase with `use` prefix (e.g. `useDebounce.js`).
+- **Services & Utils:** camelCase (e.g. `apiClient.js`, `currency.js`).
+- **Constants:** UPPER_SNAKE_CASE (e.g. `APP_CONSTANTS`, `ROUTES`).
