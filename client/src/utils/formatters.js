@@ -1,15 +1,25 @@
-export const formatCurrencyNPR = (amount) => {
-  return new Intl.NumberFormat('en-NP', {
-    style: 'currency',
-    currency: 'NPR',
-    maximumFractionDigits: 2,
-  }).format(amount);
+export const formatDate = (dateString, options = {}) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    ...options,
+  }).format(date);
 };
 
-export const formatCurrencyINR = (amount) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 2,
-  }).format(amount);
+export const truncateText = (text, maxLength = 60) => {
+  if (!text || text.length <= maxLength) return text || '';
+  return `${text.slice(0, maxLength)}...`;
+};
+
+export const slugify = (text) => {
+  return String(text)
+    .normalize('NFKD')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-');
 };
