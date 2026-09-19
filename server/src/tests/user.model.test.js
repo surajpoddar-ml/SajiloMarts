@@ -179,5 +179,54 @@ export const runSerializationTests = async () => {
   console.log('✅ User serialization tests passed successfully');
 };
 
+/**
+ * Unit test suite for User Model default values and role constraints.
+ */
+export const runDefaultsAndRolesTests = async () => {
+  console.log('🧪 Running Role and Account Defaults Tests...');
+
+  // 1. Default values on newly instantiated user
+  const defaultUser = new User({
+    name: 'Sunita Rai',
+    email: 'sunita@example.com',
+    password: 'SecurePassword123!',
+  });
+
+  assert.equal(defaultUser.role, USER_ROLES.CUSTOMER, 'Default role must be customer');
+  assert.equal(defaultUser.isActive, true, 'Default isActive must be true');
+  assert.equal(defaultUser.isEmailVerified, false, 'Default isEmailVerified must be false');
+
+  // 2. Explicit admin role assignment
+  const adminUser = new User({
+    name: 'Admin User',
+    email: 'admin.auth@example.com',
+    password: 'AdminPassword123!',
+    role: USER_ROLES.ADMIN,
+  });
+  await adminUser.validate();
+  assert.equal(adminUser.role, USER_ROLES.ADMIN, 'Admin role must be accepted');
+
+  // 3. Reject forbidden role values
+  const disallowedRoles = ['superadmin', 'manager', 'seller', 'guest', ''];
+  for (const role of disallowedRoles) {
+    const invalidUser = new User({
+      name: 'Invalid Role User',
+      email: 'invalid@example.com',
+      password: 'Password123!',
+      role,
+    });
+    let err;
+    try {
+      await invalidUser.validate();
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(err?.errors?.role, `Role "${role}" must fail validation`);
+  }
+
+  console.log('✅ Role and account defaults tests passed successfully');
+};
+
+
 
 
