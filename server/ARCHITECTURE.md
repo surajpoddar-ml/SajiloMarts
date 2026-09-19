@@ -1,56 +1,61 @@
-# Server Architecture & Development Guide
+# Server Architecture & Engineering Guidelines
 
-## Layered Pipeline Flow
+---
+
+## 1. Layered Pipeline Flow
 ```text
 HTTP Request
      ↓
-Route Layer (routes/v1/*)
+Route Layer (src/routes/v1/*)
      ↓
-Middleware Pipeline (Auth, RBAC, Validation, RateLimiter, Sanitizer)
+Middleware Pipeline (Auth, RBAC, Validation, RateLimiter, Sanitizer, Logger)
      ↓
-Controller Layer (controllers/*)
+Controller Layer (src/controllers/*)
      ↓
-Service Layer (services/*)
+Service Layer (src/services/*)
      ↓
-Model / Database Layer (models/*)
+Model / Database Layer (src/models/*) [Planned]
      ↓
 HTTP Standardized Response (ApiResponse / ApiError)
 ```
 
-## Layer Responsibilities
+---
 
-### 1. Route Layer (`src/routes/`)
-- Declares HTTP method endpoints and URL paths.
-- Binds validation, authentication, and authorization middlewares.
-- **Rule:** Never execute database queries or business calculations directly in route handlers.
+## 2. Layer Responsibilities & Architectural Boundaries
 
-### 2. Middleware Layer (`src/middlewares/`)
-- Intercepts requests before reaching controllers.
-- Responsibilities: JWT token verification (`auth`), role-based access control (`rbac`), rate limiting, NoSQL injection sanitization (`sanitizeInput`), request logging (`requestLogger`), 404 handler (`notFound`), and global error formatter (`errorHandler`).
+### 1. Routes (`src/routes/`)
+- **Responsibility:** Declares URL paths, HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), and endpoint grouping.
+- **Middleware Binding:** Binds authentication guards, validation schemas, and rate limiters to specific endpoints.
+- **Strict Prohibition:** Route files must **never** execute database operations, perform calculations, or format custom response bodies directly.
 
-### 3. Controller Layer (`src/controllers/`)
-- Extracts request headers, query params, URL parameters, and body payloads.
-- Invokes appropriate service methods.
-- Formats and returns standardized HTTP responses via `BaseController` or `ApiResponse`.
-- Uses `asyncHandler` to safely catch unhandled exceptions without repetitive try-catch blocks.
+### 2. Middleware (`src/middlewares/`)
+- **Responsibility:** Handles cross-cutting HTTP request concerns before controllers execute.
+- **Implemented Now:**
+  - `errorHandler.js`: Global exception catcher returning standardized error responses without leaking stack traces in production.
+  - `notFound.js`: Standard 404 handler for unrecognized paths.
+  - `asyncHandler.js`: Higher-order function wrapping async route handlers to eliminate repetitive try-catch blocks.
+  - `security.js` / Helmet / CORS: Request sanitization, origin whitelisting, and secure response headers.
+- **Planned for Future Prompts:**
+  - `auth.middleware.js`: JWT token extraction, signature verification, and user session hydration.
+  - `rbac.middleware.js`: Role-based access control checking (`admin`, `staff`, `customer`).
+  - `validation.middleware.js`: Request payload validation against strict schemas.
+  - `rateLimiter.js`: Redis/in-memory rate limiting against brute force and DDoS.
 
-### 4. Service Layer (`src/services/`)
-- Contains core domain business logic (e.g. quote pricing algorithms, tax/customs calculations, exchange rate peg conversions, order state machines).
-- **Rule:** Must return pure JavaScript data/objects. Must never reference Express `req` or `res` objects.
+### 3. Controllers (`src/controllers/`)
+- **Responsibility:** HTTP orchestrators that:
+  1. Extract parameters from `req.body`, `req.query`, `req.params`, and `req.user`.
+  2. Invoke domain service methods with clean JavaScript arguments.
+  3. Format and dispatch standardized HTTP responses via `ApiResponse`.
+- **Strict Prohibition:** Controllers must not contain complex business calculations, pricing logic, or direct database queries.
 
-### 5. Model Layer (`src/models/`) *(Future)*
-- Defines schema structures, indexes, and persistence methods for MongoDB collections.
+### 4. Services (`src/services/`)
+- **Responsibility:** The core business logic layer containing pure domain rules:
+  - Landed cost quote math (INR to NPR conversion, Nepal customs duty rates, freight fees).
+  - Order state machine transitions and validation.
+  - Payment initiation and webhook signature verification.
+  - External marketplace scraping and link normalization.
+- **Strict Prohibition:** Services must remain completely decoupled from the HTTP transport layer. They must **never** reference Express `req`, `res`, or `next` objects.
 
-## Application Responsibility Boundaries
-
-| System Layer | Core Responsibilities | Prohibited Actions |
-| :--- | :--- | :--- |
-| **Browser (Client)** | Render UI, capture interactions, manage local UI state, call REST API | Direct DB access, pricing authority, secret storage |
-| **Server (API)** | Authentication, RBAC, validation, pricing authority, quote math, tax estimation, order state transitions | Trusting unvalidated client calculations, exposing stack traces |
-| **Database (Data)** | Durable data persistence, indexed queries, relational document integrity | Direct exposure to public internet |
-
-## Development Workflow for New Backend Endpoints
-1. **Define Service Method:** Write business logic in `src/services/[domain].service.js`.
-2. **Define Controller:** Handle `req`/`res` in `src/controllers/[domain].controller.js` using `asyncHandler`.
-3. **Define Route:** Declare endpoint in `src/routes/v1/[domain].routes.js` and mount in `routes/v1/index.js`.
-4. **Attach Middleware:** Attach `requireAuth` / `requireRole` where access control is needed.
+### 5. Model / Database Layer (`src/models/`) — *Planned*
+- **Responsibility:** Defines Mongoose schemas, data types, indexes, relational references, and validation rules for persistent MongoDB collections.
+- **Strict Prohibition:** Models must not be accessed directly by controllers. All database interactions will flow through domain services.
