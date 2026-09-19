@@ -128,11 +128,16 @@ class DatabaseConnection {
    */
   async disconnect(force = false) {
     if (mongoose.connection && mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-      this.connection = null;
-      this.isConnected = false;
-      this.connectingPromise = null;
-      console.log('🛑 MongoDB connection closed cleanly');
+      try {
+        await mongoose.disconnect();
+      } catch (disconnectErr) {
+        console.warn('⚠️ Warning during Mongoose disconnect:', disconnectErr.message);
+      } finally {
+        this.connection = null;
+        this.isConnected = false;
+        this.connectingPromise = null;
+        console.log('🛑 MongoDB connection closed cleanly');
+      }
     }
   }
 }
