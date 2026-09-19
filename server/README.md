@@ -15,6 +15,24 @@ The platform enables customers and businesses in Nepal to source and purchase pr
 - **Security:** Helmet, CORS Origin Whitelist, Rate Limiting, Input Sanitization
 - **Logging:** Morgan (Environment-configurable)
 
+## Development Commands
+```bash
+# Navigate to server
+cd server
+
+# Install packages
+npm install
+
+# Start development server with live reload (nodemon)
+npm run dev
+
+# Start production server
+npm start
+
+# Run syntax/lint check
+npm run lint
+```
+
 ## Architecture Overview
 The backend follows an enterprise layered architecture:
 `Route → Middleware → Controller → Service → Model / Database`

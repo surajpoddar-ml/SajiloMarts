@@ -8,6 +8,27 @@ SastoMarts is a cross-border India-to-Nepal B2B/B2C e-commerce and product-sourc
 - **Linter:** Oxlint (JavaScript/JSX rules only)
 - **Styling:** CSS variables & modular CSS architecture
 
+## Development Commands
+```bash
+# Navigate to client
+cd client
+
+# Install packages
+npm install
+
+# Start Vite development server (http://localhost:5173)
+npm run dev
+
+# Run JavaScript/JSX linter
+npm run lint
+
+# Build production bundle
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
 ## Directory Overview
 ```text
 client/
