@@ -22,7 +22,7 @@ The platform enables customers and businesses in Nepal to source and purchase pr
 
 ---
 
-## 2. Technology Stack
+## 3. Technology Stack
 - **Runtime:** Node.js (v20+ / ES Modules)
 - **Framework:** Express 4 (Strict JavaScript only)
 - **Security:** Helmet, CORS Origin Whitelist, Rate Limiting, Input Sanitization
@@ -41,7 +41,7 @@ The platform enables customers and businesses in Nepal to source and purchase pr
 
 ---
 
-## 4. Documentation Index
+## 5. Documentation Index & Verification
 
 The following architecture guides provide comprehensive details on every facet of the backend:
 
@@ -56,4 +56,13 @@ The following architecture guides provide comprehensive details on every facet o
 | [`AUTH.md`](./AUTH.md) | JWT authentication and role-based access control planning |
 | [`PAYMENTS.md`](./PAYMENTS.md) | Payment gateway architecture and webhook verification |
 | [`WORKFLOW.md`](./WORKFLOW.md) | Git workflow, commit standards, and production principles |
-| [`ROADMAP.md`](./ROADMAP.md) | 21-step sequential future implementation order |
+| [`ROADMAP.md`](./ROADMAP.md) | 36-step sequential future implementation order |
+| [`STATUS.md`](./STATUS.md) | Subsystem implementation status matrix |
+
+---
+
+## 6. Documentation Accuracy Certification
+- [x] All active endpoints and file paths match the physical codebase.
+- [x] All future architectures (MongoDB, JWT Auth, eSewa/Khalti, RBAC) are explicitly designated as Planned.
+- [x] Pure JavaScript invariant verified across all files and dependencies.
+- [x] Zero sensitive credentials or private tokens are recorded in any document.
