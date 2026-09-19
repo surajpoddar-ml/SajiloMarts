@@ -1,61 +1,40 @@
-# SastoMarts — Payment Architecture & Gateway Planning
+# SastoMarts — Payment Architecture & Gateway Planning Guide
 
 > **Status:** Architecture Design / Planned (Not Yet Implemented in Code)
 
 ---
 
-## 1. Overview & Business Model
-
-SastoMarts facilitates cross-border e-commerce and product sourcing between India and Nepal. Transactions must handle Nepal Rupees (NPR) as the primary base pricing currency while supporting Indian Rupee (INR) supplier cost conversions and international payment rails.
+## 1. Cross-Border Financial Flow & Currency Peg
+SastoMarts facilitates cross-border e-commerce and product sourcing between India and Nepal:
+- **Base Sourcing Currency:** Indian Rupee (INR).
+- **Customer Facing Currency:** Nepali Rupee (NPR).
+- **Official Pegged Rate:** `1 INR = 1.60 NPR`.
+- **Landed Cost Breakdown:**
+  $$\text{Landed Cost (NPR)} = (\text{Supplier INR} \times 1.60) + \text{Customs Duty} + \text{Cross-Border Freight} + \text{Service Fee} + \text{Nepal VAT/Taxes}$$
 
 ---
 
-## 2. Planned Payment Gateways
+## 2. Planned Payment Gateways & Integration Protocols
 
-| Gateway | Primary Region / Use Case | Protocol / Method |
+| Gateway | Primary Region / Method | Integration Protocol |
 | :--- | :--- | :--- |
-| **eSewa** | Nepal Domestic | Redirect / EPAY API & Signature Verification |
-| **Khalti** | Nepal Domestic | Khalti Payment Gateway (KPG) v2 Widget / Server Verification |
-| **Fonepay / ConnectIPS**| Nepal Bank Interbank | QR Code & Direct Bank Transfer Gateway |
-| **Stripe** | International Cards (Visa / Mastercard) | Stripe Elements / Payment Intents API |
-| **Cash on Delivery (COD)**| Nepal Local Delivery | Restricted threshold with admin phone/SMS verification |
+| **eSewa** | Nepal Domestic Wallet | eSewa EPAY v2 API (HMAC SHA-256 signature payload & redirect callback). |
+| **Khalti** | Nepal Domestic Wallet / Banking | Khalti Payment Gateway (KPG) v2 API (Server-to-Server `/epayment/lookup/` verification). |
+| **Fonepay / ConnectIPS**| Nepal Interbank | Direct Interbank QR & Gateway API with cryptographic checksum verification. |
+| **Bank Transfer** | Nepal Corporate / High-Value | Manual slip upload + Admin manual reconciliation with dual verification. |
+| **Cash on Delivery (COD)**| Nepal Domestic Local | Restricted to low-risk verified accounts with SMS confirmation. |
+| **Stripe** | International Visa / Mastercard | Stripe PaymentIntents API with webhook event signatures. |
 
 ---
 
-## 3. Server-Authoritative Payment Principles
+## 3. Server-Authoritative Financial Principles
 
-1. **Client Never Dictates Amount**: The browser NEVER sends the payable amount to the payment gateway. The server calculates the exact order total (subtotal + customs duty + international shipping + tax - coupons) and signs the payment request payload.
-2. **Idempotency**: All payment initialization and verification operations will use idempotent transaction tokens to prevent double billing.
-3. **Webhook Verification**: Payment gateways will notify SastoMarts via server-to-server webhooks. All incoming webhooks must verify HMAC signatures using secret keys stored strictly in private environment variables.
-4. **State Machine**: Order payment status follows a strict lifecycle:
-   - `PENDING` → `PROCESSING` → `COMPLETED` / `FAILED` / `REFUNDED`
-5. **Audit Trail**: Every payment attempt, gateway response, webhook log, and status transition is recorded in an immutable payment transaction collection.
-
----
-
-## 4. Planned Architecture & File Layout
-
-When payment integration is scheduled in a future prompt, it will follow this module layout:
-
-```text
-server/src/
-├── integrations/
-│   ├── esewa/          # eSewa API client & signature generator
-│   ├── khalti/         # Khalti v2 API client & verification
-│   └── stripe/         # Stripe SDK wrapper & webhook parser
-├── services/
-│   ├── payment.service.js   # Orchestrates payment initialization and callback processing
-├── controllers/
-│   └── payment.controller.js # Handles client initiation & webhook endpoints
-├── routes/v1/
-│   └── payment.routes.js     # /api/v1/payments (initiate, verify, webhook)
-```
-
----
-
-## 5. Security & Compliance Checklist
-
-- [ ] Private API keys & secret hashes stored strictly in private `.env`
-- [ ] Webhook endpoints configured with raw body parser for accurate HMAC calculation
-- [ ] TLS 1.3 encryption for all gateway communication
-- [ ] No cardholder PAN or CVV stored in SastoMarts database (PCI-DSS compliance via tokenization)
+1. **Client Never Dictates Payable Amount**: The browser client **never** sends payable amounts to gateways. The backend server computes the exact order total and issues cryptographically signed payment initialization tokens.
+2. **Idempotency**: Every payment attempt generates a unique UUID `transactionToken` to prevent accidental double-charges.
+3. **Webhook Verification**: Inbound webhooks must verify HMAC signatures using private secrets stored in `.env`.
+4. **Payment State Machine**:
+   ```text
+   INITIATED → PROCESSING → COMPLETED
+                          ↘ FAILED / EXPIRED / REFUNDED
+   ```
+5. **Immutable Audit Trail**: All gateway requests, raw payloads, IP addresses, and response codes are stored in the database for compliance.
