@@ -118,8 +118,17 @@ export class AddressService extends BaseService {
     // Prevent overriding protected ownership and internal fields
     const { userId: _uId, _id: _id, createdAt: _c, updatedAt: _u, ...allowedUpdates } = updateData;
 
+    // If address is being set to inactive, clear default flags
+    if (allowedUpdates.isActive === false) {
+      allowedUpdates.isDefaultShipping = false;
+      allowedUpdates.isDefaultBilling = false;
+    }
+
     // If setting as default shipping, clear other shipping defaults for this user
     if (allowedUpdates.isDefaultShipping === true) {
+      if (address.isActive === false && allowedUpdates.isActive !== true) {
+        throw new BadRequestError('Cannot set an inactive address as default shipping address');
+      }
       await Address.updateMany(
         { userId, _id: { $ne: addressId }, isDefaultShipping: true },
         { $set: { isDefaultShipping: false } }
@@ -128,6 +137,9 @@ export class AddressService extends BaseService {
 
     // If setting as default billing, clear other billing defaults for this user
     if (allowedUpdates.isDefaultBilling === true) {
+      if (address.isActive === false && allowedUpdates.isActive !== true) {
+        throw new BadRequestError('Cannot set an inactive address as default billing address');
+      }
       await Address.updateMany(
         { userId, _id: { $ne: addressId }, isDefaultBilling: true },
         { $set: { isDefaultBilling: false } }
