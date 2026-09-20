@@ -111,6 +111,13 @@ const addressSchema = new mongoose.Schema(
       trim: true,
       maxlength: [20, 'Postal code cannot exceed 20 characters'],
     },
+    deliveryInstructions: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [500, 'Delivery instructions cannot exceed 500 characters'],
+    },
   },
   {
     timestamps: true,
