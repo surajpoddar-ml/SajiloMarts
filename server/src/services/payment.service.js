@@ -134,7 +134,86 @@ export class PaymentService extends BaseService {
 
     return savedPayment;
   }
+
+  /**
+   * Helper: Asserts that a user holds the administrative role.
+   * @param {string} adminUserId
+   */
+  async assertAdmin(adminUserId) {
+    this.validateObjectId(adminUserId, 'Admin User ID');
+    const { User, USER_ROLES } = await import('../models/user.model.js');
+    const adminUser = await User.findById(adminUserId);
+    if (!adminUser || adminUser.role !== USER_ROLES.ADMIN) {
+      throw new ForbiddenError('Administrative privileges required');
+    }
+    return adminUser;
+  }
+
+  /**
+   * Retrieves payment submission details including proof for administrative inspection.
+   * @param {string} adminUserId - Admin User ID
+   * @param {string} paymentId - Payment ID
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async getPaymentForAdmin(adminUserId, paymentId) {
+    await this.assertAdmin(adminUserId);
+    this.validateObjectId(paymentId, 'Payment ID');
+
+    const payment = await PaymentSubmission.findById(paymentId)
+      .populate('user', 'name email phone role')
+      .populate('productRequest');
+
+    if (!payment) {
+      throw new NotFoundError('Payment submission not found');
+    }
+
+    return payment;
+  }
+
+  /**
+   * Reviews and verifies or rejects a customer payment submission.
+   * Updates associated ProductRequest status accordingly.
+   * @param {string} adminUserId - Admin User ID
+   * @param {string} paymentId - Payment ID
+   * @param {object} reviewData - { status: 'verified' | 'rejected', rejectionReason?: string }
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async reviewPayment(adminUserId, paymentId, reviewData = {}) {
+    await this.assertAdmin(adminUserId);
+    this.validateObjectId(paymentId, 'Payment ID');
+
+    const payment = await PaymentSubmission.findById(paymentId);
+    if (!payment) {
+      throw new NotFoundError('Payment submission not found');
+    }
+
+    const { status, rejectionReason } = reviewData;
+    if (![PAYMENT_STATUSES.VERIFIED, PAYMENT_STATUSES.REJECTED].includes(status)) {
+      throw new BadRequestError('Review status must be either "verified" or "rejected"');
+    }
+
+    payment.paymentStatus = status;
+    payment.verifiedAt = new Date();
+    payment.verifiedBy = adminUserId;
+    if (status === PAYMENT_STATUSES.REJECTED) {
+      payment.rejectionReason = rejectionReason ? String(rejectionReason).trim() : 'Payment proof rejected by admin';
+    }
+
+    const savedPayment = await payment.save();
+
+    // Update product request status based on verification result
+    const newRequestStatus = status === PAYMENT_STATUSES.VERIFIED
+      ? REQUEST_STATUSES.PAYMENT_VERIFIED
+      : REQUEST_STATUSES.PAYMENT_PENDING;
+
+    await ProductRequest.findByIdAndUpdate(payment.productRequest, {
+      status: newRequestStatus,
+    });
+
+    return savedPayment;
+  }
 }
 
 export const paymentService = new PaymentService();
 export default paymentService;
+
