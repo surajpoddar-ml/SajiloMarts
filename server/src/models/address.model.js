@@ -156,6 +156,20 @@ const addressSchema = new mongoose.Schema(
     strict: true,
     strictQuery: true,
     collection: 'addresses',
+    toJSON: {
+      virtuals: true,
+      transform: function (_doc, ret) {
+        delete ret.__v;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: function (_doc, ret) {
+        delete ret.__v;
+        return ret;
+      },
+    },
   }
 );
 
