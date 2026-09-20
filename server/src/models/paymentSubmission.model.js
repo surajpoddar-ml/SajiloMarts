@@ -54,6 +54,12 @@ const paymentSubmissionSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, 'Transaction code cannot exceed 100 characters'],
     },
+    paymentProof: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+    },
   },
   {
     timestamps: true,
