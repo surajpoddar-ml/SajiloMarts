@@ -197,3 +197,94 @@ export const runAddressOwnershipTests = async () => {
   }
 };
 
+/**
+ * Unit tests for default shipping address logic.
+ */
+export const runShippingDefaultTests = async () => {
+  console.log('🧪 Running Shipping Default Tests...');
+
+  const userId = new mongoose.Types.ObjectId().toString();
+  const addressId1 = new mongoose.Types.ObjectId().toString();
+  const addressId2 = new mongoose.Types.ObjectId().toString();
+
+  // Mock addresses in memory
+  const addressStore = [
+    {
+      _id: addressId1,
+      userId,
+      fullName: 'Default Recipient',
+      phone: '+977 9841234567',
+      province: 'Bagmati',
+      district: 'Kathmandu',
+      municipality: 'Kathmandu',
+      wardNumber: 3,
+      tole: 'Lazimpat',
+      country: 'Nepal',
+      label: 'home',
+      isActive: true,
+      isDefaultShipping: true,
+      isDefaultBilling: false,
+      save: async function () { return this; },
+    },
+    {
+      _id: addressId2,
+      userId,
+      fullName: 'Second Recipient',
+      phone: '+977 9841234567',
+      province: 'Bagmati',
+      district: 'Kathmandu',
+      municipality: 'Kathmandu',
+      wardNumber: 4,
+      tole: 'Baluwatar',
+      country: 'Nepal',
+      label: 'work',
+      isActive: true,
+      isDefaultShipping: false,
+      isDefaultBilling: false,
+      save: async function () { return this; },
+    },
+  ];
+
+  const origFindById = Address.findById;
+  const origUpdateMany = Address.updateMany;
+  const origFindOne = Address.findOne;
+
+  Address.findById = (id) => addressStore.find((a) => a._id === id);
+  Address.updateMany = async (filter, update) => {
+    for (const a of addressStore) {
+      if (a.userId === filter.userId && (!filter._id?.$ne || a._id !== filter._id.$ne)) {
+        if (update.$set?.isDefaultShipping !== undefined) {
+          a.isDefaultShipping = update.$set.isDefaultShipping;
+        }
+      }
+    }
+  };
+  Address.findOne = (query) => addressStore.find((a) => a.userId === query.userId && a.isActive && a.isDefaultShipping);
+
+  try {
+    // 1. Initial check - address 1 is default shipping
+    const initialDefault = await addressService.getDefaultShippingAddress(userId);
+    assert.equal(initialDefault._id, addressId1, 'Address 1 should initially be default shipping');
+
+    // 2. Set address 2 as default shipping
+    await addressService.setDefaultShippingAddress(userId, addressId2);
+    assert.equal(addressStore[0].isDefaultShipping, false, 'Address 1 should no longer be default shipping');
+    assert.equal(addressStore[1].isDefaultShipping, true, 'Address 2 should now be default shipping');
+
+    // 3. Inactive address cannot be set as default shipping
+    addressStore[0].isActive = false;
+    let inactiveErr;
+    try {
+      await addressService.setDefaultShippingAddress(userId, addressId1);
+    } catch (err) {
+      inactiveErr = err;
+    }
+    assert.equal(inactiveErr?.statusCode, 400, 'Inactive address cannot be set as default shipping');
+
+    console.log('✅ Shipping default tests passed successfully');
+  } finally {
+    Address.findById = origFindById;
+    Address.updateMany = origUpdateMany;
+    Address.findOne = origFindOne;
+  }
+};
