@@ -138,6 +138,7 @@ const addressSchema = new mongoose.Schema(
     timestamps: true,
     strict: true,
     strictQuery: true,
+    collection: 'addresses',
   }
 );
 
