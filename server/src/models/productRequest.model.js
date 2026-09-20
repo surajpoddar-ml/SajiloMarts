@@ -32,6 +32,7 @@ const productRequestSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'User is required'],
+      immutable: [true, 'Request ownership cannot be reassigned'],
       index: true,
     },
     productUrl: {
