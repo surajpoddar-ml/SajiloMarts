@@ -39,6 +39,12 @@ const addressSchema = new mongoose.Schema(
       lowercase: true,
       required: [true, 'Address label is required'],
     },
+    country: {
+      type: String,
+      default: 'Nepal',
+      required: [true, 'Country is required'],
+      trim: true,
+    },
   },
   {
     timestamps: true,
