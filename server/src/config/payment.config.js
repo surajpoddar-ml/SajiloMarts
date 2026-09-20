@@ -21,6 +21,14 @@ export const paymentConfig = {
       accountName: 'SajiloMarts Pvt. Ltd.',
       instructions: 'Pay via Khalti QR code or wallet transfer and submit the transaction code.',
     },
+    [PAYMENT_METHODS.MYPAY]: {
+      id: PAYMENT_METHODS.MYPAY,
+      displayName: 'MyPay Digital Wallet',
+      enabled: true,
+      qrImageReference: 'mypay_merchant_qr.webp',
+      accountName: 'SajiloMarts Pvt. Ltd.',
+      instructions: 'Pay via MyPay QR code or merchant payment and upload/submit your payment reference.',
+    },
   },
 };
 
