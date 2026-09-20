@@ -40,6 +40,43 @@ export class AddressService extends BaseService {
 
     return address;
   }
+
+  /**
+   * Creates a new address for a user.
+   * Clears existing default shipping/billing addresses if requested on new address.
+   * @param {string} userId - User ObjectId
+   * @param {object} addressData - New address payload
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async createAddress(userId, addressData) {
+    this.validateObjectId(userId, 'User ID');
+
+    // Mass assignment protection: ensure userId is bound to authenticated user
+    const { userId: _ignoreUserId, _id: _ignoreId, createdAt: _c, updatedAt: _u, ...cleanData } = addressData;
+
+    // Handle default shipping unset on existing addresses if new is default
+    if (cleanData.isDefaultShipping) {
+      await Address.updateMany(
+        { userId, isDefaultShipping: true },
+        { $set: { isDefaultShipping: false } }
+      );
+    }
+
+    // Handle default billing unset on existing addresses if new is default
+    if (cleanData.isDefaultBilling) {
+      await Address.updateMany(
+        { userId, isDefaultBilling: true },
+        { $set: { isDefaultBilling: false } }
+      );
+    }
+
+    const newAddress = new Address({
+      ...cleanData,
+      userId,
+    });
+
+    return newAddress.save();
+  }
 }
 
 export const addressService = new AddressService();
