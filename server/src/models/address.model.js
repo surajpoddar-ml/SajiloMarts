@@ -45,6 +45,13 @@ const addressSchema = new mongoose.Schema(
       required: [true, 'Country is required'],
       trim: true,
     },
+    province: {
+      type: String,
+      required: [true, 'Province is required'],
+      trim: true,
+      minlength: [2, 'Province must be at least 2 characters'],
+      maxlength: [50, 'Province cannot exceed 50 characters'],
+    },
   },
   {
     timestamps: true,
