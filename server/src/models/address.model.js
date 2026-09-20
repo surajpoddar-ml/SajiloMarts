@@ -104,6 +104,13 @@ const addressSchema = new mongoose.Schema(
       trim: true,
       maxlength: [150, 'Landmark cannot exceed 150 characters'],
     },
+    postalCode: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [20, 'Postal code cannot exceed 20 characters'],
+    },
   },
   {
     timestamps: true,
