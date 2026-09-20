@@ -372,3 +372,92 @@ export const runBillingDefaultTests = async () => {
   }
 };
 
+/**
+ * Live MongoDB Atlas integration test for the Address model and service.
+ */
+export const runMongoAddressIntegrationTests = async () => {
+  console.log('🧪 Running MongoDB Address Atlas Integration Tests...');
+  const { connectDatabase } = await import('../database/connection.js');
+  const { User } = await import('../models/user.model.js');
+  const mongoose = (await import('mongoose')).default;
+
+  if (mongoose.connection.readyState !== 1) {
+    await connectDatabase();
+  }
+
+  const uniqueSuffix = Date.now();
+  let testUser;
+  const createdAddressIds = [];
+
+  try {
+    // 1. Create temporary test User
+    testUser = await User.create({
+      name: 'Address Test User',
+      email: `address_test_${uniqueSuffix}@example.com`,
+      password: 'SecureAddressPass123!',
+      phone: '+977 9801234567',
+    });
+
+    // 2. Sync indexes
+    await Address.syncIndexes();
+    const indexes = await Address.collection.indexes();
+    assert.ok(indexes.some((idx) => idx.key.userId === 1 && idx.key.isActive === 1), 'Compound index userId+isActive should exist');
+
+    // 3. Create address 1 via service
+    const addr1 = await addressService.createAddress(testUser._id.toString(), {
+      fullName: 'Suman Thapa',
+      phone: '+977 9841000001',
+      province: 'Bagmati',
+      district: 'Kathmandu',
+      municipality: 'Kathmandu Metropolitan City',
+      wardNumber: 3,
+      tole: 'Maharajgunj',
+      isDefaultShipping: true,
+      isDefaultBilling: true,
+    });
+    createdAddressIds.push(addr1._id);
+    assert.equal(addr1.isDefaultShipping, true);
+    assert.equal(addr1.isDefaultBilling, true);
+
+    // 4. Create address 2 setting isDefaultShipping = true
+    const addr2 = await addressService.createAddress(testUser._id.toString(), {
+      fullName: 'Suman Thapa Office',
+      phone: '+977 9841000002',
+      province: 'Bagmati',
+      district: 'Kathmandu',
+      municipality: 'Kathmandu Metropolitan City',
+      wardNumber: 4,
+      tole: 'Baluwatar',
+      isDefaultShipping: true,
+      label: 'work',
+    });
+    createdAddressIds.push(addr2._id);
+
+    // Verify address 1 is no longer default shipping, but remains default billing
+    const refreshedAddr1 = await Address.findById(addr1._id);
+    assert.equal(refreshedAddr1.isDefaultShipping, false, 'Addr 1 shipping default should have been cleared');
+    assert.equal(refreshedAddr1.isDefaultBilling, true, 'Addr 1 billing default should remain');
+
+    // 5. Query user addresses
+    const userAddresses = await addressService.getUserAddresses(testUser._id.toString());
+    assert.equal(userAddresses.length, 2, 'User should have 2 active addresses');
+
+    // 6. Deactivate address 2
+    const deactivatedAddr2 = await addressService.deactivateAddress(testUser._id.toString(), addr2._id.toString());
+    assert.equal(deactivatedAddr2.isActive, false, 'Addr 2 should be inactive');
+    assert.equal(deactivatedAddr2.isDefaultShipping, false, 'Inactive addr cannot remain default shipping');
+
+    console.log('✅ MongoDB Address Atlas integration tests passed successfully');
+  } finally {
+    // Clean up test documents safely
+    if (createdAddressIds.length > 0) {
+      await Address.deleteMany({ _id: { $in: createdAddressIds } });
+    }
+    if (testUser && testUser._id) {
+      await User.deleteOne({ _id: testUser._id });
+    }
+    console.log('🧹 Cleaned up isolated address integration test records');
+  }
+};
+
+
