@@ -60,6 +60,35 @@ const paymentSubmissionSchema = new mongoose.Schema(
       default: null,
       trim: true,
     },
+    paymentStatus: {
+      type: String,
+      enum: {
+        values: Object.values(PAYMENT_STATUSES),
+        message: 'Invalid payment status',
+      },
+      default: PAYMENT_STATUSES.PENDING,
+      required: true,
+      index: true,
+    },
+    submittedAt: {
+      type: Date,
+      default: null,
+    },
+    verifiedAt: {
+      type: Date,
+      default: null,
+    },
+    verifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    rejectionReason: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: [500, 'Rejection reason cannot exceed 500 characters'],
+    },
   },
   {
     timestamps: true,

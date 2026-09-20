@@ -88,6 +88,52 @@ export class PaymentService extends BaseService {
 
     return savedPayment;
   }
+
+  /**
+   * Submits proof of payment (transaction code and/or screenshot reference).
+   * Transitions status to 'proof_submitted' / 'under_review'.
+   * @param {string} userId - User ID
+   * @param {string} paymentId - PaymentSubmission ID
+   * @param {object} proofData - { transactionCode, paymentProof }
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async submitPaymentProof(userId, paymentId, proofData = {}) {
+    this.validateObjectId(userId, 'User ID');
+    this.validateObjectId(paymentId, 'Payment ID');
+
+    const payment = await PaymentSubmission.findById(paymentId);
+    if (!payment) {
+      throw new NotFoundError('Payment submission not found');
+    }
+
+    if (payment.user.toString() !== userId.toString()) {
+      throw new ForbiddenError('You do not have permission to submit proof for this payment');
+    }
+
+    const { transactionCode, paymentProof } = proofData;
+    if (!transactionCode && !paymentProof) {
+      throw new BadRequestError('Either transaction code or payment proof image must be provided');
+    }
+
+    if (transactionCode) {
+      payment.transactionCode = String(transactionCode).trim();
+    }
+    if (paymentProof) {
+      payment.paymentProof = String(paymentProof).trim();
+    }
+
+    payment.paymentStatus = PAYMENT_STATUSES.PROOF_SUBMITTED;
+    payment.submittedAt = new Date();
+
+    const savedPayment = await payment.save();
+
+    // Also update associated product request status to payment_submitted
+    await ProductRequest.findByIdAndUpdate(payment.productRequest, {
+      status: REQUEST_STATUSES.PAYMENT_SUBMITTED,
+    });
+
+    return savedPayment;
+  }
 }
 
 export const paymentService = new PaymentService();
