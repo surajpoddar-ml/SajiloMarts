@@ -47,6 +47,13 @@ const paymentSubmissionSchema = new mongoose.Schema(
       default: 0,
       min: [0, 'Remaining amount cannot be negative'],
     },
+    transactionCode: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [100, 'Transaction code cannot exceed 100 characters'],
+    },
   },
   {
     timestamps: true,
