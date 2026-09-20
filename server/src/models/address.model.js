@@ -19,6 +19,7 @@ const addressSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'User ID is required'],
+      immutable: [true, 'Address ownership cannot be reassigned'],
       index: true,
     },
     fullName: {
