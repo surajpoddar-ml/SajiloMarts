@@ -128,3 +128,72 @@ export const runAddressValidationTests = async () => {
 
   console.log('✅ Address validation tests passed successfully');
 };
+
+/**
+ * Unit tests for address ownership security and isolation.
+ */
+export const runAddressOwnershipTests = async () => {
+  console.log('🧪 Running Address Ownership Tests...');
+
+  const userAId = new mongoose.Types.ObjectId().toString();
+  const userBId = new mongoose.Types.ObjectId().toString();
+  const addressAId = new mongoose.Types.ObjectId().toString();
+
+  // Mock Address.findById to return User A's address
+  const originalFindById = Address.findById;
+  Address.findById = (id) => ({
+    _id: id,
+    userId: userAId,
+    fullName: 'User A Recipient',
+    phone: '+977 9841111111',
+    province: 'Bagmati',
+    district: 'Kathmandu',
+    municipality: 'Kathmandu',
+    wardNumber: 1,
+    tole: 'Thamel',
+    country: 'Nepal',
+    label: 'home',
+    isActive: true,
+    isDefaultShipping: true,
+    isDefaultBilling: false,
+    save: async function () { return this; },
+  });
+
+  try {
+    // 1. User A retrieves own address -> succeeds
+    const userAAddress = await addressService.getAddressForUser(userAId, addressAId);
+    assert.equal(userAAddress.userId, userAId, 'User A should access their own address');
+
+    // 2. User B tries to retrieve User A's address -> ForbiddenError
+    let getErr;
+    try {
+      await addressService.getAddressForUser(userBId, addressAId);
+    } catch (err) {
+      getErr = err;
+    }
+    assert.equal(getErr?.statusCode, 403, 'User B should get 403 Forbidden accessing User A address');
+
+    // 3. User B tries to update User A's address -> ForbiddenError
+    let updateErr;
+    try {
+      await addressService.updateAddress(userBId, addressAId, { fullName: 'Hacker Name' });
+    } catch (err) {
+      updateErr = err;
+    }
+    assert.equal(updateErr?.statusCode, 403, 'User B should get 403 Forbidden updating User A address');
+
+    // 4. User B tries to deactivate User A's address -> ForbiddenError
+    let deactErr;
+    try {
+      await addressService.deactivateAddress(userBId, addressAId);
+    } catch (err) {
+      deactErr = err;
+    }
+    assert.equal(deactErr?.statusCode, 403, 'User B should get 403 Forbidden deactivating User A address');
+
+    console.log('✅ Address ownership security tests passed successfully');
+  } finally {
+    Address.findById = originalFindById;
+  }
+};
+
