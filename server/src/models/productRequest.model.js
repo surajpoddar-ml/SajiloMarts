@@ -26,6 +26,30 @@ export const REQUEST_STATUSES = Object.freeze({
 
 export const PRODUCT_URL_REGEX = /^https?:\/\/[^\s$.?#].[^\s]*$/i;
 
+export const quoteSnapshotSchema = new mongoose.Schema(
+  {
+    sourceCurrency: { type: String, default: 'INR', required: true },
+    destinationCurrency: { type: String, default: 'NPR', required: true },
+    sourceUnitPriceInr: { type: Number, required: true },
+    quantity: { type: Number, required: true },
+    sourceSubtotalInr: { type: Number, required: true },
+    exchangeRate: { type: Number, required: true },
+    convertedAmountNpr: { type: Number, required: true },
+    paymentMode: {
+      type: String,
+      enum: ['online_100', 'cod_50_50'],
+      required: true,
+    },
+    appliedRate: { type: Number, required: true },
+    rateAmountNpr: { type: Number, required: true },
+    finalAmountNpr: { type: Number, required: true },
+    payNowAmountNpr: { type: Number, required: true },
+    remainingCodAmountNpr: { type: Number, required: true, default: 0 },
+    calculatedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const productRequestSchema = new mongoose.Schema(
   {
     user: {
@@ -114,6 +138,11 @@ const productRequestSchema = new mongoose.Schema(
       default: REQUEST_STATUSES.SUBMITTED,
       required: true,
       index: true,
+    },
+    quote: {
+      type: quoteSnapshotSchema,
+      required: false,
+      default: null,
     },
   },
   {
