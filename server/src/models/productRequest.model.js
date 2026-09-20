@@ -150,12 +150,40 @@ const productRequestSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+    internalNotes: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [2000, 'Internal notes cannot exceed 2000 characters'],
+      select: false,
+    },
   },
   {
     timestamps: true,
     strict: true,
     strictQuery: true,
     collection: 'product_requests',
+    toJSON: {
+      virtuals: true,
+      transform: function (_doc, ret) {
+        delete ret.__v;
+        if (!_doc.$locals?.isAdmin) {
+          delete ret.internalNotes;
+        }
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: function (_doc, ret) {
+        delete ret.__v;
+        if (!_doc.$locals?.isAdmin) {
+          delete ret.internalNotes;
+        }
+        return ret;
+      },
+    },
   }
 );
 

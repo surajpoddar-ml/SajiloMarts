@@ -125,6 +125,26 @@ export class ProductRequestService extends BaseService {
 
     return request;
   }
+
+  /**
+   * Updates internal admin notes on a request (admin only).
+   * @param {string} adminUserId - Admin User ID
+   * @param {string} requestId - Request ID
+   * @param {string} internalNotes - Private notes
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async updateInternalNotes(adminUserId, requestId, internalNotes) {
+    await this.assertAdmin(adminUserId);
+    this.validateObjectId(requestId, 'Request ID');
+
+    const request = await ProductRequest.findById(requestId).select('+internalNotes');
+    if (!request) {
+      throw new NotFoundError('Product request not found');
+    }
+
+    request.internalNotes = internalNotes ? String(internalNotes).trim() : null;
+    return request.save();
+  }
 }
 
 export const productRequestService = new ProductRequestService();
