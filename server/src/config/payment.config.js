@@ -29,6 +29,12 @@ export const paymentConfig = {
       accountName: 'SajiloMarts Pvt. Ltd.',
       instructions: 'Pay via MyPay QR code or merchant payment and upload/submit your payment reference.',
     },
+    cod: {
+      id: 'cod',
+      displayName: 'Cash on Delivery (Remaining 50%)',
+      enabled: true,
+      instructions: 'Pay the remaining balance in cash to the courier upon delivery in Nepal.',
+    },
   },
 };
 
