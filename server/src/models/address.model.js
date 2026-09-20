@@ -123,6 +123,11 @@ const addressSchema = new mongoose.Schema(
       default: false,
       required: true,
     },
+    isDefaultBilling: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   {
     timestamps: true,
