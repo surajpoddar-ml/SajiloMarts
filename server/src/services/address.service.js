@@ -77,6 +77,33 @@ export class AddressService extends BaseService {
 
     return newAddress.save();
   }
+
+  /**
+   * Retrieves all active addresses belonging to a specific user.
+   * @param {string} userId - User ObjectId
+   * @param {object} [options={}] - Query options (e.g. includeInactive)
+   * @returns {Promise<Array<import('mongoose').Document>>}
+   */
+  async getUserAddresses(userId, options = {}) {
+    this.validateObjectId(userId, 'User ID');
+
+    const query = { userId };
+    if (!options.includeInactive) {
+      query.isActive = true;
+    }
+
+    return Address.find(query).sort({ isDefaultShipping: -1, createdAt: -1 });
+  }
+
+  /**
+   * Retrieves a single address verifying user ownership.
+   * @param {string} userId - User ObjectId
+   * @param {string} addressId - Address ObjectId
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async getAddressForUser(userId, addressId) {
+    return this.verifyOwnership(userId, addressId);
+  }
 }
 
 export const addressService = new AddressService();
