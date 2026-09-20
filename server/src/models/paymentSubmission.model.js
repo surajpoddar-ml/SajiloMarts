@@ -69,5 +69,8 @@ const paymentSubmissionSchema = new mongoose.Schema(
   }
 );
 
+paymentSubmissionSchema.index({ productRequest: 1, user: 1 });
+paymentSubmissionSchema.index({ user: 1, paymentStatus: 1 });
+
 export const PaymentSubmission = mongoose.model('PaymentSubmission', paymentSubmissionSchema);
 export default PaymentSubmission;

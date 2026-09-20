@@ -144,6 +144,12 @@ const productRequestSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+    paymentSubmission: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PaymentSubmission',
+      required: false,
+      default: null,
+    },
   },
   {
     timestamps: true,
