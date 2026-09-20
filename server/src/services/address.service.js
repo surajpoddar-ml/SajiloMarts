@@ -153,6 +153,38 @@ export class AddressService extends BaseService {
 
     return address.save();
   }
+
+  /**
+   * Designates an address as the default shipping address, unsetting any previous shipping default.
+   * @param {string} userId - User ObjectId
+   * @param {string} addressId - Address ObjectId
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async setDefaultShippingAddress(userId, addressId) {
+    const address = await this.verifyOwnership(userId, addressId);
+
+    if (!address.isActive) {
+      throw new BadRequestError('Cannot set an inactive address as default shipping address');
+    }
+
+    await Address.updateMany(
+      { userId, _id: { $ne: addressId }, isDefaultShipping: true },
+      { $set: { isDefaultShipping: false } }
+    );
+
+    address.isDefaultShipping = true;
+    return address.save();
+  }
+
+  /**
+   * Retrieves the active default shipping address for a user.
+   * @param {string} userId - User ObjectId
+   * @returns {Promise<import('mongoose').Document|null>}
+   */
+  async getDefaultShippingAddress(userId) {
+    this.validateObjectId(userId, 'User ID');
+    return Address.findOne({ userId, isActive: true, isDefaultShipping: true });
+  }
 }
 
 export const addressService = new AddressService();
