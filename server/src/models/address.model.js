@@ -128,6 +128,11 @@ const addressSchema = new mongoose.Schema(
       default: false,
       required: true,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
   },
   {
     timestamps: true,
