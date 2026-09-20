@@ -118,6 +118,11 @@ const addressSchema = new mongoose.Schema(
       trim: true,
       maxlength: [500, 'Delivery instructions cannot exceed 500 characters'],
     },
+    isDefaultShipping: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   {
     timestamps: true,
