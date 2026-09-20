@@ -288,3 +288,87 @@ export const runShippingDefaultTests = async () => {
     Address.findOne = origFindOne;
   }
 };
+
+/**
+ * Unit tests for default billing address logic.
+ */
+export const runBillingDefaultTests = async () => {
+  console.log('🧪 Running Billing Default Tests...');
+
+  const userId = new mongoose.Types.ObjectId().toString();
+  const addressId1 = new mongoose.Types.ObjectId().toString();
+  const addressId2 = new mongoose.Types.ObjectId().toString();
+
+  const addressStore = [
+    {
+      _id: addressId1,
+      userId,
+      fullName: 'Billing Recipient 1',
+      phone: '+977 9841234567',
+      province: 'Bagmati',
+      district: 'Kathmandu',
+      municipality: 'Kathmandu',
+      wardNumber: 3,
+      tole: 'Lazimpat',
+      country: 'Nepal',
+      label: 'work',
+      isActive: true,
+      isDefaultShipping: true,
+      isDefaultBilling: true,
+      save: async function () { return this; },
+    },
+    {
+      _id: addressId2,
+      userId,
+      fullName: 'Billing Recipient 2',
+      phone: '+977 9841234567',
+      province: 'Bagmati',
+      district: 'Kathmandu',
+      municipality: 'Kathmandu',
+      wardNumber: 4,
+      tole: 'Baluwatar',
+      country: 'Nepal',
+      label: 'home',
+      isActive: true,
+      isDefaultShipping: false,
+      isDefaultBilling: false,
+      save: async function () { return this; },
+    },
+  ];
+
+  const origFindById = Address.findById;
+  const origUpdateMany = Address.updateMany;
+  const origFindOne = Address.findOne;
+
+  Address.findById = (id) => addressStore.find((a) => a._id === id);
+  Address.updateMany = async (filter, update) => {
+    for (const a of addressStore) {
+      if (a.userId === filter.userId && (!filter._id?.$ne || a._id !== filter._id.$ne)) {
+        if (update.$set?.isDefaultBilling !== undefined) {
+          a.isDefaultBilling = update.$set.isDefaultBilling;
+        }
+      }
+    }
+  };
+  Address.findOne = (query) => addressStore.find((a) => a.userId === query.userId && a.isActive && a.isDefaultBilling);
+
+  try {
+    // 1. Initial check - address 1 is default billing
+    const initialDefault = await addressService.getDefaultBillingAddress(userId);
+    assert.equal(initialDefault._id, addressId1, 'Address 1 should initially be default billing');
+
+    // 2. Set address 2 as default billing
+    await addressService.setDefaultBillingAddress(userId, addressId2);
+    assert.equal(addressStore[0].isDefaultBilling, false, 'Address 1 should no longer be default billing');
+    assert.equal(addressStore[1].isDefaultBilling, true, 'Address 2 should now be default billing');
+    // Note: Address 1 remains default shipping (independent)
+    assert.equal(addressStore[0].isDefaultShipping, true, 'Address 1 should maintain shipping default independently');
+
+    console.log('✅ Billing default tests passed successfully');
+  } finally {
+    Address.findById = origFindById;
+    Address.updateMany = origUpdateMany;
+    Address.findOne = origFindOne;
+  }
+};
+
