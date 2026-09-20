@@ -15,6 +15,12 @@ export const PRODUCT_URL_REGEX = /^https?:\/\/[^\s$.?#].[^\s]*$/i;
 
 const productRequestSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'User is required'],
+      index: true,
+    },
     productUrl: {
       type: String,
       required: [true, 'Product URL is required'],
