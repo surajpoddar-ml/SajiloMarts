@@ -11,6 +11,19 @@ export const SUPPORTED_MARKETPLACES = Object.freeze([
   'other',
 ]);
 
+export const REQUEST_STATUSES = Object.freeze({
+  DRAFT: 'draft',
+  SUBMITTED: 'submitted',
+  QUOTED: 'quoted',
+  PAYMENT_PENDING: 'payment_pending',
+  PAYMENT_SUBMITTED: 'payment_submitted',
+  PAYMENT_UNDER_REVIEW: 'payment_under_review',
+  PAYMENT_VERIFIED: 'payment_verified',
+  PROCESSING: 'processing',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+});
+
 export const PRODUCT_URL_REGEX = /^https?:\/\/[^\s$.?#].[^\s]*$/i;
 
 const productRequestSchema = new mongoose.Schema(
@@ -90,6 +103,16 @@ const productRequestSchema = new mongoose.Schema(
       default: null,
       trim: true,
       maxlength: [1000, 'Customer notes cannot exceed 1000 characters'],
+    },
+    status: {
+      type: String,
+      enum: {
+        values: Object.values(REQUEST_STATUSES),
+        message: 'Invalid request status',
+      },
+      default: REQUEST_STATUSES.SUBMITTED,
+      required: true,
+      index: true,
     },
   },
   {
