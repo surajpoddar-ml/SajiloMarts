@@ -13,6 +13,14 @@ export const paymentConfig = {
       accountName: 'SajiloMarts Pvt. Ltd.',
       instructions: 'Scan the eSewa QR code or transfer to the SajiloMarts ID and submit your transaction code.',
     },
+    [PAYMENT_METHODS.KHALTI]: {
+      id: PAYMENT_METHODS.KHALTI,
+      displayName: 'Khalti Digital Wallet',
+      enabled: true,
+      qrImageReference: 'khalti_merchant_qr.webp',
+      accountName: 'SajiloMarts Pvt. Ltd.',
+      instructions: 'Pay via Khalti QR code or wallet transfer and submit the transaction code.',
+    },
   },
 };
 
