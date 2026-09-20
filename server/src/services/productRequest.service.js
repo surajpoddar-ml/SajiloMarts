@@ -102,6 +102,29 @@ export class ProductRequestService extends BaseService {
     this.validateObjectId(userId, 'User ID');
     return ProductRequest.find({ user: userId }).sort({ createdAt: -1 });
   }
+
+  /**
+   * Retrieves complete administrative details for a sourcing request.
+   * Exposes internal notes, customer contact, and payment proof references.
+   * @param {string} adminUserId - Admin User ID
+   * @param {string} requestId - ProductRequest ID
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async getAdminRequestDetails(adminUserId, requestId) {
+    await this.assertAdmin(adminUserId);
+    this.validateObjectId(requestId, 'Request ID');
+
+    const request = await ProductRequest.findById(requestId)
+      .select('+internalNotes')
+      .populate('user', 'name email phone role')
+      .populate('paymentSubmission');
+
+    if (!request) {
+      throw new NotFoundError('Product request not found');
+    }
+
+    return request;
+  }
 }
 
 export const productRequestService = new ProductRequestService();
