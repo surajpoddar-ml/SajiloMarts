@@ -52,6 +52,25 @@ const productRequestSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    productPriceInr: {
+      type: Number,
+      required: [true, 'Indian product price in INR is required'],
+      min: [0.01, 'Product price must be greater than zero'],
+      validate: {
+        validator: (val) => typeof val === 'number' && Number.isFinite(val) && val > 0,
+        message: 'Product price must be a valid positive number',
+      },
+    },
+    quantity: {
+      type: Number,
+      required: [true, 'Quantity is required'],
+      default: 1,
+      min: [1, 'Quantity must be at least 1'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'Quantity must be a positive whole integer',
+      },
+    },
   },
   {
     timestamps: true,
