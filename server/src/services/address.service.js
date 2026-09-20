@@ -185,6 +185,38 @@ export class AddressService extends BaseService {
     this.validateObjectId(userId, 'User ID');
     return Address.findOne({ userId, isActive: true, isDefaultShipping: true });
   }
+
+  /**
+   * Designates an address as the default billing address, unsetting any previous billing default.
+   * @param {string} userId - User ObjectId
+   * @param {string} addressId - Address ObjectId
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async setDefaultBillingAddress(userId, addressId) {
+    const address = await this.verifyOwnership(userId, addressId);
+
+    if (!address.isActive) {
+      throw new BadRequestError('Cannot set an inactive address as default billing address');
+    }
+
+    await Address.updateMany(
+      { userId, _id: { $ne: addressId }, isDefaultBilling: true },
+      { $set: { isDefaultBilling: false } }
+    );
+
+    address.isDefaultBilling = true;
+    return address.save();
+  }
+
+  /**
+   * Retrieves the active default billing address for a user.
+   * @param {string} userId - User ObjectId
+   * @returns {Promise<import('mongoose').Document|null>}
+   */
+  async getDefaultBillingAddress(userId) {
+    this.validateObjectId(userId, 'User ID');
+    return Address.findOne({ userId, isActive: true, isDefaultBilling: true });
+  }
 }
 
 export const addressService = new AddressService();
