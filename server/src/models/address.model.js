@@ -159,5 +159,10 @@ const addressSchema = new mongoose.Schema(
   }
 );
 
+// Compound indexes for optimal lookup patterns
+addressSchema.index({ userId: 1, isActive: 1 });
+addressSchema.index({ userId: 1, isDefaultShipping: 1 });
+addressSchema.index({ userId: 1, isDefaultBilling: 1 });
+
 export const Address = mongoose.model('Address', addressSchema);
 export default Address;
