@@ -145,6 +145,30 @@ export class ProductRequestService extends BaseService {
     request.internalNotes = internalNotes ? String(internalNotes).trim() : null;
     return request.save();
   }
+
+  /**
+   * Updates request lifecycle status (admin only).
+   * @param {string} adminUserId - Admin User ID
+   * @param {string} requestId - Request ID
+   * @param {string} newStatus - New status value
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async updateRequestStatus(adminUserId, requestId, newStatus) {
+    await this.assertAdmin(adminUserId);
+    this.validateObjectId(requestId, 'Request ID');
+
+    if (!Object.values(REQUEST_STATUSES).includes(newStatus)) {
+      throw new BadRequestError(`Invalid status: ${newStatus}`);
+    }
+
+    const request = await ProductRequest.findById(requestId);
+    if (!request) {
+      throw new NotFoundError('Product request not found');
+    }
+
+    request.status = newStatus;
+    return request.save();
+  }
 }
 
 export const productRequestService = new ProductRequestService();
