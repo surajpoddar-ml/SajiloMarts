@@ -83,6 +83,13 @@ const addressSchema = new mongoose.Schema(
       minlength: [2, 'Tole / Locality must be at least 2 characters'],
       maxlength: [100, 'Tole / Locality cannot exceed 100 characters'],
     },
+    street: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [150, 'Street name cannot exceed 150 characters'],
+    },
   },
   {
     timestamps: true,
