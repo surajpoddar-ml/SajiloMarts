@@ -104,6 +104,39 @@ export class AddressService extends BaseService {
   async getAddressForUser(userId, addressId) {
     return this.verifyOwnership(userId, addressId);
   }
+
+  /**
+   * Updates an address with ownership enforcement and mass assignment protection.
+   * @param {string} userId - User ObjectId
+   * @param {string} addressId - Address ObjectId
+   * @param {object} updateData - Update fields
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async updateAddress(userId, addressId, updateData) {
+    const address = await this.verifyOwnership(userId, addressId);
+
+    // Prevent overriding protected ownership and internal fields
+    const { userId: _uId, _id: _id, createdAt: _c, updatedAt: _u, ...allowedUpdates } = updateData;
+
+    // If setting as default shipping, clear other shipping defaults for this user
+    if (allowedUpdates.isDefaultShipping === true) {
+      await Address.updateMany(
+        { userId, _id: { $ne: addressId }, isDefaultShipping: true },
+        { $set: { isDefaultShipping: false } }
+      );
+    }
+
+    // If setting as default billing, clear other billing defaults for this user
+    if (allowedUpdates.isDefaultBilling === true) {
+      await Address.updateMany(
+        { userId, _id: { $ne: addressId }, isDefaultBilling: true },
+        { $set: { isDefaultBilling: false } }
+      );
+    }
+
+    Object.assign(address, allowedUpdates);
+    return address.save();
+  }
 }
 
 export const addressService = new AddressService();
