@@ -66,6 +66,16 @@ const addressSchema = new mongoose.Schema(
       minlength: [2, 'Municipality / City must be at least 2 characters'],
       maxlength: [100, 'Municipality / City cannot exceed 100 characters'],
     },
+    wardNumber: {
+      type: Number,
+      required: [true, 'Ward number is required'],
+      min: [1, 'Ward number must be at least 1'],
+      max: [50, 'Ward number cannot exceed 50'],
+      validate: {
+        validator: Number.isInteger,
+        message: 'Ward number must be an integer',
+      },
+    },
   },
   {
     timestamps: true,
