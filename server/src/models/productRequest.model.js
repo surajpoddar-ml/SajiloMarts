@@ -71,6 +71,20 @@ const productRequestSchema = new mongoose.Schema(
         message: 'Quantity must be a positive whole integer',
       },
     },
+    variant: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [100, 'Variant description cannot exceed 100 characters'],
+    },
+    notes: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [1000, 'Customer notes cannot exceed 1000 characters'],
+    },
   },
   {
     timestamps: true,
