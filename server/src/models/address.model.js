@@ -59,6 +59,13 @@ const addressSchema = new mongoose.Schema(
       minlength: [2, 'District must be at least 2 characters'],
       maxlength: [50, 'District cannot exceed 50 characters'],
     },
+    municipality: {
+      type: String,
+      required: [true, 'Municipality / City is required'],
+      trim: true,
+      minlength: [2, 'Municipality / City must be at least 2 characters'],
+      maxlength: [100, 'Municipality / City cannot exceed 100 characters'],
+    },
   },
   {
     timestamps: true,
