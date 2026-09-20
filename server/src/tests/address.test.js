@@ -460,4 +460,33 @@ export const runMongoAddressIntegrationTests = async () => {
   }
 };
 
+/**
+ * Master test runner executing all Address unit and Atlas integration tests.
+ */
+export const runAllAddressTests = async () => {
+  console.log('====================================================');
+  console.log('🚀 Executing Complete Address Model & Service Test Suite');
+  console.log('====================================================');
+
+  await runAddressValidationTests();
+  await runAddressOwnershipTests();
+  await runShippingDefaultTests();
+  await runBillingDefaultTests();
+  await runMongoAddressIntegrationTests();
+
+  console.log('====================================================');
+  console.log('🎉 All Address unit & Atlas integration tests PASSED!');
+  console.log('====================================================');
+};
+
+if (process.argv[1]?.includes('address.test.js')) {
+  runAllAddressTests()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('❌ Address test suite failed:', err);
+      process.exit(1);
+    });
+}
+
+
 
