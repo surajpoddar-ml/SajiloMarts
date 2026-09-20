@@ -1,5 +1,18 @@
 import mongoose from 'mongoose';
 
+export const ADDRESS_LABELS = Object.freeze({
+  HOME: 'home',
+  WORK: 'work',
+  OTHER: 'other',
+});
+
+export const DEFAULT_COUNTRY = 'Nepal';
+
+export const WARD_BOUNDARIES = Object.freeze({
+  MIN: 1,
+  MAX: 50,
+});
+
 const addressSchema = new mongoose.Schema(
   {
     userId: {
