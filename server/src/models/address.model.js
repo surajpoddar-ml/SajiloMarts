@@ -76,6 +76,13 @@ const addressSchema = new mongoose.Schema(
         message: 'Ward number must be an integer',
       },
     },
+    tole: {
+      type: String,
+      required: [true, 'Tole / Locality is required'],
+      trim: true,
+      minlength: [2, 'Tole / Locality must be at least 2 characters'],
+      maxlength: [100, 'Tole / Locality cannot exceed 100 characters'],
+    },
   },
   {
     timestamps: true,
