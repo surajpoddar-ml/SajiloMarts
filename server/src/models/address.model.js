@@ -19,6 +19,15 @@ const addressSchema = new mongoose.Schema(
         message: 'Recipient name cannot be empty or whitespace only',
       },
     },
+    phone: {
+      type: String,
+      required: [true, 'Delivery contact phone number is required'],
+      trim: true,
+      match: [
+        /^(?:\+?(?:977|91)[-\s]?)?[6-9]\d{9}$/,
+        'Please provide a valid Nepal (+977) or India (+91) delivery phone number',
+      ],
+    },
   },
   {
     timestamps: true,
