@@ -70,13 +70,13 @@ function App() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 10 &bull; Production Address Model &amp; Address Management Foundation"
+        stepLabel="Prompt 11 &bull; Sourcing Request, Quote &amp; Payment Foundation"
       />
 
       <main className="hero-section">
         <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
         <p className="subtitle">
-          Nepal-oriented customer address foundation with ownership isolation, shipping/billing defaults, and MongoDB Atlas persistence.
+          Customer product sourcing request pipeline with authoritative INR-to-NPR pricing, 18% online &amp; 22% COD quote splits, and digital wallet payment submission foundation.
         </p>
 
         <div className="status-card-grid">

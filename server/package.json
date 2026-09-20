@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node -r dotenv/config src/tests/user.model.test.js && node -r dotenv/config src/tests/address.test.js",
-    "lint": "node --check src/server.js src/app.js src/database/connection.js src/models/user.model.js src/models/address.model.js src/models/index.js src/services/address.service.js src/services/index.js"
+    "test": "node -r dotenv/config src/tests/user.model.test.js && node -r dotenv/config src/tests/address.test.js && node -r dotenv/config src/tests/sourcingPayment.test.js",
+    "lint": "node --check src/server.js src/app.js src/database/connection.js src/models/user.model.js src/models/address.model.js src/models/productRequest.model.js src/models/paymentSubmission.model.js src/models/index.js src/services/address.service.js src/services/quote.service.js src/services/productRequest.service.js src/services/payment.service.js src/services/index.js"
   },
   "keywords": [
     "ecommerce",
