@@ -137,6 +137,22 @@ export class AddressService extends BaseService {
     Object.assign(address, allowedUpdates);
     return address.save();
   }
+
+  /**
+   * Soft deactivates an address. If the address was default shipping/billing, clears the flags.
+   * @param {string} userId - User ObjectId
+   * @param {string} addressId - Address ObjectId
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async deactivateAddress(userId, addressId) {
+    const address = await this.verifyOwnership(userId, addressId);
+
+    address.isActive = false;
+    address.isDefaultShipping = false;
+    address.isDefaultBilling = false;
+
+    return address.save();
+  }
 }
 
 export const addressService = new AddressService();
