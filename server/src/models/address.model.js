@@ -14,6 +14,7 @@ const addressSchema = new mongoose.Schema(
       trim: true,
       minlength: [2, 'Recipient name must be at least 2 characters'],
       maxlength: [100, 'Recipient name cannot exceed 100 characters'],
+      set: (val) => (typeof val === 'string' ? val.trim() : val),
       validate: {
         validator: (val) => typeof val === 'string' && val.trim().length >= 2,
         message: 'Recipient name cannot be empty or whitespace only',
@@ -23,6 +24,7 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Delivery contact phone number is required'],
       trim: true,
+      set: (val) => (typeof val === 'string' ? val.trim() : val),
       match: [
         /^(?:\+?(?:977|91)[-\s]?)?[6-9]\d{9}$/,
         'Please provide a valid Nepal (+977) or India (+91) delivery phone number',
@@ -37,6 +39,7 @@ const addressSchema = new mongoose.Schema(
       default: 'home',
       trim: true,
       lowercase: true,
+      set: (val) => (typeof val === 'string' ? val.trim().toLowerCase() : val),
       required: [true, 'Address label is required'],
     },
     country: {
@@ -44,6 +47,7 @@ const addressSchema = new mongoose.Schema(
       default: 'Nepal',
       required: [true, 'Country is required'],
       trim: true,
+      set: (val) => (typeof val === 'string' ? val.trim() : val),
     },
     province: {
       type: String,
