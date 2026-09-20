@@ -28,6 +28,17 @@ const addressSchema = new mongoose.Schema(
         'Please provide a valid Nepal (+977) or India (+91) delivery phone number',
       ],
     },
+    label: {
+      type: String,
+      enum: {
+        values: ['home', 'work', 'other'],
+        message: 'Address label must be one of: home, work, other',
+      },
+      default: 'home',
+      trim: true,
+      lowercase: true,
+      required: [true, 'Address label is required'],
+    },
   },
   {
     timestamps: true,
