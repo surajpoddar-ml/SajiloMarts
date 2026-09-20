@@ -97,6 +97,13 @@ const addressSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, 'House/building reference cannot exceed 100 characters'],
     },
+    landmark: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      maxlength: [150, 'Landmark cannot exceed 150 characters'],
+    },
   },
   {
     timestamps: true,
