@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { PAYMENT_MODES, PAYMENT_METHODS } from '../constants/payment.constants.js';
+import { PAYMENT_MODES, PAYMENT_METHODS, PAYMENT_STATUSES } from '../constants/payment.constants.js';
 
 const paymentSubmissionSchema = new mongoose.Schema(
   {
