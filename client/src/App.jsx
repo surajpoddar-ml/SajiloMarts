@@ -70,13 +70,13 @@ function App() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 9 &bull; Production User Database Foundation"
+        stepLabel="Prompt 10 &bull; Production Address Model &amp; Address Management Foundation"
       />
 
       <main className="hero-section">
         <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
         <p className="subtitle">
-          Secure, normalized, validated User schema with bcrypt password protection, safe serialization, and unique index enforcement.
+          Nepal-oriented customer address foundation with ownership isolation, shipping/billing defaults, and MongoDB Atlas persistence.
         </p>
 
         <div className="status-card-grid">
