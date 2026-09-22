@@ -1,6 +1,7 @@
 import { User } from '../models/user.model.js';
 import { USER_ROLES } from '../constants/roles.js';
-import { BadRequestError, ConflictError, normalizeEmail, toSafeUser } from '../utils/index.js';
+import { AUTH_ERRORS } from '../constants/auth.constants.js';
+import { BadRequestError, ConflictError, UnauthorizedError, normalizeEmail, toSafeUser } from '../utils/index.js';
 
 /**
  * Service to register a new customer in SajiloMarts.
@@ -55,7 +56,39 @@ export const registerCustomer = async ({ name, email, password, phone }) => {
   return toSafeUser(newUser);
 };
 
+/**
+ * Service to authenticate customer credentials.
+ *
+ * @param {Object} credentials
+ * @param {string} credentials.email
+ * @param {string} credentials.password
+ * @returns {Promise<Object>} Safe user object
+ */
+export const loginCustomer = async ({ email, password }) => {
+  if (!email || typeof email !== 'string' || !email.trim()) {
+    throw new BadRequestError('Email address is required');
+  }
+  if (!password || typeof password !== 'string') {
+    throw new BadRequestError('Password is required');
+  }
+
+  const normalizedEmail = normalizeEmail(email);
+  const user = await User.findOne({ email: normalizedEmail }).select('+password');
+
+  if (!user) {
+    throw new UnauthorizedError(AUTH_ERRORS.INVALID_CREDENTIALS);
+  }
+
+  const isPasswordValid = await user.comparePassword(password);
+  if (!isPasswordValid) {
+    throw new UnauthorizedError(AUTH_ERRORS.INVALID_CREDENTIALS);
+  }
+
+  return toSafeUser(user);
+};
+
 export default {
   normalizeEmail,
   registerCustomer,
+  loginCustomer,
 };
