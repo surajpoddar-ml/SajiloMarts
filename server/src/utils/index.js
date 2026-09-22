@@ -11,6 +11,7 @@ export * from './normalizeEmail.js';
 export * from './userSerializer.js';
 export * from './jwtToken.js';
 export * from './authCookies.js';
+export * from './authContext.js';
 export * from './asyncHandler.js';
 export * from './currency.js';
 export * from './sanitizeUri.js';
