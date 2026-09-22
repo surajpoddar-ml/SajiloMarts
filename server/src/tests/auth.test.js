@@ -154,10 +154,41 @@ async function testSessionAndSerializationSecurity() {
   console.log('✅ Session tokens and safe serialization tests passed successfully');
 }
 
+async function testOwnershipIntegration() {
+  console.log('🧪 Testing Request Ownership & Context Binding...');
+
+  // Mock authenticated req context
+  const mockCustomerReq = {
+    user: {
+      id: '650000000000000000000002',
+      name: 'Ramesh Adhikari',
+      email: 'ramesh@example.com',
+      role: USER_ROLES.CUSTOMER,
+    },
+  };
+
+  const { getAuthUserId, getAuthUser } = await import('../utils/authContext.js');
+
+  const authUserId = getAuthUserId(mockCustomerReq);
+  assert.equal(authUserId, '650000000000000000000002');
+
+  const authUser = getAuthUser(mockCustomerReq);
+  assert.equal(authUser.name, 'Ramesh Adhikari');
+
+  // Verify unauthenticated request rejection
+  assert.throws(
+    () => getAuthUserId({}),
+    (err) => err.name === 'UnauthorizedError'
+  );
+
+  console.log('✅ Request ownership and context binding tests passed successfully');
+}
+
 async function runAll() {
   await testRegistrationSecurity();
   await testLoginAndAccountSecurity();
   await testSessionAndSerializationSecurity();
+  await testOwnershipIntegration();
   console.log('🎉 Auth security tests completed!');
 }
 
