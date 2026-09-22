@@ -1,18 +1,25 @@
 import { User } from '../models/user.model.js';
 import { USER_ROLES } from '../constants/roles.js';
 import { AUTH_ERRORS } from '../constants/auth.constants.js';
-import { BadRequestError, ConflictError, UnauthorizedError, normalizeEmail, toSafeUser } from '../utils/index.js';
+import {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+  normalizeEmail,
+  toSafeUser,
+  createAuthToken,
+} from '../utils/index.js';
 
 /**
  * Service to register a new customer in SajiloMarts.
- * Enforces role isolation (always CUSTOMER), email normalization, and returns safe customer data.
+ * Enforces role isolation (always CUSTOMER), email normalization, and issues fresh authentication state.
  *
  * @param {Object} customerData
  * @param {string} customerData.name
  * @param {string} customerData.email
  * @param {string} customerData.password
  * @param {string} [customerData.phone]
- * @returns {Promise<Object>} Safe customer object
+ * @returns {Promise<{user: Object, token: string}>} Safe customer object and fresh auth token
  */
 export const registerCustomer = async ({ name, email, password, phone }) => {
   if (!name || typeof name !== 'string' || !name.trim()) {
@@ -53,16 +60,22 @@ export const registerCustomer = async ({ name, email, password, phone }) => {
     throw error;
   }
 
-  return toSafeUser(newUser);
+  const safeUser = toSafeUser(newUser);
+  const token = createAuthToken(safeUser);
+
+  return {
+    user: safeUser,
+    token,
+  };
 };
 
 /**
- * Service to authenticate customer credentials.
+ * Service to authenticate customer credentials and issue fresh authentication state.
  *
  * @param {Object} credentials
  * @param {string} credentials.email
  * @param {string} credentials.password
- * @returns {Promise<Object>} Safe user object
+ * @returns {Promise<{user: Object, token: string}>} Safe user object and fresh auth token
  */
 export const loginCustomer = async ({ email, password }) => {
   if (!email || typeof email !== 'string' || !email.trim()) {
@@ -89,7 +102,13 @@ export const loginCustomer = async ({ email, password }) => {
     throw new UnauthorizedError(AUTH_ERRORS.INVALID_CREDENTIALS);
   }
 
-  return toSafeUser(user);
+  const safeUser = toSafeUser(user);
+  const token = createAuthToken(safeUser);
+
+  return {
+    user: safeUser,
+    token,
+  };
 };
 
 export default {
