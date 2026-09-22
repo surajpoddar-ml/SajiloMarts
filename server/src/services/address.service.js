@@ -49,6 +49,9 @@ export class AddressService extends BaseService {
    * @returns {Promise<import('mongoose').Document>}
    */
   async createAddress(userId, addressData) {
+    if (!userId) {
+      throw new BadRequestError('Authenticated User ID is required to create an address');
+    }
     this.validateObjectId(userId, 'User ID');
 
     // Mass assignment protection: ensure userId is bound to authenticated user
