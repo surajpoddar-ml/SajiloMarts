@@ -79,6 +79,11 @@ export const loginCustomer = async ({ email, password }) => {
     throw new UnauthorizedError(AUTH_ERRORS.INVALID_CREDENTIALS);
   }
 
+  // Enforce account activation status
+  if (!user.isActive) {
+    throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
+  }
+
   const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
     throw new UnauthorizedError(AUTH_ERRORS.INVALID_CREDENTIALS);
