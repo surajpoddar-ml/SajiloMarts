@@ -40,6 +40,9 @@ export class ProductRequestService extends BaseService {
    * @returns {Promise<import('mongoose').Document>}
    */
   async createRequest(userId, requestData) {
+    if (!userId) {
+      throw new BadRequestError('Authenticated User ID is required to create a sourcing request');
+    }
     this.validateObjectId(userId, 'User ID');
 
     // Mass assignment protection
