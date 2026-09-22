@@ -52,7 +52,12 @@ export const registerCustomer = async ({ name, email, password, phone }) => {
     throw error;
   }
 
-  return newUser;
+  // Return sanitized user object
+  const userObject = newUser.toObject();
+  delete userObject.password;
+  delete userObject.__v;
+
+  return userObject;
 };
 
 export default {
