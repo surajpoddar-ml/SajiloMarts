@@ -36,6 +36,14 @@ export const validateEnvironment = () => {
     }
   }
 
+  // Validate JWT Secret in production
+  if (envConfig.isProduction) {
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'dev_jwt_secret_do_not_use_in_production') {
+      errors.push('JWT_SECRET must be set to a secure custom random secret in production mode');
+      missingKeys.push('JWT_SECRET');
+    }
+  }
+
   if (errors.length > 0) {
     throw new ConfigError(
       `Environment validation failed:\n- ${errors.join('\n- ')}`,
