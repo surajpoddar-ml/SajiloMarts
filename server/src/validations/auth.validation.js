@@ -102,6 +102,60 @@ export const validateRegistrationInput = (data) => {
   };
 };
 
+/**
+ * Validates customer login payload.
+ *
+ * @param {Object} data - The login request payload
+ * @throws {ValidationError}
+ * @returns {Object} Cleaned login data
+ */
+export const validateLoginInput = (data) => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError('Login payload must be an object', [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const errors = [];
+  const { email, password, ...extraFields } = data;
+
+  // Mass assignment / unexpected property check
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unexpected fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  // Email validation
+  if (!email || typeof email !== 'string') {
+    errors.push({ field: 'email', message: 'Email address is required' });
+  } else {
+    const trimmedEmail = email.trim();
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
+      errors.push({ field: 'email', message: 'Please provide a valid email address format' });
+    }
+  }
+
+  // Password validation
+  if (!password || typeof password !== 'string') {
+    errors.push({ field: 'password', message: 'Password is required' });
+  } else if (password.length > 128) {
+    errors.push({ field: 'password', message: 'Password cannot exceed 128 characters' });
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for login input', errors);
+  }
+
+  return {
+    email: email.trim().toLowerCase(),
+    password,
+  };
+};
+
 export default {
   validateRegistrationInput,
+  validateLoginInput,
 };
