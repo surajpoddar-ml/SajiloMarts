@@ -24,7 +24,25 @@ export const verifyToken = (token) => {
   return jwt.verify(token, securityConfig.jwt.secret);
 };
 
+/**
+ * Creates an authentication JWT token from a User object.
+ *
+ * @param {Object} user - User document or safe user object
+ * @param {string} [expiresIn] - Token expiration duration
+ * @returns {string} Signed JWT token string
+ */
+export const createAuthToken = (user, expiresIn = securityConfig.jwt.accessExpiry) => {
+  const userId = user._id ? user._id.toString() : user.id ? user.id.toString() : user.userId;
+  const payload = {
+    userId,
+    role: user.role,
+    email: user.email,
+  };
+  return signToken(payload, expiresIn);
+};
+
 export default {
   signToken,
   verifyToken,
+  createAuthToken,
 };

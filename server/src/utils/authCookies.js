@@ -1,13 +1,14 @@
 import { envConfig } from '../config/environment.js';
+import { securityConfig } from '../config/security.js';
 import { AUTH_COOKIE_NAME } from '../constants/auth.constants.js';
 
 /**
  * Returns standard cookie configuration for secure HTTP-only sessions.
  *
- * @param {number} [maxAgeMs] - Cookie lifetime in milliseconds (defaults to 7 days)
+ * @param {number} [maxAgeMs] - Cookie lifetime in milliseconds (defaults to securityConfig)
  * @returns {import('express').CookieOptions}
  */
-export const getAuthCookieOptions = (maxAgeMs = 7 * 24 * 60 * 60 * 1000) => {
+export const getAuthCookieOptions = (maxAgeMs = securityConfig.jwt.cookieMaxAgeMs) => {
   return {
     httpOnly: true,
     secure: envConfig.isProduction,
