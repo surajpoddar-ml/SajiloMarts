@@ -1,4 +1,5 @@
 import { ValidationError } from '../utils/index.js';
+import { USER_ROLES } from '../constants/roles.js';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
@@ -20,8 +21,18 @@ export const validateRegistrationInput = (data) => {
   const errors = [];
   const { name, email, password, phone, ...extraFields } = data;
 
+  // Explicit role & privilege injection protection
+  if ('role' in data && data.role !== USER_ROLES.CUSTOMER) {
+    errors.push({
+      field: 'role',
+      message: 'Public registration cannot assign privileged roles',
+    });
+  }
+
   // Mass assignment protection check
-  const forbiddenFields = Object.keys(extraFields);
+  const forbiddenFields = Object.keys(extraFields).filter(
+    (key) => !['role', 'isActive', 'isEmailVerified'].includes(key)
+  );
   if (forbiddenFields.length > 0) {
     errors.push({
       field: 'extraFields',
