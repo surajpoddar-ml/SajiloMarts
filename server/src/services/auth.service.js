@@ -1,16 +1,6 @@
 import { User } from '../models/user.model.js';
 import { USER_ROLES } from '../constants/roles.js';
-import { BadRequestError, ConflictError } from '../utils/index.js';
-
-/**
- * Normalizes email address to lower case and trimmed string.
- * @param {string} email
- * @returns {string}
- */
-export const normalizeEmail = (email) => {
-  if (typeof email !== 'string') return '';
-  return email.trim().toLowerCase();
-};
+import { BadRequestError, ConflictError, normalizeEmail } from '../utils/index.js';
 
 /**
  * Service to register a new customer in SajiloMarts.

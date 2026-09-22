@@ -7,6 +7,7 @@ export * from './forbiddenError.js';
 export * from './notFoundError.js';
 export * from './validationError.js';
 export * from './conflictError.js';
+export * from './normalizeEmail.js';
 export * from './asyncHandler.js';
 export * from './currency.js';
 export * from './sanitizeUri.js';
