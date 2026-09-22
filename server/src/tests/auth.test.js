@@ -73,9 +73,45 @@ async function testRegistrationSecurity() {
   console.log('✅ Registration security & validation tests passed successfully');
 }
 
+async function testLoginAndAccountSecurity() {
+  console.log('🧪 Testing Login and Account Status Security...');
+
+  // 1. Validation test: Missing email
+  assert.throws(
+    () => validateLoginInput({ password: 'password123' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'email')
+  );
+
+  // 2. Validation test: Missing password
+  assert.throws(
+    () => validateLoginInput({ email: 'user@example.com' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'password')
+  );
+
+  // 3. Validation test: Invalid email format
+  assert.throws(
+    () => validateLoginInput({ email: 'not-an-email', password: 'password123' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'email')
+  );
+
+  // 4. Validation test: Reject extra unknown fields
+  assert.throws(
+    () => validateLoginInput({ email: 'user@example.com', password: 'password123', extra: 'bad' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'extraFields')
+  );
+
+  // 5. Valid Login Input
+  const cleanLogin = validateLoginInput({ email: '  USER@example.COM ', password: 'secretpassword' });
+  assert.equal(cleanLogin.email, 'user@example.com');
+  assert.equal(cleanLogin.password, 'secretpassword');
+
+  console.log('✅ Login and account status security tests passed successfully');
+}
+
 async function runAll() {
   await testRegistrationSecurity();
-  console.log('🎉 Auth Registration Security tests completed!');
+  await testLoginAndAccountSecurity();
+  console.log('🎉 Auth security tests completed!');
 }
 
 runAll().catch((err) => {
