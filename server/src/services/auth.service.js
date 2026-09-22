@@ -11,6 +11,8 @@ import {
   createAuthToken,
 } from '../utils/index.js';
 
+export { normalizeEmail };
+
 const DUMMY_HASH = '$2a$12$e8Uk5a96a.k5088K.40G2.x4Jq0Ikn0qC/2mB8eG0oO0M4uGgL6pG';
 
 /**
