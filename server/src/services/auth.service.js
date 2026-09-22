@@ -21,7 +21,10 @@ import {
  * @param {string} [customerData.phone]
  * @returns {Promise<{user: Object, token: string}>} Safe customer object and fresh auth token
  */
-export const registerCustomer = async ({ name, email, password, phone }) => {
+export const registerCustomer = async (customerData) => {
+  // Mass assignment protection: whitelist permitted customer registration fields only
+  const { name, email, password, phone } = customerData || {};
+
   if (!name || typeof name !== 'string' || !name.trim()) {
     throw new BadRequestError('Full name is required');
   }
