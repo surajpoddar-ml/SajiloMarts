@@ -12,6 +12,7 @@ export const apiClient = async (endpoint, options = {}) => {
   }
 
   const response = await fetch(`${ENV.API_BASE_URL}${endpoint}`, {
+    credentials: 'include',
     ...options,
     headers: {
       ...defaultHeaders,
