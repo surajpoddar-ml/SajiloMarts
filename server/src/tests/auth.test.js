@@ -108,9 +108,56 @@ async function testLoginAndAccountSecurity() {
   console.log('✅ Login and account status security tests passed successfully');
 }
 
+async function testSessionAndSerializationSecurity() {
+  console.log('🧪 Testing Session Tokens and Safe Serialization Security...');
+
+  // 1. Safe User Serialization Check
+  const mockUserDoc = {
+    _id: new mongoose.Types.ObjectId('650000000000000000000001'),
+    name: 'Sita Sharma',
+    email: 'sita@example.com',
+    phone: '+977-9841234567',
+    role: USER_ROLES.CUSTOMER,
+    isActive: true,
+    isEmailVerified: false,
+    password: '$2a$12$SuperSecretHashedPasswordThatMustNeverBeExposed',
+    passwordHash: '$2a$12$AnotherSecretHash',
+    __v: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const safeUser = toSafeUser(mockUserDoc);
+  assert.equal(safeUser.id, '650000000000000000000001');
+  assert.equal(safeUser.name, 'Sita Sharma');
+  assert.equal(safeUser.email, 'sita@example.com');
+  assert.equal(safeUser.role, USER_ROLES.CUSTOMER);
+  assert.equal(safeUser.password, undefined);
+  assert.equal(safeUser.passwordHash, undefined);
+  assert.equal(safeUser.__v, undefined);
+
+  // 2. Token creation and verification
+  const token = createAuthToken(safeUser);
+  assert.ok(typeof token === 'string' && token.length > 20);
+
+  const decoded = verifyToken(token);
+  assert.equal(decoded.userId, '650000000000000000000001');
+  assert.equal(decoded.email, 'sita@example.com');
+  assert.equal(decoded.role, USER_ROLES.CUSTOMER);
+
+  // 3. Reject tampered token
+  assert.throws(
+    () => verifyToken(token + 'tampered'),
+    (err) => err.name === 'JsonWebTokenError'
+  );
+
+  console.log('✅ Session tokens and safe serialization tests passed successfully');
+}
+
 async function runAll() {
   await testRegistrationSecurity();
   await testLoginAndAccountSecurity();
+  await testSessionAndSerializationSecurity();
   console.log('🎉 Auth security tests completed!');
 }
 
