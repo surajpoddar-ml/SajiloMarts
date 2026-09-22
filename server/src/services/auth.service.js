@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { User } from '../models/user.model.js';
 import { USER_ROLES } from '../constants/roles.js';
 import { AUTH_ERRORS } from '../constants/auth.constants.js';
@@ -9,6 +10,8 @@ import {
   toSafeUser,
   createAuthToken,
 } from '../utils/index.js';
+
+const DUMMY_HASH = '$2a$12$e8Uk5a96a.k5088K.40G2.x4Jq0Ikn0qC/2mB8eG0oO0M4uGgL6pG';
 
 /**
  * Service to register a new customer in SajiloMarts.
@@ -92,6 +95,8 @@ export const loginCustomer = async ({ email, password }) => {
   const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
   if (!user) {
+    // Timing-safe dummy comparison to mitigate account enumeration
+    await bcrypt.compare(password, DUMMY_HASH);
     throw new UnauthorizedError(AUTH_ERRORS.INVALID_CREDENTIALS);
   }
 
