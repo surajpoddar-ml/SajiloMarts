@@ -184,12 +184,99 @@ async function testOwnershipIntegration() {
   console.log('✅ Request ownership and context binding tests passed successfully');
 }
 
+async function testAtlasIntegration() {
+  console.log('🧪 Running MongoDB Atlas Live Authentication Integration Tests...');
+
+  await connectDatabase();
+
+  const testEmail = `live_test_${Date.now()}@sajilomarts.np`;
+  const rawPassword = 'SecurePassword123!';
+
+  // Clean up any stale record
+  await User.deleteMany({ email: testEmail });
+
+  try {
+    // 1. Test live registration
+    const { user: registeredUser, token: regToken } = await registerCustomer({
+      name: 'Atlas Integration Tester',
+      email: testEmail,
+      password: rawPassword,
+      phone: '+977-9812345678',
+    });
+
+    assert.ok(registeredUser.id);
+    assert.equal(registeredUser.email, testEmail);
+    assert.equal(registeredUser.role, USER_ROLES.CUSTOMER);
+    assert.equal(registeredUser.isActive, true);
+    assert.equal(registeredUser.isEmailVerified, false);
+    assert.equal(registeredUser.password, undefined);
+    assert.ok(regToken);
+
+    // Verify hashed password persisted in DB
+    const dbUser = await User.findById(registeredUser.id).select('+password');
+    assert.ok(dbUser.password && (dbUser.password.startsWith('$2a$') || dbUser.password.startsWith('$2b$')));
+
+    // 2. Test duplicate registration rejection
+    await assert.rejects(
+      async () => {
+        await registerCustomer({
+          name: 'Duplicate Tester',
+          email: testEmail.toUpperCase(), // Test case-insensitive duplicate
+          password: 'anotherpassword',
+        });
+      },
+      (err) => err.statusCode === 409
+    );
+
+    // 3. Test live customer login
+    const { user: loggedInUser, token: loginToken } = await loginCustomer({
+      email: testEmail,
+      password: rawPassword,
+    });
+
+    assert.equal(loggedInUser.id, registeredUser.id);
+    assert.ok(loginToken);
+
+    // 4. Test wrong password rejection
+    await assert.rejects(
+      async () => {
+        await loginCustomer({
+          email: testEmail,
+          password: 'wrongPassword123!',
+        });
+      },
+      (err) => err.statusCode === 401
+    );
+
+    // 5. Test inactive account rejection
+    await User.findByIdAndUpdate(registeredUser.id, { isActive: false });
+
+    await assert.rejects(
+      async () => {
+        await loginCustomer({
+          email: testEmail,
+          password: rawPassword,
+        });
+      },
+      (err) => err.statusCode === 401
+    );
+
+    console.log('✅ MongoDB Atlas authentication integration tests passed successfully');
+  } finally {
+    // Clean up isolated test record
+    await User.deleteMany({ email: testEmail });
+    await disconnectDatabase();
+    console.log('🧹 Cleaned up isolated Atlas auth test record');
+  }
+}
+
 async function runAll() {
   await testRegistrationSecurity();
   await testLoginAndAccountSecurity();
   await testSessionAndSerializationSecurity();
   await testOwnershipIntegration();
-  console.log('🎉 Auth security tests completed!');
+  await testAtlasIntegration();
+  console.log('🎉 All SajiloMarts Auth tests PASSED successfully!');
 }
 
 runAll().catch((err) => {
