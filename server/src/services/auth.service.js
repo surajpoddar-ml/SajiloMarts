@@ -43,7 +43,14 @@ export const registerCustomer = async ({ name, email, password, phone }) => {
     isEmailVerified: false,
   });
 
-  await newUser.save();
+  try {
+    await newUser.save();
+  } catch (error) {
+    if (error.name === 'DuplicateKeyError' || (error.name === 'MongoServerError' && error.code === 11000)) {
+      throw new ConflictError('An account with this email address already exists');
+    }
+    throw error;
+  }
 
   return newUser;
 };
