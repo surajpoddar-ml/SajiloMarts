@@ -15,3 +15,18 @@ export const AUTH_ERRORS = {
   UNAUTHORIZED: 'You do not have permission to perform this action',
   EMAIL_ALREADY_EXISTS: 'An account with this email address already exists',
 };
+
+export const AUTH_EVENTS = {
+  REGISTER_SUCCESS: 'auth:register_success',
+  LOGIN_SUCCESS: 'auth:login_success',
+  LOGOUT_SUCCESS: 'auth:logout_success',
+  TOKEN_REFRESH: 'auth:token_refresh',
+};
+
+export default {
+  AUTH_COOKIE_NAME,
+  AUTH_HEADER_PREFIX,
+  AUTH_TOKEN_TYPES,
+  AUTH_ERRORS,
+  AUTH_EVENTS,
+};
