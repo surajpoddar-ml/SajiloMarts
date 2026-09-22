@@ -1,6 +1,6 @@
 import { User } from '../models/user.model.js';
 import { USER_ROLES } from '../constants/roles.js';
-import { BadRequestError, ConflictError, normalizeEmail } from '../utils/index.js';
+import { BadRequestError, ConflictError, normalizeEmail, toSafeUser } from '../utils/index.js';
 
 /**
  * Service to register a new customer in SajiloMarts.
@@ -52,12 +52,7 @@ export const registerCustomer = async ({ name, email, password, phone }) => {
     throw error;
   }
 
-  // Return sanitized user object
-  const userObject = newUser.toObject();
-  delete userObject.password;
-  delete userObject.__v;
-
-  return userObject;
+  return toSafeUser(newUser);
 };
 
 export default {
