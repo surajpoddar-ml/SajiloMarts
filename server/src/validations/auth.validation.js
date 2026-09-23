@@ -182,7 +182,7 @@ export const validateVerifyEmailInput = (data) => {
 
   if (!token || typeof token !== 'string') {
     errors.push({ field: 'token', message: 'Verification token is required' });
-  } else if (!/^[a-fA-F0-9]{32,128}$/.test(token.trim())) {
+  } else if (!/^[a-fA-F0-9]{64,128}$/.test(token.trim())) {
     errors.push({ field: 'token', message: 'Malformed verification token format' });
   }
 
@@ -312,7 +312,7 @@ export const validateResetPasswordInput = (data) => {
   // Token validation
   if (!token || typeof token !== 'string') {
     errors.push({ field: 'token', message: 'Reset token is required' });
-  } else if (!/^[a-fA-F0-9]{32,128}$/.test(token.trim())) {
+  } else if (!/^[a-fA-F0-9]{64,128}$/.test(token.trim())) {
     errors.push({ field: 'token', message: 'Malformed reset token format' });
   }
 
