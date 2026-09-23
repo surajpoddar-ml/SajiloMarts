@@ -8,7 +8,7 @@ import {
   PAYMENT_METHODS,
   PAYMENT_STATUSES,
 } from '../constants/payment.constants.js';
-import { BadRequestError, NotFoundError, ForbiddenError } from '../utils/index.js';
+import { BadRequestError, NotFoundError, ForbiddenError, assertResourceOwnership } from '../utils/index.js';
 
 /**
  * Payment Service
@@ -41,9 +41,7 @@ export class PaymentService extends BaseService {
       throw new NotFoundError('Product request not found');
     }
 
-    if (request.user.toString() !== userId.toString()) {
-      throw new ForbiddenError('You do not have permission to pay for this request');
-    }
+    assertResourceOwnership(request, userId, 'Product request', 'user');
 
     const { paymentMode, paymentMethod } = paymentData;
 
@@ -106,9 +104,7 @@ export class PaymentService extends BaseService {
       throw new NotFoundError('Payment submission not found');
     }
 
-    if (payment.user.toString() !== userId.toString()) {
-      throw new ForbiddenError('You do not have permission to submit proof for this payment');
-    }
+    assertResourceOwnership(payment, userId, 'Payment submission', 'user');
 
     const { transactionCode, paymentProof } = proofData;
     if (!transactionCode && !paymentProof) {
