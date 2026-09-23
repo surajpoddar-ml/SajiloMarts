@@ -73,6 +73,15 @@ export const authService = {
   },
 
   /**
+   * Updates customer profile fields (name, phone).
+   * @param {Object} data - { name, phone }
+   * @returns {Promise<Object>} API response data
+   */
+  updateProfile: async (data) => {
+    return http.patch('/auth/profile', data);
+  },
+
+  /**
    * Logs out the user and clears authentication cookie.
    * @returns {Promise<Object>} API response data
    */
