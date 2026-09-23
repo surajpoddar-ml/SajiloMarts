@@ -116,14 +116,15 @@ export class AdminService extends BaseService {
   }
 
   /**
-   * Updates customer account status, role, verification, or profile details (admin only).
-   * Strictly validates allowed mutations.
+   * Updates customer or admin account status, role, verification, or profile details (admin only).
+   * Enforces self-protection safeguards: prevents self-deactivation and preserves last administrator.
    *
+   * @param {string} actorAdminId - Authenticated administrator ID making the request
    * @param {string} targetUserId - Target User ID to update
    * @param {object} updateData - Validated administrative update fields
    * @returns {Promise<object>} Updated safe user object
    */
-  async updateCustomerAccount(targetUserId, updateData) {
+  async updateCustomerAccount(actorAdminId, targetUserId, updateData) {
     if (!targetUserId) {
       throw new BadRequestError('Target User ID is required');
     }
@@ -131,6 +132,35 @@ export class AdminService extends BaseService {
     const user = await User.findById(targetUserId);
     if (!user) {
       throw new NotFoundError('User account not found');
+    }
+
+    const isSelf = actorAdminId && actorAdminId.toString() === targetUserId.toString();
+
+    // 1. Safeguard: Prevent self-deactivation
+    if (isSelf && updateData.isActive === false) {
+      throw new BadRequestError('Administrators cannot deactivate their own account');
+    }
+
+    // 2. Safeguard: Prevent removing or demoting admin if it would leave zero active admins
+    const isTargetAdmin = user.role === 'admin';
+    const isDemotingAdmin = isTargetAdmin && updateData.role !== undefined && updateData.role !== 'admin';
+    const isDeactivatingAdmin = isTargetAdmin && updateData.isActive === false;
+
+    if (isDemotingAdmin || isDeactivatingAdmin) {
+      const remainingAdminsCount = await User.countDocuments({
+        _id: { $ne: targetUserId },
+        role: 'admin',
+        isActive: true,
+      });
+
+      if (remainingAdminsCount === 0) {
+        throw new BadRequestError('Operation rejected: Cannot demote or deactivate the last active administrator');
+      }
+    }
+
+    // 3. Safeguard: Prevent self-demotion
+    if (isSelf && isDemotingAdmin) {
+      throw new BadRequestError('Administrators cannot remove their own administrative privileges');
     }
 
     if (updateData.isActive !== undefined) {
