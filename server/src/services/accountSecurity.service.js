@@ -325,7 +325,12 @@ export const changeCustomerPassword = async ({ userId, currentPassword, newPassw
     throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
   }
 
-  // Next steps will verify current password before saving
+  // Verify current password strictly
+  const isCurrentValid = await user.comparePassword(currentPassword);
+  if (!isCurrentValid) {
+    throw new UnauthorizedError(AUTH_ERRORS.CURRENT_PASSWORD_INCORRECT);
+  }
+
   user.password = newPassword;
   await user.save();
 
