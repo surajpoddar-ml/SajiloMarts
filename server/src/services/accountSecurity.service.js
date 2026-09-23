@@ -5,10 +5,12 @@ import {
   SECURITY_TOKEN_PURPOSES,
   SECURITY_TOKEN_EXPIRY,
   AUTH_ERRORS,
+  AUTH_EVENTS,
 } from '../constants/auth.constants.js';
 import {
   generateSecurityTokenPair,
   hashSecurityToken,
+  recordSecurityEvent,
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
@@ -184,6 +186,11 @@ export const verifyCustomerEmail = async (rawToken) => {
     await user.save();
   }
 
+  recordSecurityEvent(AUTH_EVENTS.EMAIL_VERIFIED, {
+    userId: user._id,
+    email: user.email,
+  });
+
   return { user, tokenDoc, alreadyVerified };
 };
 
@@ -228,6 +235,13 @@ export const resendVerificationToken = async ({ email, userId, metadata = {} }) 
   }
 
   const { rawToken, expiresAt } = await issueVerificationToken(user._id, metadata);
+
+  recordSecurityEvent(AUTH_EVENTS.EMAIL_VERIFICATION_REQUESTED, {
+    userId: user._id,
+    email: user.email,
+    ip: metadata.ip,
+  });
+
   return { dispatched: true, user, rawToken, expiresAt, alreadyVerified: false };
 };
 
@@ -254,6 +268,13 @@ export const requestPasswordReset = async (email, metadata = {}) => {
   }
 
   const { rawToken, expiresAt } = await issuePasswordResetToken(user._id, metadata);
+
+  recordSecurityEvent(AUTH_EVENTS.PASSWORD_RESET_REQUESTED, {
+    userId: user._id,
+    email: user.email,
+    ip: metadata.ip,
+  });
+
   return { initiated: true, user, rawToken, expiresAt };
 };
 
@@ -282,6 +303,11 @@ export const resetCustomerPassword = async ({ token, newPassword }) => {
   tokenDoc.isUsed = true;
   tokenDoc.usedAt = new Date();
   await tokenDoc.save();
+
+  recordSecurityEvent(AUTH_EVENTS.PASSWORD_RESET_COMPLETED, {
+    userId: user._id,
+    email: user.email,
+  });
 
   return { user, tokenDoc };
 };
@@ -323,11 +349,22 @@ export const changeCustomerPassword = async ({ userId, currentPassword, newPassw
   // Verify current password strictly
   const isCurrentValid = await user.comparePassword(currentPassword);
   if (!isCurrentValid) {
+    recordSecurityEvent(AUTH_EVENTS.PASSWORD_CHANGE_FAILED, {
+      userId: user._id,
+      email: user.email,
+      reason: 'Incorrect current password',
+      success: false,
+    });
     throw new UnauthorizedError(AUTH_ERRORS.CURRENT_PASSWORD_INCORRECT);
   }
 
   user.password = newPassword;
   await user.save();
+
+  recordSecurityEvent(AUTH_EVENTS.PASSWORD_CHANGED, {
+    userId: user._id,
+    email: user.email,
+  });
 
   return { user };
 };
