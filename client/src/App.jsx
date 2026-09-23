@@ -13,38 +13,39 @@ import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
 import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
+import { AdminRoute } from './routes/AdminRoute.jsx';
 import './App.css';
 
 const ARCHITECTURE_RULES = [
   {
-    label: 'JavaScript Only',
-    description: 'Strict pure JavaScript (ES2022+ / JSX) across frontend and backend layers.',
+    label: 'Authoritative RBAC',
+    description: 'Roles (customer, admin), permissions, and resource ownership are enforced strictly by the backend.',
   },
   {
-    label: 'Architectural Boundaries',
-    description: 'Separation of concerns across UI Presentation, Layered Server API, and MongoDB persistence.',
+    label: 'Ownership Boundaries',
+    description: 'Customers can only access their own sourcing requests and addresses; IDOR bypasses are blocked.',
   },
   {
-    label: 'Secure Authentication',
-    description: 'HTTP-only cookies, password hashing with bcrypt, timing protection, and active account enforcement.',
+    label: 'Admin Safeguards',
+    description: 'Protection against accidental self-deactivation and deletion of the last system administrator.',
   },
   {
-    label: 'Server Authoritative',
-    description: 'Critical business rules, quote calculations, and INR-to-NPR peg conversions enforced server-side.',
+    label: 'Deny-By-Default',
+    description: 'Explicit permission checks with deny-by-default behavior across all operational endpoints.',
   },
   {
-    label: 'Documentation & Workflow',
-    description: 'Institutionalized Git standards, security guidelines, and 36-step future implementation roadmap.',
+    label: 'Role-Aware Frontend',
+    description: 'Client-side state exposes role helpers and route guards while relying on authoritative backend APIs.',
   },
 ];
 
 function AppContent() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, role, isAdmin, isCustomer, logout } = useAuth();
   const [currentView, setCurrentView] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const path = window.location.pathname;
-      if (path.includes('verify-email') || params.get('token') && window.location.hash.includes('verify')) {
+      if (path.includes('verify-email') || (params.get('token') && window.location.hash.includes('verify'))) {
         return 'verify-email';
       }
       if (path.includes('reset-password') || params.get('token')) {
@@ -95,7 +96,7 @@ function AppContent() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 13 &bull; Account Security &amp; Password Recovery"
+        stepLabel="Prompt 14 &bull; Role-Based Access Control &amp; Authorization"
         user={user}
         onLogin={() => setCurrentView('login')}
         onRegister={() => setCurrentView('register')}
@@ -129,7 +130,20 @@ function AppContent() {
             borderColor: currentView === 'account' ? '#2563eb' : '#cbd5e1',
           }}
         >
-          Customer Portal (Protected)
+          Customer Portal (Customer Guard)
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCurrentView('admin-console')}
+          className="refresh-btn"
+          style={{
+            background: currentView === 'admin-console' ? '#b91c1c' : '#ffffff',
+            color: currentView === 'admin-console' ? '#ffffff' : '#991b1b',
+            borderColor: currentView === 'admin-console' ? '#b91c1c' : '#fca5a5',
+          }}
+        >
+          🛡️ Admin Console (Admin Guard)
         </button>
       </nav>
 
@@ -138,7 +152,7 @@ function AppContent() {
           onNavigateToRegister={() => setCurrentView('register')}
           onNavigateToForgot={() => setCurrentView('forgot-password')}
           onNavigateToResend={() => setCurrentView('resend-verification')}
-          onLoginSuccess={() => setCurrentView('account')}
+          onLoginSuccess={() => setCurrentView(isAdmin ? 'admin-console' : 'account')}
         />
       )}
 
@@ -176,14 +190,17 @@ function AppContent() {
       )}
 
       {currentView === 'account' && (
-        <ProtectedRoute onRedirectToLogin={() => setCurrentView('login')}>
+        <ProtectedRoute
+          onRedirectToLogin={() => setCurrentView('login')}
+          onRedirectToHome={() => setCurrentView('home')}
+        >
           <div style={{ maxWidth: '640px', margin: '2rem auto', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ margin: '0 0 1rem', color: '#0f172a' }}>Customer Profile &amp; Security</h2>
+            <h2 style={{ margin: '0 0 1rem', color: '#0f172a' }}>Customer Profile &amp; Access Controls</h2>
             <div style={{ display: 'grid', gap: '0.75rem', textAlign: 'left', background: '#f8fafc', padding: '1.25rem', borderRadius: '8px' }}>
               <div><strong>Name:</strong> {user?.name}</div>
               <div><strong>Email:</strong> {user?.email}</div>
               <div><strong>Phone:</strong> {user?.phone || 'Not provided'}</div>
-              <div><strong>Role:</strong> <span className="badge" style={{ marginLeft: '0.25rem' }}>{user?.role}</span></div>
+              <div><strong>Authoritative Role:</strong> <span className="badge" style={{ marginLeft: '0.25rem' }}>{role}</span></div>
               <div>
                 <strong>Email Verification:</strong>{' '}
                 {user?.isEmailVerified ? (
@@ -210,31 +227,55 @@ function AppContent() {
         </ProtectedRoute>
       )}
 
+      {currentView === 'admin-console' && (
+        <AdminRoute
+          onRedirectToLogin={() => setCurrentView('login')}
+          onRedirectToHome={() => setCurrentView('account')}
+        >
+          <div style={{ maxWidth: '640px', margin: '2rem auto', background: '#ffffff', border: '1px solid #fecaca', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+            <h2 style={{ margin: '0 0 1rem', color: '#991b1b' }}>🛡️ Administrative Access Boundary</h2>
+            <div style={{ background: '#fef2f2', padding: '1.25rem', borderRadius: '8px', textAlign: 'left', marginBottom: '1.5rem' }}>
+              <p style={{ margin: '0 0 0.5rem', color: '#7f1d1d', fontWeight: 600 }}>
+                &check; Administrator Privilege Verified Server-Side
+              </p>
+              <div style={{ color: '#475569', fontSize: '0.9rem' }}>
+                <div><strong>Admin Identity:</strong> {user?.name} ({user?.email})</div>
+                <div><strong>Role Guard:</strong> <code>{role}</code></div>
+                <div><strong>Authorization Status:</strong> <span style={{ color: '#16a34a', fontWeight: 600 }}>Authorized for Administrative Endpoints</span></div>
+              </div>
+            </div>
+            <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
+              Note: Full administrative control panel views will be implemented in Prompt 21.
+            </p>
+          </div>
+        </AdminRoute>
+      )}
+
       {currentView === 'home' && (
         <main className="hero-section">
           <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
           <p className="subtitle">
-            Secure session foundation with HTTP-only cookies, password hashing with bcrypt, timing protection, and active account enforcement.
+            Role-Based Access Control &amp; Authorization foundation with customer/admin isolation, ownership validation, and deny-by-default policy.
           </p>
 
           <div className="status-card-grid">
             <StatusCard
               statusIndicator="active"
               tag={`React Frontend (${ENV.NODE_ENV})`}
-              title="Auth Context &amp; Protected Routes"
-              detail={`Session State: ${isAuthenticated ? `Authenticated (${user?.name})` : 'Guest / Unauthenticated'}`}
+              title="Auth Context &amp; Role Guards"
+              detail={`Session State: ${isAuthenticated ? `Authenticated (${user?.name} - ${role})` : 'Guest / Unauthenticated'}`}
             >
               <div className="badge-list">
                 <span className="badge">Pure JavaScript / JSX</span>
-                <span className="badge">Active Flags: {Object.keys(FEATURE_FLAGS).length}</span>
+                <span className="badge">Active Role: {role || 'none'}</span>
               </div>
             </StatusCard>
 
             <StatusCard
               statusIndicator={backendIndicator}
               tag="Express Backend"
-              title="Layered Architecture API"
-              detail="Target: /api/v1/health &amp; /api/v1/auth"
+              title="RBAC &amp; Authorization API"
+              detail="Target: /api/v1/admin &amp; /api/v1/auth"
             >
               <div className="connection-info">
                 {backendStatus.loading ? (
@@ -262,7 +303,7 @@ function AppContent() {
           </div>
 
           <FoundationHighlights
-            title="Code Quality &amp; Development Standards"
+            title="RBAC &amp; Security Principles"
             items={ARCHITECTURE_RULES}
           />
         </main>
