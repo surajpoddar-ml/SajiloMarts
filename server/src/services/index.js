@@ -5,3 +5,5 @@ export * from './quote.service.js';
 export * from './productRequest.service.js';
 export * from './payment.service.js';
 export * from './auth.service.js';
+export * from './accountSecurity.service.js';
+export * from './email.service.js';
