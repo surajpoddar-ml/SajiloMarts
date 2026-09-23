@@ -156,6 +156,18 @@ export const resendVerificationToken = async ({ email, userId, metadata = {} }) 
     return { dispatched: false, user, rawToken: null, expiresAt: null, alreadyVerified: true };
   }
 
+  // 1. Cooldown protection: Check if an active token was issued recently (< 60s)
+  const recentToken = await SecurityToken.findOne({
+    userId: user._id,
+    purpose: SECURITY_TOKEN_PURPOSES.EMAIL_VERIFICATION,
+    createdAt: { $gte: new Date(Date.now() - 60 * 1000) },
+  });
+
+  if (recentToken) {
+    // Return gracefully within cooldown window without generating redundant credentials
+    return { dispatched: false, user, rawToken: null, expiresAt: recentToken.expiresAt, inCooldown: true };
+  }
+
   const { rawToken, expiresAt } = await issueVerificationToken(user._id, metadata);
   return { dispatched: true, user, rawToken, expiresAt, alreadyVerified: false };
 };
