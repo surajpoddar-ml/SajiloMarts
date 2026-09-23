@@ -17,3 +17,4 @@ export * from './currency.js';
 export * from './sanitizeUri.js';
 export * from './securityToken.js';
 export * from './securityAudit.js';
+export * from './ownership.js';
