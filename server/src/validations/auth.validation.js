@@ -343,6 +343,60 @@ export const validateResetPasswordInput = (data) => {
   };
 };
 
+/**
+ * Validates authenticated password change request payload.
+ *
+ * @param {Object} data
+ * @throws {ValidationError}
+ * @returns {{currentPassword: string, newPassword: string}}
+ */
+export const validateChangePasswordInput = (data) => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError('Payload must be an object', [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const errors = [];
+  const { currentPassword, newPassword, password, confirmPassword, ...extraFields } = data;
+
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unexpected fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  if (!currentPassword || typeof currentPassword !== 'string') {
+    errors.push({ field: 'currentPassword', message: 'Current password is required' });
+  }
+
+  const candidateNewPassword = newPassword !== undefined ? newPassword : password;
+  if (!candidateNewPassword || typeof candidateNewPassword !== 'string') {
+    errors.push({ field: 'newPassword', message: 'New password is required' });
+  } else {
+    if (candidateNewPassword.length < 8) {
+      errors.push({ field: 'newPassword', message: 'New password must be at least 8 characters long' });
+    } else if (candidateNewPassword.length > 128) {
+      errors.push({ field: 'newPassword', message: 'New password cannot exceed 128 characters' });
+    }
+  }
+
+  if (confirmPassword !== undefined && candidateNewPassword !== confirmPassword) {
+    errors.push({ field: 'confirmPassword', message: 'Password confirmation does not match' });
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for password change input', errors);
+  }
+
+  return {
+    currentPassword,
+    newPassword: candidateNewPassword,
+  };
+};
+
 export default {
   validateRegistrationInput,
   validateLoginInput,
@@ -350,4 +404,5 @@ export default {
   validateResendVerificationInput,
   validateForgotPasswordInput,
   validateResetPasswordInput,
+  validateChangePasswordInput,
 };

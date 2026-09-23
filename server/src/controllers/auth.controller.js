@@ -6,6 +6,7 @@ import {
   resendVerificationToken,
   requestPasswordReset,
   resetCustomerPassword,
+  changeCustomerPassword,
 } from '../services/accountSecurity.service.js';
 import { emailService } from '../services/email.service.js';
 import {
@@ -15,6 +16,7 @@ import {
   validateResendVerificationInput,
   validateForgotPasswordInput,
   validateResetPasswordInput,
+  validateChangePasswordInput,
 } from '../validations/auth.validation.js';
 
 /**
@@ -190,6 +192,29 @@ export const resetPassword = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Controller to handle authenticated password changes.
+ *
+ * @route POST /api/v1/auth/change-password
+ */
+export const changePassword = asyncHandler(async (req, res) => {
+  const validatedInput = validateChangePasswordInput(req.body);
+
+  const { user } = await changeCustomerPassword({
+    userId: req.user?.id || req.userId,
+    currentPassword: validatedInput.currentPassword,
+    newPassword: validatedInput.newPassword,
+  });
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      { user: toSafeUser(user), changed: true },
+      'Password changed successfully'
+    )
+  );
+});
+
+/**
  * Controller to fetch the currently authenticated customer's profile.
  *
  * @route GET /api/v1/auth/me
@@ -220,6 +245,7 @@ export default {
   resendVerification,
   forgotPassword,
   resetPassword,
+  changePassword,
   getMe,
   logout,
 };

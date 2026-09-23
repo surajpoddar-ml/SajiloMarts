@@ -300,6 +300,38 @@ export const resetCustomerPassword = async ({ token, newPassword }) => {
   return { user, tokenDoc };
 };
 
+/**
+ * Changes password for an already-authenticated customer.
+ *
+ * @param {Object} params
+ * @param {string|import('mongoose').Types.ObjectId} params.userId
+ * @param {string} params.currentPassword
+ * @param {string} params.newPassword
+ * @returns {Promise<{user: Object}>}
+ */
+export const changeCustomerPassword = async ({ userId, currentPassword, newPassword }) => {
+  if (!userId) {
+    throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
+  }
+  if (!currentPassword || typeof currentPassword !== 'string') {
+    throw new BadRequestError('Current password is required');
+  }
+  if (!newPassword || typeof newPassword !== 'string') {
+    throw new BadRequestError('New password is required');
+  }
+
+  const user = await User.findById(userId).select('+password');
+  if (!user) {
+    throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
+  }
+
+  // Next steps will verify current password before saving
+  user.password = newPassword;
+  await user.save();
+
+  return { user };
+};
+
 export default {
   issueVerificationToken,
   issuePasswordResetToken,
@@ -308,4 +340,5 @@ export default {
   resendVerificationToken,
   requestPasswordReset,
   resetCustomerPassword,
+  changeCustomerPassword,
 };
