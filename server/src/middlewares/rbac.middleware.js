@@ -38,11 +38,18 @@ export const requireRole = (...allowedRoles) => {
 };
 
 /**
+ * Admin-only authorization guard.
+ * Rejects unauthenticated, inactive, or non-admin callers.
+ */
+export const requireAdmin = requireRole(USER_ROLES.ADMIN);
+
+/**
  * Reusable alias for requiring any of a set of roles.
  */
 export const requireAnyRole = (...roles) => requireRole(...roles);
 
 export default {
   requireRole,
+  requireAdmin,
   requireAnyRole,
 };
