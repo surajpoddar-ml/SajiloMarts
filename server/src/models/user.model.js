@@ -77,6 +77,10 @@ const userSchema = new mongoose.Schema(
       default: false,
       required: true,
     },
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -100,12 +104,15 @@ const userSchema = new mongoose.Schema(
 );
 
 /**
- * Pre-save middleware: Hashes password if created or modified.
+ * Pre-save middleware: Hashes password if created or modified, and updates passwordChangedAt.
  * Preserves existing hash untouched during profile, email, or role updates.
  */
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
     return;
+  }
+  if (!this.isNew) {
+    this.passwordChangedAt = new Date(Date.now() - 1000);
   }
   const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
   this.password = await bcrypt.hash(this.password, salt);

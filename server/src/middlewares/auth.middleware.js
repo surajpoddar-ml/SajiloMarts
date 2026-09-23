@@ -54,7 +54,15 @@ export const requireAuth = async (req, res, next) => {
       throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
     }
 
-    // 6. Attach safe authenticated user context
+    // 6. Enforce session revocation if password was modified after token was issued
+    if (user.passwordChangedAt && decoded.iat) {
+      const passwordChangedTimestamp = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
+      if (decoded.iat < passwordChangedTimestamp) {
+        throw new UnauthorizedError('Password was recently changed. Please log in again.');
+      }
+    }
+
+    // 7. Attach safe authenticated user context
     req.user = toSafeUser(user);
     req.userId = user._id.toString();
     req.userRole = user.role;
