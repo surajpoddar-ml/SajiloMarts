@@ -292,6 +292,11 @@ export const resetCustomerPassword = async ({ token, newPassword }) => {
   user.password = newPassword;
   await user.save();
 
+  // Atomically invalidate reset token to prevent any replay
+  tokenDoc.isUsed = true;
+  tokenDoc.usedAt = new Date();
+  await tokenDoc.save();
+
   return { user, tokenDoc };
 };
 
