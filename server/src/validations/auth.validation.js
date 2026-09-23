@@ -284,10 +284,70 @@ export const validateForgotPasswordInput = (data) => {
   };
 };
 
+/**
+ * Validates password reset request payload.
+ *
+ * @param {Object} data
+ * @throws {ValidationError}
+ * @returns {{token: string, password: string}}
+ */
+export const validateResetPasswordInput = (data) => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError('Payload must be an object', [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const errors = [];
+  const { token, password, newPassword, confirmPassword, ...extraFields } = data;
+
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unexpected fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  // Token validation
+  if (!token || typeof token !== 'string') {
+    errors.push({ field: 'token', message: 'Reset token is required' });
+  } else if (!/^[a-fA-F0-9]{32,128}$/.test(token.trim())) {
+    errors.push({ field: 'token', message: 'Malformed reset token format' });
+  }
+
+  // Password validation (accept either `password` or `newPassword` for frontend flexibility)
+  const candidatePassword = password !== undefined ? password : newPassword;
+  if (!candidatePassword || typeof candidatePassword !== 'string') {
+    errors.push({ field: 'password', message: 'New password is required' });
+  } else {
+    if (candidatePassword.length < 8) {
+      errors.push({ field: 'password', message: 'Password must be at least 8 characters long' });
+    } else if (candidatePassword.length > 128) {
+      errors.push({ field: 'password', message: 'Password cannot exceed 128 characters' });
+    }
+  }
+
+  // Optional confirmPassword validation if provided
+  if (confirmPassword !== undefined && candidatePassword !== confirmPassword) {
+    errors.push({ field: 'confirmPassword', message: 'Password confirmation does not match' });
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for password reset input', errors);
+  }
+
+  return {
+    token: token.trim(),
+    password: candidatePassword,
+  };
+};
+
 export default {
   validateRegistrationInput,
   validateLoginInput,
   validateVerifyEmailInput,
   validateResendVerificationInput,
   validateForgotPasswordInput,
+  validateResetPasswordInput,
 };
