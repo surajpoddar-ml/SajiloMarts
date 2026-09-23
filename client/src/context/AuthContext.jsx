@@ -4,6 +4,11 @@ import { authService } from '../services/auth.service.js';
 export const AuthContext = createContext({
   user: null,
   isAuthenticated: false,
+  role: null,
+  isAdmin: false,
+  isCustomer: false,
+  isEmailVerified: false,
+  hasRole: () => false,
   isLoading: true,
   error: null,
   login: async () => {},
@@ -83,9 +88,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const role = user?.role || null;
+  const isAdmin = role === 'admin';
+  const isCustomer = role === 'customer';
+  const isEmailVerified = Boolean(user?.isEmailVerified);
+  const hasRole = (targetRole) => Boolean(role && role.toLowerCase() === String(targetRole).toLowerCase());
+
   const value = {
     user,
     isAuthenticated: Boolean(user),
+    role,
+    isAdmin,
+    isCustomer,
+    isEmailVerified,
+    hasRole,
     isLoading,
     error,
     login,
