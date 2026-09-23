@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { Address } from '../models/address.model.js';
 import { BaseService } from './base.service.js';
-import { BadRequestError, NotFoundError, ForbiddenError } from '../utils/index.js';
+import { BadRequestError, NotFoundError, assertResourceOwnership } from '../utils/index.js';
 
 /**
  * Address Service
@@ -34,9 +34,7 @@ export class AddressService extends BaseService {
       throw new NotFoundError('Address not found');
     }
 
-    if (address.userId.toString() !== userId.toString()) {
-      throw new ForbiddenError('You do not have permission to access this address');
-    }
+    assertResourceOwnership(address, userId, 'Address', 'userId');
 
     return address;
   }
@@ -54,7 +52,7 @@ export class AddressService extends BaseService {
     }
     this.validateObjectId(userId, 'User ID');
 
-    // Mass assignment protection: ensure userId is bound to authenticated user
+    // Mass assignment protection: ensure userId is bound strictly to authenticated user
     const { userId: _ignoreUserId, _id: _ignoreId, createdAt: _c, updatedAt: _u, ...cleanData } = addressData;
 
     // Handle default shipping unset on existing addresses if new is default
