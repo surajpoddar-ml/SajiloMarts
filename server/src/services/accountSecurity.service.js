@@ -237,6 +237,8 @@ export const requestPasswordReset = async (email, metadata = {}) => {
   const user = await User.findOne({ email: normalizedEmail });
 
   if (!user || !user.isActive) {
+    // Timing mitigation: perform dummy token generation and hashing to prevent timing attack enumeration
+    generateSecurityTokenPair(32);
     return { initiated: false, user: null, rawToken: null, expiresAt: null };
   }
 
