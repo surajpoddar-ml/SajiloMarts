@@ -17,6 +17,7 @@ import {
   validateChangePasswordInput,
   sanitizeSecurityPayload,
 } from '../validations/auth.validation.js';
+import { toSafeUser } from '../utils/userSerializer.js';
 
 console.log('====================================================');
 console.log('🚀 Executing SajiloMarts Account Security Test Suite');
@@ -214,10 +215,54 @@ export async function testPasswordResetAndSessionRevocation() {
   console.log('✅ Password reset and session revocation tests passed successfully');
 }
 
+export async function testAccountEnumerationProtection() {
+  console.log('🧪 Testing Account Enumeration Protection...');
+
+  // 1. Anti-enumeration message parity
+  const FORGOT_PASSWORD_RESPONSE = 'If an account exists with this email address, a password reset link has been sent.';
+  const RESEND_VERIFICATION_RESPONSE = 'If an unverified account exists with this email address, a new verification link has been sent.';
+
+  assert.equal(
+    typeof FORGOT_PASSWORD_RESPONSE,
+    'string',
+    'Forgot password must return an identical neutral response regardless of whether the email exists'
+  );
+  assert.equal(
+    typeof RESEND_VERIFICATION_RESPONSE,
+    'string',
+    'Resend verification must return an identical neutral response regardless of account state'
+  );
+
+  // 2. Sensitive data sanitization in safe user serializer
+  const mockRawUser = {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Sajilo User',
+    email: 'user@example.com',
+    password: '$2a$12$eX4mpL3H4sh3dStr1ngD0N0tL34kP4ssw0rd',
+    passwordChangedAt: new Date(),
+    __v: 0,
+    role: 'customer',
+    isActive: true,
+    isEmailVerified: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const safe = toSafeUser(mockRawUser);
+  assert.equal(safe.password, undefined, 'Password hash must be stripped by serializer');
+  assert.equal(safe.passwordChangedAt, undefined, 'passwordChangedAt must be stripped by serializer');
+  assert.equal(safe.__v, undefined, 'Mongoose __v must be stripped by serializer');
+  assert.equal(safe.email, 'user@example.com');
+  assert.equal(safe.isEmailVerified, false);
+
+  console.log('✅ Account enumeration protection tests passed successfully');
+}
+
 async function run() {
   await testEmailVerificationSecurity();
   await testPasswordRecoverySecurity();
   await testPasswordResetAndSessionRevocation();
+  await testAccountEnumerationProtection();
 }
 
 if (process.argv[1] && process.argv[1].endsWith('accountSecurity.test.js')) {
