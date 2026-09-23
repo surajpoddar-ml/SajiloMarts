@@ -155,7 +155,48 @@ export const validateLoginInput = (data) => {
   };
 };
 
+/**
+ * Validates email verification payload.
+ *
+ * @param {Object} data
+ * @throws {ValidationError}
+ * @returns {{token: string}}
+ */
+export const validateVerifyEmailInput = (data) => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError('Payload must be an object', [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const errors = [];
+  const { token, ...extraFields } = data;
+
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unexpected fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  if (!token || typeof token !== 'string') {
+    errors.push({ field: 'token', message: 'Verification token is required' });
+  } else if (!/^[a-fA-F0-9]{32,128}$/.test(token.trim())) {
+    errors.push({ field: 'token', message: 'Malformed verification token format' });
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for verification input', errors);
+  }
+
+  return {
+    token: token.trim(),
+  };
+};
+
 export default {
   validateRegistrationInput,
   validateLoginInput,
+  validateVerifyEmailInput,
 };

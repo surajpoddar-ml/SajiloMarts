@@ -1,7 +1,12 @@
-import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie } from '../utils/index.js';
+import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { registerCustomer, loginCustomer } from '../services/auth.service.js';
-import { validateRegistrationInput, validateLoginInput } from '../validations/auth.validation.js';
+import { verifyEmailToken } from '../services/accountSecurity.service.js';
+import {
+  validateRegistrationInput,
+  validateLoginInput,
+  validateVerifyEmailInput,
+} from '../validations/auth.validation.js';
 
 /**
  * Controller to handle public customer registration.
@@ -46,6 +51,29 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Controller to handle customer email verification.
+ * Validates security token and confirms email address.
+ *
+ * @route POST /api/v1/auth/verify-email
+ */
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const validatedInput = validateVerifyEmailInput(req.body);
+  const { user } = await verifyEmailToken(validatedInput.token);
+
+  // Mark verified
+  user.isEmailVerified = true;
+  await user.save();
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      { user: toSafeUser(user), verified: true },
+      'Email address verified successfully'
+    )
+  );
+});
+
+/**
  * Controller to fetch the currently authenticated customer's profile.
  *
  * @route GET /api/v1/auth/me
@@ -72,6 +100,7 @@ export const logout = asyncHandler(async (req, res) => {
 export default {
   register,
   login,
+  verifyEmail,
   getMe,
   logout,
 };
