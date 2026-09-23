@@ -63,6 +63,49 @@ export const issueVerificationToken = async (userId, metadata = {}) => {
   return { rawToken, expiresAt };
 };
 
+/**
+ * Validates a submitted raw verification token, checks purpose, usage state, and expiration.
+ *
+ * @param {string} rawToken
+ * @returns {Promise<{user: Object, tokenDoc: Object}>} Verified user and token record
+ */
+export const verifyEmailToken = async (rawToken) => {
+  if (!rawToken || typeof rawToken !== 'string' || !rawToken.trim()) {
+    throw new BadRequestError('Verification token is required');
+  }
+
+  const tokenHash = hashSecurityToken(rawToken.trim());
+  const tokenDoc = await SecurityToken.findOne({ tokenHash });
+
+  if (!tokenDoc) {
+    throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
+  }
+
+  // Enforce purpose separation
+  if (tokenDoc.purpose !== SECURITY_TOKEN_PURPOSES.EMAIL_VERIFICATION) {
+    throw new BadRequestError(AUTH_ERRORS.TOKEN_PURPOSE_MISMATCH);
+  }
+
+  // Enforce single-use
+  if (tokenDoc.isUsed) {
+    throw new BadRequestError(AUTH_ERRORS.TOKEN_ALREADY_USED);
+  }
+
+  // Enforce expiration
+  if (tokenDoc.expiresAt < new Date()) {
+    throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
+  }
+
+  // Retrieve associated user
+  const user = await User.findById(tokenDoc.userId);
+  if (!user) {
+    throw new NotFoundError('Associated customer account not found');
+  }
+
+  return { user, tokenDoc };
+};
+
 export default {
   issueVerificationToken,
+  verifyEmailToken,
 };
