@@ -67,5 +67,14 @@ const securityTokenSchema = new mongoose.Schema(
   }
 );
 
+// Compound index for token verification lookups
+securityTokenSchema.index({ tokenHash: 1, purpose: 1 }, { unique: true });
+
+// Compound index for user-specific active token queries and invalidations
+securityTokenSchema.index({ userId: 1, purpose: 1, isUsed: 1 });
+
+// MongoDB TTL Index for automatic background cleanup of expired security tokens
+securityTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
 export const SecurityToken = mongoose.model('SecurityToken', securityTokenSchema);
 export default SecurityToken;
