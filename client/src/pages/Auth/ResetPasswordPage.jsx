@@ -164,7 +164,7 @@ export const ResetPasswordPage = ({ initialToken, onNavigateToLogin, onNavigateT
           </form>
         )}
 
-        <div className="auth-footer">
+        <div className="auth-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button
             type="button"
             className="auth-link"
@@ -173,6 +173,16 @@ export const ResetPasswordPage = ({ initialToken, onNavigateToLogin, onNavigateT
           >
             &larr; Back to Login
           </button>
+          {onNavigateToForgot && (
+            <button
+              type="button"
+              className="auth-link"
+              onClick={onNavigateToForgot}
+              style={{ background: 'none', border: 'none', padding: 0 }}
+            >
+              Request new link
+            </button>
+          )}
         </div>
       </div>
     </div>
