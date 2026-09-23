@@ -1,22 +1,25 @@
 import { Router } from 'express';
 import { requireAuth } from '../../middlewares/auth.middleware.js';
 import { requireAdmin } from '../../middlewares/rbac.middleware.js';
-import { ApiResponse } from '../../utils/apiResponse.js';
+import {
+  getAdminStatus,
+  getCustomers,
+  getCustomerById,
+  updateCustomer,
+  getSourcingRequests,
+  getPaymentSubmissions,
+} from '../../controllers/admin.controller.js';
 
 const router = Router();
 
-// Protect all admin endpoints with authentication and administrative role guard
+// Protect all administrative routes with authentication and admin role guard
 router.use(requireAuth, requireAdmin);
 
-/**
- * Admin health / verification probe endpoint.
- */
-router.get('/status', (req, res) => {
-  return ApiResponse.success({
-    authorized: true,
-    role: req.user.role,
-    user: req.user,
-  }, 'Administrative access authorized').send(res);
-});
+router.get('/status', getAdminStatus);
+router.get('/customers', getCustomers);
+router.get('/customers/:id', getCustomerById);
+router.patch('/customers/:id', updateCustomer);
+router.get('/sourcing-requests', getSourcingRequests);
+router.get('/payments', getPaymentSubmissions);
 
 export default router;
