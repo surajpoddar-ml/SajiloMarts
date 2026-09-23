@@ -12,6 +12,9 @@ import {
 import {
   validateVerifyEmailInput,
   validateResendVerificationInput,
+  validateForgotPasswordInput,
+  validateResetPasswordInput,
+  validateChangePasswordInput,
   sanitizeSecurityPayload,
 } from '../validations/auth.validation.js';
 
@@ -87,8 +90,69 @@ export async function testEmailVerificationSecurity() {
   console.log('✅ Email verification security tests passed successfully');
 }
 
+export async function testPasswordRecoverySecurity() {
+  console.log('🧪 Testing Password Recovery Security...');
+
+  // 1. Forgot password input validation
+  assert.throws(
+    () => validateForgotPasswordInput({}),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'email'),
+    'Should require email for forgot password'
+  );
+
+  assert.throws(
+    () => validateForgotPasswordInput({ email: 'invalid-email' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'email'),
+    'Should reject invalid email format'
+  );
+
+  assert.throws(
+    () => validateForgotPasswordInput({ email: 'valid@example.com', role: 'admin' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'extraFields'),
+    'Should reject extra fields on forgot password payload'
+  );
+
+  const cleanForgot = validateForgotPasswordInput({ email: ' USER@EXAMple.COM  ' });
+  assert.equal(cleanForgot.email, 'user@example.com', 'Should normalize email to trimmed lowercase');
+
+  // 2. Reset password input validation
+  assert.throws(
+    () => validateResetPasswordInput({ token: 'short', password: 'newpassword123' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'token'),
+    'Should reject invalid token format'
+  );
+
+  assert.throws(
+    () => validateResetPasswordInput({ token: 'a'.repeat(64), password: 'short' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'password'),
+    'Should reject short password'
+  );
+
+  assert.throws(
+    () =>
+      validateResetPasswordInput({
+        token: 'a'.repeat(64),
+        password: 'ValidPassword123!',
+        confirmPassword: 'MismatchPassword123!',
+      }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'confirmPassword'),
+    'Should reject mismatched confirm password'
+  );
+
+  const cleanReset = validateResetPasswordInput({
+    token: '  ' + 'f'.repeat(64) + '  ',
+    password: 'SecureNewPassword123',
+    confirmPassword: 'SecureNewPassword123',
+  });
+  assert.equal(cleanReset.token, 'f'.repeat(64));
+  assert.equal(cleanReset.password, 'SecureNewPassword123');
+
+  console.log('✅ Password recovery security tests passed successfully');
+}
+
 async function run() {
   await testEmailVerificationSecurity();
+  await testPasswordRecoverySecurity();
 }
 
 if (process.argv[1] && process.argv[1].endsWith('accountSecurity.test.js')) {
