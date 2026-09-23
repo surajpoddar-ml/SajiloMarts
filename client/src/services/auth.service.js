@@ -28,6 +28,51 @@ export const authService = {
   },
 
   /**
+   * Verifies an account email with a security token.
+   * @param {string} token
+   * @returns {Promise<Object>} API response data
+   */
+  verifyEmail: async (token) => {
+    return http.post('/auth/verify-email', { token });
+  },
+
+  /**
+   * Requests resending an email verification link.
+   * @param {string} [email]
+   * @returns {Promise<Object>} API response data
+   */
+  resendVerification: async (email) => {
+    return http.post('/auth/resend-verification', email ? { email } : {});
+  },
+
+  /**
+   * Submits a forgot password request.
+   * @param {string} email
+   * @returns {Promise<Object>} API response data
+   */
+  forgotPassword: async (email) => {
+    return http.post('/auth/forgot-password', { email });
+  },
+
+  /**
+   * Resets password using a recovery token.
+   * @param {Object} data - { token, password, confirmPassword }
+   * @returns {Promise<Object>} API response data
+   */
+  resetPassword: async (data) => {
+    return http.post('/auth/reset-password', data);
+  },
+
+  /**
+   * Changes password for an authenticated user.
+   * @param {Object} data - { currentPassword, newPassword, confirmPassword }
+   * @returns {Promise<Object>} API response data
+   */
+  changePassword: async (data) => {
+    return http.post('/auth/change-password', data);
+  },
+
+  /**
    * Logs out the user and clears authentication cookie.
    * @returns {Promise<Object>} API response data
    */
