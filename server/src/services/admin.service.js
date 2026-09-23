@@ -114,6 +114,44 @@ export class AdminService extends BaseService {
       limit,
     };
   }
+
+  /**
+   * Updates customer account status, role, verification, or profile details (admin only).
+   * Strictly validates allowed mutations.
+   *
+   * @param {string} targetUserId - Target User ID to update
+   * @param {object} updateData - Validated administrative update fields
+   * @returns {Promise<object>} Updated safe user object
+   */
+  async updateCustomerAccount(targetUserId, updateData) {
+    if (!targetUserId) {
+      throw new BadRequestError('Target User ID is required');
+    }
+
+    const user = await User.findById(targetUserId);
+    if (!user) {
+      throw new NotFoundError('User account not found');
+    }
+
+    if (updateData.isActive !== undefined) {
+      user.isActive = updateData.isActive;
+    }
+    if (updateData.isEmailVerified !== undefined) {
+      user.isEmailVerified = updateData.isEmailVerified;
+    }
+    if (updateData.role !== undefined) {
+      user.role = updateData.role;
+    }
+    if (updateData.name !== undefined) {
+      user.name = updateData.name;
+    }
+    if (updateData.phone !== undefined) {
+      user.phone = updateData.phone;
+    }
+
+    await user.save();
+    return toSafeUser(user);
+  }
 }
 
 export const adminService = new AdminService();
