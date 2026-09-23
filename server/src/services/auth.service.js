@@ -10,6 +10,9 @@ import {
   toSafeUser,
   createAuthToken,
 } from '../utils/index.js';
+import { issueVerificationToken } from './accountSecurity.service.js';
+import { emailService } from './email.service.js';
+import { appConfig } from '../config/index.js';
 
 export { normalizeEmail };
 
@@ -70,6 +73,23 @@ export const registerCustomer = async (customerData) => {
 
   const safeUser = toSafeUser(newUser);
   const token = createAuthToken(safeUser);
+
+  // Safely attempt verification email dispatch without blocking account registration on email errors
+  try {
+    const { rawToken } = await issueVerificationToken(newUser._id);
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    const verificationUrl = `${clientUrl}/verify-email?token=${rawToken}`;
+    await emailService.sendVerificationEmail({
+      to: newUser.email,
+      name: newUser.name,
+      verificationUrl,
+    });
+  } catch (emailErr) {
+    // Log safe error without exposing credentials or crashing registration flow
+    if (process.env.NODE_ENV !== 'test') {
+      console.warn('[AccountSecurity] Verification email dispatch deferred:', emailErr.message);
+    }
+  }
 
   return {
     user: safeUser,

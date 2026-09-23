@@ -2,6 +2,7 @@ import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser }
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { registerCustomer, loginCustomer } from '../services/auth.service.js';
 import { verifyCustomerEmail, resendVerificationToken } from '../services/accountSecurity.service.js';
+import { emailService } from '../services/email.service.js';
 import {
   validateRegistrationInput,
   validateLoginInput,
@@ -81,7 +82,7 @@ export const resendVerification = asyncHandler(async (req, res) => {
   const validatedInput = validateResendVerificationInput(req.body);
   const email = validatedInput.email || req.user?.email;
 
-  await resendVerificationToken({
+  const result = await resendVerificationToken({
     email,
     userId: req.user?.id,
     metadata: {
@@ -89,6 +90,22 @@ export const resendVerification = asyncHandler(async (req, res) => {
       userAgent: req.get('user-agent'),
     },
   });
+
+  if (result.dispatched && result.rawToken && result.user) {
+    try {
+      const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+      const verificationUrl = `${clientUrl}/verify-email?token=${result.rawToken}`;
+      await emailService.sendVerificationEmail({
+        to: result.user.email,
+        name: result.user.name,
+        verificationUrl,
+      });
+    } catch (emailErr) {
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn('[AccountSecurity] Resend verification email delivery deferred:', emailErr.message);
+      }
+    }
+  }
 
   // Always return generic success message to prevent account enumeration
   return res.status(HTTP_STATUS.OK).json(
