@@ -5,6 +5,14 @@ import { AUTH_COOKIE_NAME } from '../constants/auth.constants.js';
 /**
  * Returns standard cookie configuration for secure HTTP-only sessions.
  *
+ * Security configurations applied:
+ * - httpOnly: true (prevents client-side XSS script access to session tokens)
+ * - secure: true in production (enforces HTTPS transport)
+ * - sameSite: 'none' in production (for cross-origin frontend-backend deployments over HTTPS)
+ *   or 'lax' in local development (provides CSRF protection for same-site requests)
+ * - path: '/' (ensures uniform authorization scope)
+ * - maxAge: configured lifetime in milliseconds
+ *
  * @param {number} [maxAgeMs] - Cookie lifetime in milliseconds (defaults to securityConfig)
  * @returns {import('express').CookieOptions}
  */
