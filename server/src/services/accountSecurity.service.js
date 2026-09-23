@@ -325,6 +325,15 @@ export const changeCustomerPassword = async ({ userId, currentPassword, newPassw
     throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
   }
 
+  if (!user.isActive) {
+    throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
+  }
+
+  // Prevent identical current and new password
+  if (currentPassword === newPassword) {
+    throw new BadRequestError(AUTH_ERRORS.SAME_AS_CURRENT_PASSWORD);
+  }
+
   // Verify current password strictly
   const isCurrentValid = await user.comparePassword(currentPassword);
   if (!isCurrentValid) {

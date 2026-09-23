@@ -205,10 +205,14 @@ export const changePassword = asyncHandler(async (req, res) => {
     newPassword: validatedInput.newPassword,
   });
 
+  const safeUser = toSafeUser(user);
+  const token = createAuthToken(safeUser);
+  setAuthCookie(res, token);
+
   return res.status(HTTP_STATUS.OK).json(
     new ApiResponse(
       HTTP_STATUS.OK,
-      { user: toSafeUser(user), changed: true },
+      { user: safeUser, token, changed: true },
       'Password changed successfully'
     )
   );
