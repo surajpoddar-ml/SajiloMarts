@@ -8,4 +8,5 @@ export {
   PRODUCT_URL_REGEX,
 } from './productRequest.model.js';
 export { PaymentSubmission } from './paymentSubmission.model.js';
+export { SecurityToken } from './securityToken.model.js';
 export { default } from './user.model.js';
