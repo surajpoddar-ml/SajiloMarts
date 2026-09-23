@@ -393,6 +393,57 @@ export const validateChangePasswordInput = (data) => {
   };
 };
 
+/**
+ * Validates customer profile update payload with strict field allowlist.
+ *
+ * @param {Object} data
+ * @throws {ValidationError}
+ * @returns {{name?: string, phone?: string|null}}
+ */
+export const validateUpdateProfileInput = (data) => {
+  sanitizeSecurityPayload(data, 'Update profile payload');
+
+  const errors = [];
+  const { name, phone, ...extraFields } = data;
+
+  // Strict mass assignment check: disallow changing role, status, verification, password etc.
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unauthorized profile fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  if (name !== undefined) {
+    if (typeof name !== 'string' || name.trim().length < 2) {
+      errors.push({ field: 'name', message: 'Name must be at least 2 characters long' });
+    } else if (name.trim().length > 100) {
+      errors.push({ field: 'name', message: 'Name cannot exceed 100 characters' });
+    }
+  }
+
+  if (phone !== undefined && phone !== null && phone !== '') {
+    if (typeof phone !== 'string') {
+      errors.push({ field: 'phone', message: 'Phone number must be a string' });
+    } else {
+      const cleaned = phone.replace(/[\s-]/g, '');
+      if (!PHONE_REGEX.test(cleaned)) {
+        errors.push({ field: 'phone', message: 'Please provide a valid mobile number format' });
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for profile update', errors);
+  }
+
+  return {
+    name: name !== undefined ? name.trim() : undefined,
+    phone: phone !== undefined ? (phone && typeof phone === 'string' && phone.trim() ? phone.trim() : null) : undefined,
+  };
+};
+
 export default {
   validateRegistrationInput,
   validateLoginInput,
@@ -401,4 +452,5 @@ export default {
   validateForgotPasswordInput,
   validateResetPasswordInput,
   validateChangePasswordInput,
+  validateUpdateProfileInput,
 };

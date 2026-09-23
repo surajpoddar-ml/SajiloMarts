@@ -141,8 +141,42 @@ export const loginCustomer = async ({ email, password }) => {
   };
 };
 
+/**
+ * Updates an authenticated customer's profile.
+ * Strictly prevents mutation of role, active status, email verification, passwords, and security tokens.
+ *
+ * @param {string} userId - Authenticated user ID
+ * @param {Object} updateData - Validated profile fields (name, phone)
+ * @returns {Promise<Object>} Updated safe user object
+ */
+export const updateCustomerProfile = async (userId, updateData) => {
+  if (!userId) {
+    throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
+  }
+
+  if (!user.isActive) {
+    throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
+  }
+
+  if (updateData.name !== undefined) {
+    user.name = updateData.name;
+  }
+  if (updateData.phone !== undefined) {
+    user.phone = updateData.phone;
+  }
+
+  await user.save();
+  return toSafeUser(user);
+};
+
 export default {
   normalizeEmail,
   registerCustomer,
   loginCustomer,
+  updateCustomerProfile,
 };

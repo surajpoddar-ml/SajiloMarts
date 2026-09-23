@@ -9,6 +9,7 @@ import {
   changePassword,
   getMe,
   logout,
+  updateProfile,
 } from '../../controllers/auth.controller.js';
 import { requireAuth } from '../../middlewares/auth.middleware.js';
 import { validateBody } from '../../middlewares/validation.middleware.js';
@@ -26,6 +27,7 @@ import {
   validateForgotPasswordInput,
   validateResetPasswordInput,
   validateChangePasswordInput,
+  validateUpdateProfileInput,
 } from '../../validations/auth.validation.js';
 
 const router = Router();
@@ -47,6 +49,9 @@ router.post('/change-password', requireAuth, passwordChangeRateLimiter, validate
 
 // Current authenticated user
 router.get('/me', requireAuth, getMe);
+
+// Update customer profile (whitelisted fields: name, phone)
+router.patch('/profile', requireAuth, validateBody(validateUpdateProfileInput), updateProfile);
 
 // Secure logout
 router.post('/logout', logout);

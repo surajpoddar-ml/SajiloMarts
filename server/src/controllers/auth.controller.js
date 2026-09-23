@@ -1,6 +1,6 @@
-import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser } from '../utils/index.js';
+import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser, createAuthToken } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
-import { registerCustomer, loginCustomer } from '../services/auth.service.js';
+import { registerCustomer, loginCustomer, updateCustomerProfile } from '../services/auth.service.js';
 import {
   verifyCustomerEmail,
   resendVerificationToken,
@@ -17,6 +17,7 @@ import {
   validateForgotPasswordInput,
   validateResetPasswordInput,
   validateChangePasswordInput,
+  validateUpdateProfileInput,
 } from '../validations/auth.validation.js';
 
 /**
@@ -242,6 +243,21 @@ export const logout = asyncHandler(async (req, res) => {
   );
 });
 
+/**
+ * Controller to handle customer profile updates.
+ * Only allows permitted fields: name, phone.
+ *
+ * @route PATCH /api/v1/auth/profile
+ */
+export const updateProfile = asyncHandler(async (req, res) => {
+  const validatedInput = validateUpdateProfileInput(req.body);
+  const updatedUser = await updateCustomerProfile(req.user?.id || req.userId, validatedInput);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(HTTP_STATUS.OK, updatedUser, 'Profile updated successfully')
+  );
+});
+
 export default {
   register,
   login,
@@ -252,4 +268,5 @@ export default {
   changePassword,
   getMe,
   logout,
+  updateProfile,
 };
