@@ -281,12 +281,14 @@ export const requestPasswordReset = async (email, metadata = {}) => {
 /**
  * Resets a customer password using a validated security recovery token.
  *
- * @param {Object} params
- * @param {string} params.token - Raw recovery token string
- * @param {string} params.newPassword - New plaintext password to hash and set
+ * @param {Object|string} paramsOrToken - Param object { token, newPassword } or raw token string
+ * @param {string} [maybeNewPassword] - Plaintext password if using positional syntax
  * @returns {Promise<{user: Object, tokenDoc: Object}>}
  */
-export const resetCustomerPassword = async ({ token, newPassword }) => {
+export const resetCustomerPassword = async (paramsOrToken, maybeNewPassword) => {
+  const token = typeof paramsOrToken === 'string' ? paramsOrToken : paramsOrToken?.token;
+  const newPassword = typeof paramsOrToken === 'string' ? maybeNewPassword : paramsOrToken?.newPassword;
+
   if (!newPassword || typeof newPassword !== 'string') {
     throw new BadRequestError('New password is required');
   }
@@ -315,13 +317,17 @@ export const resetCustomerPassword = async ({ token, newPassword }) => {
 /**
  * Changes password for an already-authenticated customer.
  *
- * @param {Object} params
- * @param {string|import('mongoose').Types.ObjectId} params.userId
- * @param {string} params.currentPassword
- * @param {string} params.newPassword
+ * @param {Object|string} paramsOrUserId - Param object { userId, currentPassword, newPassword } or userId
+ * @param {string} [maybeCurrentPassword]
+ * @param {string} [maybeNewPassword]
  * @returns {Promise<{user: Object}>}
  */
-export const changeCustomerPassword = async ({ userId, currentPassword, newPassword }) => {
+export const changeCustomerPassword = async (paramsOrUserId, maybeCurrentPassword, maybeNewPassword) => {
+  const isPositional = typeof paramsOrUserId === 'string' || (paramsOrUserId && paramsOrUserId._id);
+  const userId = isPositional ? paramsOrUserId : paramsOrUserId?.userId;
+  const currentPassword = isPositional ? maybeCurrentPassword : paramsOrUserId?.currentPassword;
+  const newPassword = isPositional ? maybeNewPassword : paramsOrUserId?.newPassword;
+
   if (!userId) {
     throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
   }

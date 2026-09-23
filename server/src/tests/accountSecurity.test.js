@@ -18,6 +18,16 @@ import {
   sanitizeSecurityPayload,
 } from '../validations/auth.validation.js';
 import { toSafeUser } from '../utils/userSerializer.js';
+import {
+  issueVerificationToken,
+  verifyCustomerEmail,
+  requestPasswordReset,
+  resetCustomerPassword,
+  changeCustomerPassword,
+  cleanupExpiredSecurityTokens,
+} from '../services/accountSecurity.service.js';
+import { registerCustomer, loginCustomer } from '../services/auth.service.js';
+import { connectDatabase, disconnectDatabase } from '../database/connection.js';
 
 console.log('====================================================');
 console.log('🚀 Executing SajiloMarts Account Security Test Suite');
@@ -258,11 +268,143 @@ export async function testAccountEnumerationProtection() {
   console.log('✅ Account enumeration protection tests passed successfully');
 }
 
+export async function testAtlasAccountSecurityIntegration() {
+  console.log('🧪 Running MongoDB Atlas Live Account Security Integration Tests...');
+
+  await connectDatabase();
+
+  const testEmail = `sec_atlas_${Date.now()}@sajilomarts.np`;
+  const initialPassword = 'InitialSecurePassword123!';
+  const recoveredPassword = 'RecoveredSecurePassword123!';
+  const changedPassword = 'ChangedSecurePassword123!';
+
+  // Cleanup any residue
+  await User.deleteMany({ email: testEmail });
+
+  try {
+    // 1. Register customer
+    const { user: customer } = await registerCustomer({
+      name: 'Account Security Tester',
+      email: testEmail,
+      password: initialPassword,
+      phone: '+977-9800000000',
+    });
+
+    assert.ok(customer.id);
+    assert.equal(customer.isEmailVerified, false);
+
+    // 2. Issue email verification token
+    const { rawToken: verificationRawToken } = await issueVerificationToken(customer.id);
+    assert.ok(verificationRawToken && verificationRawToken.length === 64);
+
+    // Verify token record in DB has hash and is not used
+    const tokenRecord = await SecurityToken.findOne({
+      userId: customer.id,
+      purpose: SECURITY_TOKEN_PURPOSES.EMAIL_VERIFICATION,
+      isUsed: false,
+    }).sort({ createdAt: -1 });
+    assert.ok(tokenRecord);
+    assert.equal(tokenRecord.isUsed, false);
+    assert.equal(tokenRecord.tokenHash, hashSecurityToken(verificationRawToken));
+
+    // 3. Verify email with raw token
+    const { user: verifiedCustomer } = await verifyCustomerEmail(verificationRawToken);
+    assert.equal(verifiedCustomer.isEmailVerified, true);
+
+    // Verify DB user is updated
+    const refreshedUser = await User.findById(customer.id);
+    assert.equal(refreshedUser.isEmailVerified, true);
+
+    // 4. Token Replay Protection: Reusing the consumed verification token must fail
+    await assert.rejects(
+      async () => {
+        await verifyCustomerEmail(verificationRawToken);
+      },
+      (err) => err.statusCode === 400
+    );
+
+    // 5. Request password reset (anti-enumeration flow)
+    const resetResult = await requestPasswordReset(testEmail);
+    assert.equal(resetResult.initiated, true);
+    assert.ok(resetResult.rawToken && resetResult.rawToken.length === 64);
+
+    // Find the generated reset token for test execution
+    const resetRecord = await SecurityToken.findOne({
+      userId: customer.id,
+      purpose: SECURITY_TOKEN_PURPOSES.PASSWORD_RESET,
+      isUsed: false,
+    });
+    assert.ok(resetRecord);
+    assert.equal(resetRecord.tokenHash, hashSecurityToken(resetResult.rawToken));
+
+    // 6. Reset password with generated reset token
+    const { user: userAfterReset } = await resetCustomerPassword(resetResult.rawToken, recoveredPassword);
+    assert.ok(userAfterReset);
+
+    // 7. Replaying consumed reset token must fail
+    await assert.rejects(
+      async () => {
+        await resetCustomerPassword(resetResult.rawToken, 'AnotherPassword123!');
+      },
+      (err) => err.statusCode === 400
+    );
+
+    // 8. Login with old password must fail, login with recovered password must succeed
+    await assert.rejects(
+      async () => {
+        await loginCustomer({ email: testEmail, password: initialPassword });
+      },
+      (err) => err.statusCode === 401
+    );
+
+    const { user: loggedInRecovered } = await loginCustomer({
+      email: testEmail,
+      password: recoveredPassword,
+    });
+    assert.equal(loggedInRecovered.id, customer.id);
+
+    // 9. Authenticated password change
+    await changeCustomerPassword(customer.id, recoveredPassword, changedPassword);
+
+    // Login with recovered password must now fail
+    await assert.rejects(
+      async () => {
+        await loginCustomer({ email: testEmail, password: recoveredPassword });
+      },
+      (err) => err.statusCode === 401
+    );
+
+    // Login with new changed password succeeds
+    const { user: finalLoggedIn } = await loginCustomer({
+      email: testEmail,
+      password: changedPassword,
+    });
+    assert.equal(finalLoggedIn.id, customer.id);
+
+    // 10. Test cleanup of expired security tokens
+    const cleanupRes = await cleanupExpiredSecurityTokens({ retentionDays: 0 });
+    assert.ok(typeof cleanupRes.deletedCount === 'number');
+
+    console.log('✅ MongoDB Atlas account security integration tests passed successfully');
+  } finally {
+    // Clean up test documents
+    const createdUser = await User.findOne({ email: testEmail });
+    if (createdUser) {
+      await SecurityToken.deleteMany({ userId: createdUser._id });
+      await User.deleteOne({ _id: createdUser._id });
+    }
+    await disconnectDatabase();
+    console.log('🧹 Cleaned up isolated Atlas account security test records');
+  }
+}
+
 async function run() {
   await testEmailVerificationSecurity();
   await testPasswordRecoverySecurity();
   await testPasswordResetAndSessionRevocation();
   await testAccountEnumerationProtection();
+  await testAtlasAccountSecurityIntegration();
+  console.log('🎉 All SajiloMarts Account Security tests PASSED successfully!');
 }
 
 if (process.argv[1] && process.argv[1].endsWith('accountSecurity.test.js')) {
