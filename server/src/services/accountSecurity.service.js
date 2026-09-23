@@ -246,6 +246,55 @@ export const requestPasswordReset = async (email, metadata = {}) => {
   return { initiated: true, user, rawToken, expiresAt };
 };
 
+/**
+ * Resets a customer password using a validated security recovery token.
+ *
+ * @param {Object} params
+ * @param {string} params.token - Raw recovery token string
+ * @param {string} params.newPassword - New plaintext password to hash and set
+ * @returns {Promise<{user: Object, tokenDoc: Object}>}
+ */
+export const resetCustomerPassword = async ({ token, newPassword }) => {
+  if (!token || typeof token !== 'string' || !token.trim()) {
+    throw new BadRequestError('Reset token is required');
+  }
+  if (!newPassword || typeof newPassword !== 'string') {
+    throw new BadRequestError('New password is required');
+  }
+
+  const tokenHash = hashSecurityToken(token.trim());
+  const tokenDoc = await SecurityToken.findOne({ tokenHash });
+
+  if (!tokenDoc) {
+    throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
+  }
+
+  // Enforce purpose separation
+  if (tokenDoc.purpose !== SECURITY_TOKEN_PURPOSES.PASSWORD_RESET) {
+    throw new BadRequestError(AUTH_ERRORS.TOKEN_PURPOSE_MISMATCH);
+  }
+
+  // Enforce single-use
+  if (tokenDoc.isUsed) {
+    throw new BadRequestError(AUTH_ERRORS.TOKEN_ALREADY_USED);
+  }
+
+  // Enforce expiration
+  if (tokenDoc.expiresAt < new Date()) {
+    throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
+  }
+
+  const user = await User.findById(tokenDoc.userId);
+  if (!user) {
+    throw new NotFoundError('Associated customer account not found');
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  return { user, tokenDoc };
+};
+
 export default {
   issueVerificationToken,
   issuePasswordResetToken,
@@ -253,4 +302,5 @@ export default {
   verifyCustomerEmail,
   resendVerificationToken,
   requestPasswordReset,
+  resetCustomerPassword,
 };

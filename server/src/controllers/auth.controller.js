@@ -5,6 +5,7 @@ import {
   verifyCustomerEmail,
   resendVerificationToken,
   requestPasswordReset,
+  resetCustomerPassword,
 } from '../services/accountSecurity.service.js';
 import { emailService } from '../services/email.service.js';
 import {
@@ -13,6 +14,7 @@ import {
   validateVerifyEmailInput,
   validateResendVerificationInput,
   validateForgotPasswordInput,
+  validateResetPasswordInput,
 } from '../validations/auth.validation.js';
 
 /**
@@ -162,6 +164,32 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Controller to handle password reset submissions.
+ * Validates recovery token and updates customer password securely.
+ *
+ * @route POST /api/v1/auth/reset-password
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+  const validatedInput = validateResetPasswordInput(req.body);
+
+  const { user } = await resetCustomerPassword({
+    token: validatedInput.token,
+    newPassword: validatedInput.password,
+  });
+
+  // Clear any existing session cookie so the user authenticates afresh
+  clearAuthCookie(res);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      { user: toSafeUser(user), reset: true },
+      'Password reset successfully. Please log in with your new password.'
+    )
+  );
+});
+
+/**
  * Controller to fetch the currently authenticated customer's profile.
  *
  * @route GET /api/v1/auth/me
@@ -191,6 +219,7 @@ export default {
   verifyEmail,
   resendVerification,
   forgotPassword,
+  resetPassword,
   getMe,
   logout,
 };
