@@ -1,5 +1,6 @@
 import { SecurityToken } from '../models/securityToken.model.js';
 import { User } from '../models/user.model.js';
+import { securityConfig } from '../config/security.js';
 import {
   SECURITY_TOKEN_PURPOSES,
   SECURITY_TOKEN_EXPIRY,
@@ -43,7 +44,8 @@ export const issueVerificationToken = async (userId, metadata = {}) => {
 
   // 2. Generate secure token pair
   const { rawToken, tokenHash } = generateSecurityTokenPair(32);
-  const expiresAt = new Date(Date.now() + SECURITY_TOKEN_EXPIRY.EMAIL_VERIFICATION_MS);
+  const expiryMs = securityConfig?.tokens?.verificationExpiryMs || SECURITY_TOKEN_EXPIRY.EMAIL_VERIFICATION_MS;
+  const expiresAt = new Date(Date.now() + expiryMs);
 
   // 3. Persist hashed token record
   await SecurityToken.create({
