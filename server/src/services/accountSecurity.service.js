@@ -128,8 +128,41 @@ export const verifyCustomerEmail = async (rawToken) => {
   return { user, tokenDoc, alreadyVerified };
 };
 
+/**
+ * Resends a verification token to the specified user or email address.
+ *
+ * @param {Object} params
+ * @param {string} [params.email]
+ * @param {string} [params.userId]
+ * @param {Object} [params.metadata]
+ * @returns {Promise<{dispatched: boolean, user: Object|null, rawToken: string|null, expiresAt: Date|null}>}
+ */
+export const resendVerificationToken = async ({ email, userId, metadata = {} }) => {
+  let user = null;
+
+  if (userId) {
+    user = await User.findById(userId);
+  } else if (email && typeof email === 'string') {
+    const normalized = email.trim().toLowerCase();
+    user = await User.findOne({ email: normalized });
+  }
+
+  // If user does not exist or is already verified, return safely
+  if (!user) {
+    return { dispatched: false, user: null, rawToken: null, expiresAt: null };
+  }
+
+  if (user.isEmailVerified) {
+    return { dispatched: false, user, rawToken: null, expiresAt: null, alreadyVerified: true };
+  }
+
+  const { rawToken, expiresAt } = await issueVerificationToken(user._id, metadata);
+  return { dispatched: true, user, rawToken, expiresAt, alreadyVerified: false };
+};
+
 export default {
   issueVerificationToken,
   verifyEmailToken,
   verifyCustomerEmail,
+  resendVerificationToken,
 };

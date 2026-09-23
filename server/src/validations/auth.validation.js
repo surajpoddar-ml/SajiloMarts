@@ -195,8 +195,51 @@ export const validateVerifyEmailInput = (data) => {
   };
 };
 
+/**
+ * Validates resend verification request payload.
+ *
+ * @param {Object} data
+ * @throws {ValidationError}
+ * @returns {{email?: string}}
+ */
+export const validateResendVerificationInput = (data) => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError('Payload must be an object', [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const errors = [];
+  const { email, ...extraFields } = data;
+
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unexpected fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  if (email !== undefined) {
+    if (typeof email !== 'string' || !email.trim()) {
+      errors.push({ field: 'email', message: 'Email address must be a valid string' });
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      errors.push({ field: 'email', message: 'Please provide a valid email address format' });
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for resend verification input', errors);
+  }
+
+  return {
+    email: email && typeof email === 'string' ? email.trim().toLowerCase() : undefined,
+  };
+};
+
 export default {
   validateRegistrationInput,
   validateLoginInput,
   validateVerifyEmailInput,
+  validateResendVerificationInput,
 };

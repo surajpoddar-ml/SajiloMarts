@@ -1,11 +1,12 @@
 import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { registerCustomer, loginCustomer } from '../services/auth.service.js';
-import { verifyCustomerEmail } from '../services/accountSecurity.service.js';
+import { verifyCustomerEmail, resendVerificationToken } from '../services/accountSecurity.service.js';
 import {
   validateRegistrationInput,
   validateLoginInput,
   validateVerifyEmailInput,
+  validateResendVerificationInput,
 } from '../validations/auth.validation.js';
 
 /**
@@ -72,6 +73,34 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Controller to handle verification email resend requests.
+ *
+ * @route POST /api/v1/auth/resend-verification
+ */
+export const resendVerification = asyncHandler(async (req, res) => {
+  const validatedInput = validateResendVerificationInput(req.body);
+  const email = validatedInput.email || req.user?.email;
+
+  await resendVerificationToken({
+    email,
+    userId: req.user?.id,
+    metadata: {
+      ip: req.ip,
+      userAgent: req.get('user-agent'),
+    },
+  });
+
+  // Always return generic success message to prevent account enumeration
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      null,
+      'If an unverified account with that email exists, a new verification link has been sent.'
+    )
+  );
+});
+
+/**
  * Controller to fetch the currently authenticated customer's profile.
  *
  * @route GET /api/v1/auth/me
@@ -99,6 +128,7 @@ export default {
   register,
   login,
   verifyEmail,
+  resendVerification,
   getMe,
   logout,
 };
