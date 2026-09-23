@@ -1,3 +1,10 @@
+/**
+ * SajiloMarts Account Security & Authentication Constants
+ *
+ * Enforces token lifecycle boundaries, security purposes isolation,
+ * uniform error responses, and audit event categories across server modules.
+ */
+
 export const AUTH_COOKIE_NAME = 'sajilomarts_auth_token';
 export const AUTH_HEADER_PREFIX = 'Bearer ';
 
