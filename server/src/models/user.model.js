@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-export const USER_ROLES = {
-  CUSTOMER: 'customer',
-  ADMIN: 'admin',
-};
+import { USER_ROLES, ALL_ROLES } from '../constants/roles.js';
+
+export { USER_ROLES, ALL_ROLES };
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
