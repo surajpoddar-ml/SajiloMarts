@@ -332,13 +332,35 @@ export const changeCustomerPassword = async ({ userId, currentPassword, newPassw
   return { user };
 };
 
+/**
+ * Purges expired or consumed security tokens to maintain clean collection size.
+ *
+ * @param {Object} [options]
+ * @param {number} [options.retentionDays=7] - Number of days to keep used/expired tokens before purging
+ * @returns {Promise<{deletedCount: number}>}
+ */
+export const cleanupExpiredSecurityTokens = async ({ retentionDays = 7 } = {}) => {
+  const thresholdDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
+
+  const result = await SecurityToken.deleteMany({
+    $or: [
+      { expiresAt: { $lt: thresholdDate } },
+      { isUsed: true, usedAt: { $lt: thresholdDate } },
+    ],
+  });
+
+  return { deletedCount: result.deletedCount || 0 };
+};
+
 export default {
   issueVerificationToken,
   issuePasswordResetToken,
+  validateTokenForPurpose,
   verifyEmailToken,
   verifyCustomerEmail,
   resendVerificationToken,
   requestPasswordReset,
   resetCustomerPassword,
   changeCustomerPassword,
+  cleanupExpiredSecurityTokens,
 };
