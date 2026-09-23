@@ -1,7 +1,7 @@
 import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { registerCustomer, loginCustomer } from '../services/auth.service.js';
-import { verifyEmailToken } from '../services/accountSecurity.service.js';
+import { verifyCustomerEmail } from '../services/accountSecurity.service.js';
 import {
   validateRegistrationInput,
   validateLoginInput,
@@ -58,17 +58,15 @@ export const login = asyncHandler(async (req, res) => {
  */
 export const verifyEmail = asyncHandler(async (req, res) => {
   const validatedInput = validateVerifyEmailInput(req.body);
-  const { user } = await verifyEmailToken(validatedInput.token);
-
-  // Mark verified
-  user.isEmailVerified = true;
-  await user.save();
+  const { user, alreadyVerified } = await verifyCustomerEmail(validatedInput.token);
 
   return res.status(HTTP_STATUS.OK).json(
     new ApiResponse(
       HTTP_STATUS.OK,
-      { user: toSafeUser(user), verified: true },
-      'Email address verified successfully'
+      { user: toSafeUser(user), verified: true, alreadyVerified },
+      alreadyVerified
+        ? 'Account email is already verified'
+        : 'Email address verified successfully'
     )
   );
 });

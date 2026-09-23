@@ -105,7 +105,26 @@ export const verifyEmailToken = async (rawToken) => {
   return { user, tokenDoc };
 };
 
+/**
+ * Safely marks customer account email verified.
+ *
+ * @param {string} rawToken
+ * @returns {Promise<{user: Object, alreadyVerified: boolean}>}
+ */
+export const verifyCustomerEmail = async (rawToken) => {
+  const { user, tokenDoc } = await verifyEmailToken(rawToken);
+
+  const alreadyVerified = Boolean(user.isEmailVerified);
+  if (!alreadyVerified) {
+    user.isEmailVerified = true;
+    await user.save();
+  }
+
+  return { user, tokenDoc, alreadyVerified };
+};
+
 export default {
   issueVerificationToken,
   verifyEmailToken,
+  verifyCustomerEmail,
 };
