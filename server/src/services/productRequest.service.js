@@ -3,7 +3,7 @@ import { BaseService } from './base.service.js';
 import { ProductRequest, REQUEST_STATUSES } from '../models/productRequest.model.js';
 import { User, USER_ROLES } from '../models/user.model.js';
 import { quoteService } from './quote.service.js';
-import { BadRequestError, NotFoundError, ForbiddenError } from '../utils/index.js';
+import { BadRequestError, NotFoundError, ForbiddenError, assertResourceOwnership } from '../utils/index.js';
 
 /**
  * Product Request Service
@@ -34,7 +34,7 @@ export class ProductRequestService extends BaseService {
 
   /**
    * Creates a new sourcing request for a customer.
-   * Calculates initial quote snapshot.
+   * Calculates initial quote snapshot and binds ownership strictly to the authenticated user.
    * @param {string} userId - Authenticated user ID
    * @param {object} requestData - Input fields
    * @returns {Promise<import('mongoose').Document>}
@@ -45,9 +45,10 @@ export class ProductRequestService extends BaseService {
     }
     this.validateObjectId(userId, 'User ID');
 
-    // Mass assignment protection
+    // Mass assignment and ownership tampering protection
     const {
       user: _ignoreUser,
+      userId: _ignoreUserId,
       _id: _ignoreId,
       status: _ignoreStatus,
       internalNotes: _ignoreInternalNotes,
@@ -89,9 +90,7 @@ export class ProductRequestService extends BaseService {
       throw new NotFoundError('Product request not found');
     }
 
-    if (request.user.toString() !== userId.toString()) {
-      throw new ForbiddenError('You do not have permission to view this request');
-    }
+    assertResourceOwnership(request, userId, 'Product request', 'user');
 
     return request;
   }
@@ -104,6 +103,50 @@ export class ProductRequestService extends BaseService {
   async getUserRequests(userId) {
     this.validateObjectId(userId, 'User ID');
     return ProductRequest.find({ user: userId }).sort({ createdAt: -1 });
+  }
+
+  /**
+   * Allows customer to update editable details on their own submitted sourcing request.
+   * Customers cannot modify status, internal notes, quote calculations, or reassign ownership.
+   *
+   * @param {string} userId - Authenticated user ID
+   * @param {string} requestId - Request ID
+   * @param {object} updateData - Allowed update payload
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async updateCustomerRequest(userId, requestId, updateData) {
+    const request = await this.getRequestForUser(userId, requestId);
+
+    if (request.status !== REQUEST_STATUSES.SUBMITTED && request.status !== REQUEST_STATUSES.UNDER_REVIEW) {
+      throw new BadRequestError('Cannot modify sourcing request after quotes have been finalized or approved');
+    }
+
+    // Only allow customer-editable fields (e.g. notes, product specifications)
+    const {
+      productTitle,
+      productUrl,
+      productPriceInr,
+      quantity,
+      customerNotes,
+      paymentMode,
+    } = updateData;
+
+    if (productTitle !== undefined) request.productTitle = productTitle;
+    if (productUrl !== undefined) request.productUrl = productUrl;
+    if (customerNotes !== undefined) request.customerNotes = customerNotes;
+    if (productPriceInr !== undefined || quantity !== undefined || paymentMode !== undefined) {
+      if (productPriceInr !== undefined) request.productPriceInr = productPriceInr;
+      if (quantity !== undefined) request.quantity = quantity;
+      if (paymentMode !== undefined) request.paymentMode = paymentMode;
+
+      request.quote = quoteService.calculateQuote(
+        request.productPriceInr,
+        request.quantity,
+        request.paymentMode
+      );
+    }
+
+    return request.save();
   }
 
   /**
