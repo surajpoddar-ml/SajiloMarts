@@ -7,6 +7,11 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { useAuth } from './hooks/useAuth.js';
 import { LoginPage } from './pages/Auth/LoginPage.jsx';
 import { RegisterPage } from './pages/Auth/RegisterPage.jsx';
+import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage.jsx';
+import { ResendVerificationPage } from './pages/Auth/ResendVerificationPage.jsx';
+import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
+import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
+import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import './App.css';
 
@@ -35,7 +40,19 @@ const ARCHITECTURE_RULES = [
 
 function AppContent() {
   const { user, isAuthenticated, logout } = useAuth();
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'login' | 'register' | 'account'
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const path = window.location.pathname;
+      if (path.includes('verify-email') || params.get('token') && window.location.hash.includes('verify')) {
+        return 'verify-email';
+      }
+      if (path.includes('reset-password') || params.get('token')) {
+        return 'reset-password';
+      }
+    }
+    return 'home';
+  });
 
   const [backendStatus, setBackendStatus] = useState({
     loading: true,
@@ -78,7 +95,7 @@ function AppContent() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 12 &bull; Authentication &amp; Secure Sessions"
+        stepLabel="Prompt 13 &bull; Account Security &amp; Password Recovery"
         user={user}
         onLogin={() => setCurrentView('login')}
         onRegister={() => setCurrentView('register')}
@@ -88,7 +105,7 @@ function AppContent() {
         }}
       />
 
-      <nav style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', margin: '1rem 0' }}>
+      <nav style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', margin: '1rem 0', flexWrap: 'wrap' }}>
         <button
           type="button"
           onClick={() => setCurrentView('home')}
@@ -119,6 +136,8 @@ function AppContent() {
       {currentView === 'login' && (
         <LoginPage
           onNavigateToRegister={() => setCurrentView('register')}
+          onNavigateToForgot={() => setCurrentView('forgot-password')}
+          onNavigateToResend={() => setCurrentView('resend-verification')}
           onLoginSuccess={() => setCurrentView('account')}
         />
       )}
@@ -130,17 +149,63 @@ function AppContent() {
         />
       )}
 
+      {currentView === 'forgot-password' && (
+        <ForgotPasswordPage
+          onNavigateToLogin={() => setCurrentView('login')}
+        />
+      )}
+
+      {currentView === 'reset-password' && (
+        <ResetPasswordPage
+          onNavigateToLogin={() => setCurrentView('login')}
+          onNavigateToForgot={() => setCurrentView('forgot-password')}
+        />
+      )}
+
+      {currentView === 'verify-email' && (
+        <VerifyEmailPage
+          onNavigateToLogin={() => setCurrentView('login')}
+          onNavigateToResend={() => setCurrentView('resend-verification')}
+        />
+      )}
+
+      {currentView === 'resend-verification' && (
+        <ResendVerificationPage
+          onNavigateToLogin={() => setCurrentView('login')}
+        />
+      )}
+
       {currentView === 'account' && (
         <ProtectedRoute onRedirectToLogin={() => setCurrentView('login')}>
           <div style={{ maxWidth: '640px', margin: '2rem auto', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ margin: '0 0 1rem', color: '#0f172a' }}>Customer Profile</h2>
+            <h2 style={{ margin: '0 0 1rem', color: '#0f172a' }}>Customer Profile &amp; Security</h2>
             <div style={{ display: 'grid', gap: '0.75rem', textAlign: 'left', background: '#f8fafc', padding: '1.25rem', borderRadius: '8px' }}>
               <div><strong>Name:</strong> {user?.name}</div>
               <div><strong>Email:</strong> {user?.email}</div>
               <div><strong>Phone:</strong> {user?.phone || 'Not provided'}</div>
               <div><strong>Role:</strong> <span className="badge" style={{ marginLeft: '0.25rem' }}>{user?.role}</span></div>
+              <div>
+                <strong>Email Verification:</strong>{' '}
+                {user?.isEmailVerified ? (
+                  <span style={{ color: '#16a34a', fontWeight: 600 }}>&check; Verified</span>
+                ) : (
+                  <span>
+                    <span style={{ color: '#d97706', fontWeight: 600 }}>&bull; Unverified</span>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentView('resend-verification')}
+                      className="auth-link"
+                      style={{ background: 'none', border: 'none', marginLeft: '0.75rem', fontSize: '0.85rem' }}
+                    >
+                      Resend Verification Email
+                    </button>
+                  </span>
+                )}
+              </div>
               <div><strong>Account Status:</strong> <span style={{ color: '#16a34a', fontWeight: 600 }}>Active</span></div>
             </div>
+
+            <ChangePasswordSection />
           </div>
         </ProtectedRoute>
       )}

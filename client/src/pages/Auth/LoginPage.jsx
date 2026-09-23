@@ -4,7 +4,12 @@ import './Auth.css';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-export const LoginPage = ({ onNavigateToRegister, onLoginSuccess }) => {
+export const LoginPage = ({
+  onNavigateToRegister,
+  onNavigateToForgot,
+  onNavigateToResend,
+  onLoginSuccess,
+}) => {
   const { login } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -93,7 +98,19 @@ export const LoginPage = ({ onNavigateToRegister, onLoginSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="login-password">Password</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className="form-label" htmlFor="login-password">Password</label>
+              {onNavigateToForgot && (
+                <button
+                  type="button"
+                  className="auth-link"
+                  onClick={onNavigateToForgot}
+                  style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.8rem' }}
+                >
+                  Forgot password?
+                </button>
+              )}
+            </div>
             <input
               id="login-password"
               type="password"
@@ -117,16 +134,30 @@ export const LoginPage = ({ onNavigateToRegister, onLoginSuccess }) => {
           </button>
         </form>
 
-        <div className="auth-footer">
-          Don&apos;t have an account?{' '}
-          <button
-            type="button"
-            className="auth-link"
-            onClick={onNavigateToRegister}
-            style={{ background: 'none', border: 'none', padding: 0 }}
-          >
-            Create Account
-          </button>
+        <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div>
+            Don&apos;t have an account?{' '}
+            <button
+              type="button"
+              className="auth-link"
+              onClick={onNavigateToRegister}
+              style={{ background: 'none', border: 'none', padding: 0 }}
+            >
+              Create Account
+            </button>
+          </div>
+          {onNavigateToResend && (
+            <div>
+              <button
+                type="button"
+                className="auth-link"
+                onClick={onNavigateToResend}
+                style={{ background: 'none', border: 'none', padding: 0, fontSize: '0.825rem', color: '#64748b' }}
+              >
+                Need to verify your email? Resend link
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
