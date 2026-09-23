@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { BaseService } from './base.service.js';
 import { ProductRequest, REQUEST_STATUSES } from '../models/productRequest.model.js';
+import { PaymentSubmission } from '../models/paymentSubmission.model.js';
 import { User, USER_ROLES } from '../models/user.model.js';
 import { quoteService } from './quote.service.js';
 import { BadRequestError, NotFoundError, ForbiddenError, assertResourceOwnership } from '../utils/index.js';
