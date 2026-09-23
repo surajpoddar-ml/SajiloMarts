@@ -44,6 +44,12 @@ export const requireRole = (...allowedRoles) => {
 export const requireAdmin = requireRole(USER_ROLES.ADMIN);
 
 /**
+ * Customer-only authorization guard.
+ * Rejects unauthenticated, inactive, or non-customer callers.
+ */
+export const requireCustomer = requireRole(USER_ROLES.CUSTOMER);
+
+/**
  * Reusable alias for requiring any of a set of roles.
  */
 export const requireAnyRole = (...roles) => requireRole(...roles);
@@ -51,5 +57,6 @@ export const requireAnyRole = (...roles) => requireRole(...roles);
 export default {
   requireRole,
   requireAdmin,
+  requireCustomer,
   requireAnyRole,
 };
