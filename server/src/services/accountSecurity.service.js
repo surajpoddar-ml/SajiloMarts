@@ -172,9 +172,34 @@ export const resendVerificationToken = async ({ email, userId, metadata = {} }) 
   return { dispatched: true, user, rawToken, expiresAt, alreadyVerified: false };
 };
 
+/**
+ * Initiates password recovery flow for a customer account.
+ * Mitigates account enumeration by ensuring safe, consistent return values.
+ *
+ * @param {string} email
+ * @param {Object} [metadata={}]
+ * @returns {Promise<{initiated: boolean, user: Object|null, rawToken: string|null, expiresAt: Date|null}>}
+ */
+export const requestPasswordReset = async (email, metadata = {}) => {
+  if (!email || typeof email !== 'string' || !email.trim()) {
+    throw new BadRequestError('Email address is required');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail });
+
+  if (!user || !user.isActive) {
+    return { initiated: false, user: null, rawToken: null, expiresAt: null };
+  }
+
+  // Next steps will generate and persist the secure token pair
+  return { initiated: true, user, rawToken: null, expiresAt: null };
+};
+
 export default {
   issueVerificationToken,
   verifyEmailToken,
   verifyCustomerEmail,
   resendVerificationToken,
+  requestPasswordReset,
 };
