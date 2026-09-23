@@ -112,14 +112,16 @@ export const issuePasswordResetToken = async (userId, metadata = {}) => {
 };
 
 /**
- * Validates a submitted raw verification token, checks purpose, usage state, and expiration.
+ * Validates a security token for a specific expected purpose.
+ * Enforces purpose separation, non-usage, non-expiration, and user existence.
  *
  * @param {string} rawToken
- * @returns {Promise<{user: Object, tokenDoc: Object}>} Verified user and token record
+ * @param {string} expectedPurpose
+ * @returns {Promise<{user: Object, tokenDoc: Object}>}
  */
-export const verifyEmailToken = async (rawToken) => {
+export const validateTokenForPurpose = async (rawToken, expectedPurpose) => {
   if (!rawToken || typeof rawToken !== 'string' || !rawToken.trim()) {
-    throw new BadRequestError('Verification token is required');
+    throw new BadRequestError('Security credential token is required');
   }
 
   const tokenHash = hashSecurityToken(rawToken.trim());
@@ -129,28 +131,37 @@ export const verifyEmailToken = async (rawToken) => {
     throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
   }
 
-  // Enforce purpose separation
-  if (tokenDoc.purpose !== SECURITY_TOKEN_PURPOSES.EMAIL_VERIFICATION) {
+  // Strict purpose separation check
+  if (tokenDoc.purpose !== expectedPurpose) {
     throw new BadRequestError(AUTH_ERRORS.TOKEN_PURPOSE_MISMATCH);
   }
 
-  // Enforce single-use
+  // Single-use enforcement
   if (tokenDoc.isUsed) {
     throw new BadRequestError(AUTH_ERRORS.TOKEN_ALREADY_USED);
   }
 
-  // Enforce expiration
+  // Expiration enforcement
   if (tokenDoc.expiresAt < new Date()) {
     throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
   }
 
-  // Retrieve associated user
   const user = await User.findById(tokenDoc.userId);
   if (!user) {
     throw new NotFoundError('Associated customer account not found');
   }
 
   return { user, tokenDoc };
+};
+
+/**
+ * Validates a submitted raw verification token for email verification purpose.
+ *
+ * @param {string} rawToken
+ * @returns {Promise<{user: Object, tokenDoc: Object}>} Verified user and token record
+ */
+export const verifyEmailToken = async (rawToken) => {
+  return validateTokenForPurpose(rawToken, SECURITY_TOKEN_PURPOSES.EMAIL_VERIFICATION);
 };
 
 /**
@@ -255,39 +266,14 @@ export const requestPasswordReset = async (email, metadata = {}) => {
  * @returns {Promise<{user: Object, tokenDoc: Object}>}
  */
 export const resetCustomerPassword = async ({ token, newPassword }) => {
-  if (!token || typeof token !== 'string' || !token.trim()) {
-    throw new BadRequestError('Reset token is required');
-  }
   if (!newPassword || typeof newPassword !== 'string') {
     throw new BadRequestError('New password is required');
   }
 
-  const tokenHash = hashSecurityToken(token.trim());
-  const tokenDoc = await SecurityToken.findOne({ tokenHash });
-
-  if (!tokenDoc) {
-    throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
-  }
-
-  // Enforce purpose separation
-  if (tokenDoc.purpose !== SECURITY_TOKEN_PURPOSES.PASSWORD_RESET) {
-    throw new BadRequestError(AUTH_ERRORS.TOKEN_PURPOSE_MISMATCH);
-  }
-
-  // Enforce single-use
-  if (tokenDoc.isUsed) {
-    throw new BadRequestError(AUTH_ERRORS.TOKEN_ALREADY_USED);
-  }
-
-  // Enforce expiration
-  if (tokenDoc.expiresAt < new Date()) {
-    throw new BadRequestError(AUTH_ERRORS.INVALID_OR_EXPIRED_TOKEN);
-  }
-
-  const user = await User.findById(tokenDoc.userId);
-  if (!user) {
-    throw new NotFoundError('Associated customer account not found');
-  }
+  const { user, tokenDoc } = await validateTokenForPurpose(
+    token,
+    SECURITY_TOKEN_PURPOSES.PASSWORD_RESET
+  );
 
   user.password = newPassword;
   await user.save();
