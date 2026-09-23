@@ -240,8 +240,8 @@ export const requestPasswordReset = async (email, metadata = {}) => {
     return { initiated: false, user: null, rawToken: null, expiresAt: null };
   }
 
-  // Next steps will generate and persist the secure token pair
-  return { initiated: true, user, rawToken: null, expiresAt: null };
+  const { rawToken, expiresAt } = await issuePasswordResetToken(user._id, metadata);
+  return { initiated: true, user, rawToken, expiresAt };
 };
 
 export default {
