@@ -12,7 +12,12 @@ import {
 } from '../../controllers/auth.controller.js';
 import { requireAuth } from '../../middlewares/auth.middleware.js';
 import { validateBody } from '../../middlewares/validation.middleware.js';
-import { authRateLimiter } from '../../middlewares/rateLimiter.middleware.js';
+import {
+  authRateLimiter,
+  verificationRateLimiter,
+  passwordRecoveryRateLimiter,
+  passwordChangeRateLimiter,
+} from '../../middlewares/rateLimiter.middleware.js';
 import {
   validateRegistrationInput,
   validateLoginInput,
@@ -30,15 +35,15 @@ router.post('/register', authRateLimiter, validateBody(validateRegistrationInput
 router.post('/login', authRateLimiter, validateBody(validateLoginInput), login);
 
 // Email verification & resend
-router.post('/verify-email', authRateLimiter, validateBody(validateVerifyEmailInput), verifyEmail);
-router.post('/resend-verification', authRateLimiter, validateBody(validateResendVerificationInput), resendVerification);
+router.post('/verify-email', verificationRateLimiter, validateBody(validateVerifyEmailInput), verifyEmail);
+router.post('/resend-verification', verificationRateLimiter, validateBody(validateResendVerificationInput), resendVerification);
 
 // Password recovery & reset
-router.post('/forgot-password', authRateLimiter, validateBody(validateForgotPasswordInput), forgotPassword);
-router.post('/reset-password', authRateLimiter, validateBody(validateResetPasswordInput), resetPassword);
+router.post('/forgot-password', passwordRecoveryRateLimiter, validateBody(validateForgotPasswordInput), forgotPassword);
+router.post('/reset-password', passwordRecoveryRateLimiter, validateBody(validateResetPasswordInput), resetPassword);
 
 // Authenticated password change
-router.post('/change-password', requireAuth, authRateLimiter, validateBody(validateChangePasswordInput), changePassword);
+router.post('/change-password', requireAuth, passwordChangeRateLimiter, validateBody(validateChangePasswordInput), changePassword);
 
 // Current authenticated user
 router.get('/me', requireAuth, getMe);

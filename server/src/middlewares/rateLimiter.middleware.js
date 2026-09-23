@@ -4,14 +4,24 @@ import { appConfig } from '../config/index.js';
 
 const requestCounts = new Map();
 const authRequestCounts = new Map();
+const verificationCounts = new Map();
+const recoveryCounts = new Map();
+const passwordChangeCounts = new Map();
 
-export const apiRateLimiter = (req, res, next) => {
+/**
+ * Creates an in-memory sliding window rate limiter middleware.
+ *
+ * @param {Map} store
+ * @param {number} windowMs
+ * @param {number} maxRequests
+ * @param {string} message
+ * @returns {import('express').RequestHandler}
+ */
+const createRateLimiter = (store, windowMs, maxRequests, message) => (req, res, next) => {
   const ip = req.ip || req.connection?.remoteAddress || 'unknown';
   const currentTime = Date.now();
-  const windowMs = appConfig.rateLimit.windowMs;
-  const maxRequests = appConfig.rateLimit.maxRequests;
 
-  const record = requestCounts.get(ip) || { count: 0, resetTime: currentTime + windowMs };
+  const record = store.get(ip) || { count: 0, resetTime: currentTime + windowMs };
 
   if (currentTime > record.resetTime) {
     record.count = 1;
@@ -20,43 +30,54 @@ export const apiRateLimiter = (req, res, next) => {
     record.count += 1;
   }
 
-  requestCounts.set(ip, record);
+  store.set(ip, record);
 
   if (record.count > maxRequests) {
-    throw new ApiError(HTTP_STATUS.TOO_MANY_REQUESTS, 'Too many requests. Please try again later.');
+    throw new ApiError(HTTP_STATUS.TOO_MANY_REQUESTS, message);
   }
 
   next();
 };
 
-export const authRateLimiter = (req, res, next) => {
-  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
-  const currentTime = Date.now();
-  const windowMs = 15 * 60 * 1000; // 15 minutes window
-  const maxRequests = 20; // 20 authentication attempts per window
+export const apiRateLimiter = createRateLimiter(
+  requestCounts,
+  appConfig.rateLimit.windowMs,
+  appConfig.rateLimit.maxRequests,
+  'Too many requests. Please try again later.'
+);
 
-  const record = authRequestCounts.get(ip) || { count: 0, resetTime: currentTime + windowMs };
+export const authRateLimiter = createRateLimiter(
+  authRequestCounts,
+  15 * 60 * 1000,
+  20,
+  'Too many authentication attempts. Please try again in 15 minutes.'
+);
 
-  if (currentTime > record.resetTime) {
-    record.count = 1;
-    record.resetTime = currentTime + windowMs;
-  } else {
-    record.count += 1;
-  }
+export const verificationRateLimiter = createRateLimiter(
+  verificationCounts,
+  15 * 60 * 1000,
+  10,
+  'Too many email verification attempts. Please try again in 15 minutes.'
+);
 
-  authRequestCounts.set(ip, record);
+export const passwordRecoveryRateLimiter = createRateLimiter(
+  recoveryCounts,
+  15 * 60 * 1000,
+  10,
+  'Too many password recovery attempts. Please try again in 15 minutes.'
+);
 
-  if (record.count > maxRequests) {
-    throw new ApiError(
-      HTTP_STATUS.TOO_MANY_REQUESTS,
-      'Too many authentication attempts. Please try again in 15 minutes.'
-    );
-  }
-
-  next();
-};
+export const passwordChangeRateLimiter = createRateLimiter(
+  passwordChangeCounts,
+  15 * 60 * 1000,
+  10,
+  'Too many password change attempts. Please try again in 15 minutes.'
+);
 
 export default {
   apiRateLimiter,
   authRateLimiter,
+  verificationRateLimiter,
+  passwordRecoveryRateLimiter,
+  passwordChangeRateLimiter,
 };
