@@ -106,13 +106,18 @@ export const verifyEmailToken = async (rawToken) => {
 };
 
 /**
- * Safely marks customer account email verified.
+ * Safely marks customer account email verified and invalidates the consumed credential.
  *
  * @param {string} rawToken
  * @returns {Promise<{user: Object, alreadyVerified: boolean}>}
  */
 export const verifyCustomerEmail = async (rawToken) => {
   const { user, tokenDoc } = await verifyEmailToken(rawToken);
+
+  // Invalidate token atomically to prevent replay
+  tokenDoc.isUsed = true;
+  tokenDoc.usedAt = new Date();
+  await tokenDoc.save();
 
   const alreadyVerified = Boolean(user.isEmailVerified);
   if (!alreadyVerified) {
