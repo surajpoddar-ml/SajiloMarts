@@ -5,6 +5,30 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
 
 /**
+ * Validates payload object structure and rejects prototype pollution / injection keys.
+ *
+ * @param {any} data
+ * @param {string} payloadName
+ * @throws {ValidationError}
+ */
+export const sanitizeSecurityPayload = (data, payloadName = 'Payload') => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError(`${payloadName} must be an object`, [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const forbiddenKeys = ['__proto__', 'constructor', 'prototype'];
+  for (const key of Object.keys(data)) {
+    if (forbiddenKeys.includes(key) || key.startsWith('$') || key.includes('.')) {
+      throw new ValidationError('Malformed or prohibited field name in payload', [
+        { field: key, message: `Field '${key}' is prohibited` },
+      ]);
+    }
+  }
+};
+
+/**
  * Validates customer registration payload.
  *
  * @param {Object} data - The registration request payload
@@ -12,11 +36,7 @@ const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
  * @returns {Object} Cleaned registration data
  */
 export const validateRegistrationInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Registration payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Registration payload');
 
   const errors = [];
   const { name, email, password, phone, ...extraFields } = data;
@@ -110,11 +130,7 @@ export const validateRegistrationInput = (data) => {
  * @returns {Object} Cleaned login data
  */
 export const validateLoginInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Login payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Login payload');
 
   const errors = [];
   const { email, password, ...extraFields } = data;
@@ -163,11 +179,7 @@ export const validateLoginInput = (data) => {
  * @returns {{token: string}}
  */
 export const validateVerifyEmailInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Verification payload');
 
   const errors = [];
   const { token, ...extraFields } = data;
@@ -203,11 +215,7 @@ export const validateVerifyEmailInput = (data) => {
  * @returns {{email?: string}}
  */
 export const validateResendVerificationInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Resend verification payload');
 
   const errors = [];
   const { email, ...extraFields } = data;
@@ -245,11 +253,7 @@ export const validateResendVerificationInput = (data) => {
  * @returns {{email: string}}
  */
 export const validateForgotPasswordInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Forgot password payload');
 
   const errors = [];
   const { email, ...extraFields } = data;
@@ -292,11 +296,7 @@ export const validateForgotPasswordInput = (data) => {
  * @returns {{token: string, password: string}}
  */
 export const validateResetPasswordInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Password reset payload');
 
   const errors = [];
   const { token, password, newPassword, confirmPassword, ...extraFields } = data;
@@ -351,11 +351,7 @@ export const validateResetPasswordInput = (data) => {
  * @returns {{currentPassword: string, newPassword: string}}
  */
 export const validateChangePasswordInput = (data) => {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    throw new ValidationError('Payload must be an object', [
-      { field: 'body', message: 'Invalid payload structure' },
-    ]);
-  }
+  sanitizeSecurityPayload(data, 'Password change payload');
 
   const errors = [];
   const { currentPassword, newPassword, password, confirmPassword, ...extraFields } = data;
