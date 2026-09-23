@@ -1,6 +1,7 @@
 import { ForbiddenError, UnauthorizedError } from '../utils/index.js';
 import { USER_ROLES, isValidRole } from '../constants/roles.js';
 import { AUTH_ERRORS } from '../constants/auth.constants.js';
+import { hasPermission } from '../constants/permissions.js';
 
 /**
  * Middleware factory that enforces specific role access.
@@ -54,9 +55,36 @@ export const requireCustomer = requireRole(USER_ROLES.CUSTOMER);
  */
 export const requireAnyRole = (...roles) => requireRole(...roles);
 
+/**
+ * Enforces deny-by-default permission check.
+ * If user lacks the specified permission, denies access with ForbiddenError.
+ *
+ * @param {string} permission - System permission key
+ * @returns {import('express').RequestHandler}
+ */
+export const requirePermission = (permission) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.id) {
+      throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
+    }
+
+    if (req.user.isActive === false) {
+      throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
+    }
+
+    const userRole = req.user.role || req.userRole;
+    if (!userRole || !hasPermission(userRole, permission)) {
+      throw new ForbiddenError('You do not have permission to perform this operation');
+    }
+
+    next();
+  };
+};
+
 export default {
   requireRole,
   requireAdmin,
   requireCustomer,
   requireAnyRole,
+  requirePermission,
 };
