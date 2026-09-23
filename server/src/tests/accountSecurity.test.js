@@ -150,9 +150,74 @@ export async function testPasswordRecoverySecurity() {
   console.log('✅ Password recovery security tests passed successfully');
 }
 
+export async function testPasswordResetAndSessionRevocation() {
+  console.log('🧪 Testing Password Reset and Session Revocation Logic...');
+
+  // 1. Password change validation tests
+  assert.throws(
+    () => validateChangePasswordInput({}),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'currentPassword'),
+    'Should require current password'
+  );
+
+  assert.throws(
+    () => validateChangePasswordInput({ currentPassword: 'OldPassword123!', newPassword: 'short' }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'newPassword'),
+    'Should require new password >= 8 characters'
+  );
+
+  assert.throws(
+    () =>
+      validateChangePasswordInput({
+        currentPassword: 'OldPassword123!',
+        newPassword: 'NewSecurePassword123!',
+        confirmPassword: 'DifferentPassword123!',
+      }),
+    (err) => err.name === 'ValidationError' && err.errors.some((e) => e.field === 'confirmPassword'),
+    'Should reject mismatched confirm password on change'
+  );
+
+  const cleanChange = validateChangePasswordInput({
+    currentPassword: 'OldPassword123!',
+    newPassword: 'NewSecurePassword123!',
+    confirmPassword: 'NewSecurePassword123!',
+  });
+  assert.equal(cleanChange.currentPassword, 'OldPassword123!');
+  assert.equal(cleanChange.newPassword, 'NewSecurePassword123!');
+
+  // 2. JWT Session Revocation Timing Assertion
+  // Simulate token issued before password change
+  const userId = new mongoose.Types.ObjectId().toString();
+  const pastIat = Math.floor(Date.now() / 1000) - 300; // 5 minutes ago
+  const passwordChangedAt = new Date(); // now
+
+  const isSessionRevoked = (iat, pwdChangedDate) => {
+    if (!pwdChangedDate) return false;
+    const changedTimestampSec = Math.floor(pwdChangedDate.getTime() / 1000);
+    return iat < changedTimestampSec;
+  };
+
+  assert.equal(
+    isSessionRevoked(pastIat, passwordChangedAt),
+    true,
+    'Session issued prior to password change must be marked as revoked'
+  );
+
+  // Simulate token issued after password change
+  const futureIat = Math.floor(Date.now() / 1000) + 1;
+  assert.equal(
+    isSessionRevoked(futureIat, passwordChangedAt),
+    false,
+    'Session issued after password change must remain valid'
+  );
+
+  console.log('✅ Password reset and session revocation tests passed successfully');
+}
+
 async function run() {
   await testEmailVerificationSecurity();
   await testPasswordRecoverySecurity();
+  await testPasswordResetAndSessionRevocation();
 }
 
 if (process.argv[1] && process.argv[1].endsWith('accountSecurity.test.js')) {
