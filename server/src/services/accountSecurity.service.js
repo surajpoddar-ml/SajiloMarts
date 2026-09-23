@@ -64,6 +64,54 @@ export const issueVerificationToken = async (userId, metadata = {}) => {
 };
 
 /**
+ * Creates and persists a cryptographically secure password reset token.
+ *
+ * @param {string|import('mongoose').Types.ObjectId} userId
+ * @param {Object} [metadata={}]
+ * @returns {Promise<{rawToken: string, expiresAt: Date}>}
+ */
+export const issuePasswordResetToken = async (userId, metadata = {}) => {
+  if (!userId) {
+    throw new BadRequestError('User ID is required to issue password reset token');
+  }
+
+  // 1. Invalidate any existing active password reset tokens for this customer
+  await SecurityToken.updateMany(
+    {
+      userId,
+      purpose: SECURITY_TOKEN_PURPOSES.PASSWORD_RESET,
+      isUsed: false,
+    },
+    {
+      $set: {
+        isUsed: true,
+        usedAt: new Date(),
+      },
+    }
+  );
+
+  // 2. Generate secure token pair
+  const { rawToken, tokenHash } = generateSecurityTokenPair(32);
+  const expiryMs = securityConfig?.tokens?.passwordResetExpiryMs || SECURITY_TOKEN_EXPIRY.PASSWORD_RESET_MS;
+  const expiresAt = new Date(Date.now() + expiryMs);
+
+  // 3. Persist hashed token record
+  await SecurityToken.create({
+    userId,
+    tokenHash,
+    purpose: SECURITY_TOKEN_PURPOSES.PASSWORD_RESET,
+    expiresAt,
+    isUsed: false,
+    metadata: {
+      ip: metadata.ip || null,
+      userAgent: metadata.userAgent || null,
+    },
+  });
+
+  return { rawToken, expiresAt };
+};
+
+/**
  * Validates a submitted raw verification token, checks purpose, usage state, and expiration.
  *
  * @param {string} rawToken
@@ -198,6 +246,7 @@ export const requestPasswordReset = async (email, metadata = {}) => {
 
 export default {
   issueVerificationToken,
+  issuePasswordResetToken,
   verifyEmailToken,
   verifyCustomerEmail,
   resendVerificationToken,
