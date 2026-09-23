@@ -1,13 +1,18 @@
 import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { registerCustomer, loginCustomer } from '../services/auth.service.js';
-import { verifyCustomerEmail, resendVerificationToken } from '../services/accountSecurity.service.js';
+import {
+  verifyCustomerEmail,
+  resendVerificationToken,
+  requestPasswordReset,
+} from '../services/accountSecurity.service.js';
 import { emailService } from '../services/email.service.js';
 import {
   validateRegistrationInput,
   validateLoginInput,
   validateVerifyEmailInput,
   validateResendVerificationInput,
+  validateForgotPasswordInput,
 } from '../validations/auth.validation.js';
 
 /**
@@ -118,6 +123,45 @@ export const resendVerification = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Controller to handle forgot password requests.
+ * Initiates recovery token generation and dispatches reset email.
+ *
+ * @route POST /api/v1/auth/forgot-password
+ */
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const validatedInput = validateForgotPasswordInput(req.body);
+
+  const result = await requestPasswordReset(validatedInput.email, {
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  if (result.initiated && result.rawToken && result.user) {
+    try {
+      const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+      const resetUrl = `${clientUrl}/reset-password?token=${result.rawToken}`;
+      await emailService.sendPasswordResetEmail({
+        to: result.user.email,
+        name: result.user.name,
+        resetUrl,
+      });
+    } catch (emailErr) {
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn('[AccountSecurity] Password reset email delivery deferred:', emailErr.message);
+      }
+    }
+  }
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      null,
+      'If an account with that email exists, a password reset link has been sent.'
+    )
+  );
+});
+
+/**
  * Controller to fetch the currently authenticated customer's profile.
  *
  * @route GET /api/v1/auth/me
@@ -146,6 +190,7 @@ export default {
   login,
   verifyEmail,
   resendVerification,
+  forgotPassword,
   getMe,
   logout,
 };

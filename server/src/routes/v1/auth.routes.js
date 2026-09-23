@@ -4,6 +4,7 @@ import {
   login,
   verifyEmail,
   resendVerification,
+  forgotPassword,
   getMe,
   logout,
 } from '../../controllers/auth.controller.js';
@@ -15,6 +16,7 @@ import {
   validateLoginInput,
   validateVerifyEmailInput,
   validateResendVerificationInput,
+  validateForgotPasswordInput,
 } from '../../validations/auth.validation.js';
 
 const router = Router();
@@ -26,6 +28,9 @@ router.post('/login', authRateLimiter, validateBody(validateLoginInput), login);
 // Email verification & resend
 router.post('/verify-email', authRateLimiter, validateBody(validateVerifyEmailInput), verifyEmail);
 router.post('/resend-verification', authRateLimiter, validateBody(validateResendVerificationInput), resendVerification);
+
+// Password recovery
+router.post('/forgot-password', authRateLimiter, validateBody(validateForgotPasswordInput), forgotPassword);
 
 // Current authenticated user
 router.get('/me', requireAuth, getMe);

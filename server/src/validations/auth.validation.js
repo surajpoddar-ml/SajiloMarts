@@ -237,9 +237,57 @@ export const validateResendVerificationInput = (data) => {
   };
 };
 
+/**
+ * Validates forgot password request payload.
+ *
+ * @param {Object} data
+ * @throws {ValidationError}
+ * @returns {{email: string}}
+ */
+export const validateForgotPasswordInput = (data) => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw new ValidationError('Payload must be an object', [
+      { field: 'body', message: 'Invalid payload structure' },
+    ]);
+  }
+
+  const errors = [];
+  const { email, ...extraFields } = data;
+
+  const forbiddenFields = Object.keys(extraFields);
+  if (forbiddenFields.length > 0) {
+    errors.push({
+      field: 'extraFields',
+      message: `Unexpected fields provided: ${forbiddenFields.join(', ')}`,
+    });
+  }
+
+  if (!email || typeof email !== 'string') {
+    errors.push({ field: 'email', message: 'Email address is required' });
+  } else {
+    const trimmed = email.trim();
+    if (!trimmed) {
+      errors.push({ field: 'email', message: 'Email address cannot be empty' });
+    } else if (trimmed.length > 254) {
+      errors.push({ field: 'email', message: 'Email address cannot exceed 254 characters' });
+    } else if (!EMAIL_REGEX.test(trimmed)) {
+      errors.push({ field: 'email', message: 'Please provide a valid email address format' });
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new ValidationError('Validation failed for forgot password input', errors);
+  }
+
+  return {
+    email: email.trim().toLowerCase(),
+  };
+};
+
 export default {
   validateRegistrationInput,
   validateLoginInput,
   validateVerifyEmailInput,
   validateResendVerificationInput,
+  validateForgotPasswordInput,
 };
