@@ -6,13 +6,17 @@ export const errorHandler = (err, req, res, next) => {
   let message = err.message || 'Internal Server Error';
   let errors = err.errors || [];
 
-  // Intercept JWT errors
+  // Intercept JWT authentication errors
   if (err.name === 'JsonWebTokenError') {
     statusCode = HTTP_STATUS.UNAUTHORIZED;
     message = 'Invalid authentication token';
   } else if (err.name === 'TokenExpiredError') {
     statusCode = HTTP_STATUS.UNAUTHORIZED;
     message = 'Authentication token has expired';
+  } else if (err.name === 'UnauthorizedError') {
+    statusCode = HTTP_STATUS.UNAUTHORIZED;
+  } else if (err.name === 'ForbiddenError') {
+    statusCode = HTTP_STATUS.FORBIDDEN;
   } else if (err.name === 'DuplicateKeyError' || (err.name === 'MongoServerError' && err.code === 11000)) {
     statusCode = HTTP_STATUS.CONFLICT;
     message = 'A resource with this identifier already exists';
@@ -39,3 +43,5 @@ export const errorHandler = (err, req, res, next) => {
     ...(envConfig.isDevelopment && { stack: err.stack }),
   });
 };
+
+export default errorHandler;
