@@ -1,6 +1,7 @@
 /**
  * Safely serializes a User document or plain object for client-facing API responses.
- * Strictly omits passwords, hashes, internal mongoose metadata, and private tokens.
+ * Strictly omits passwords, hashes, reset tokens, passwordChangedAt timestamps,
+ * internal mongoose metadata (__v), and private account flags.
  *
  * @param {Object} user - Mongoose User document or plain object
  * @returns {Object|null} Sanitized user profile
