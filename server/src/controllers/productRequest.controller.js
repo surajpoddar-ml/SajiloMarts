@@ -56,6 +56,44 @@ export class ProductRequestController extends BaseController {
       ApiResponse.success(request, 'Sourcing request retrieved successfully')
     );
   });
+
+  /**
+   * POST /api/v1/requests/:requestId/cancel
+   * Allows customer to cancel their own sourcing request.
+   */
+  cancelRequest = asyncHandler(async (req, res) => {
+    const requestId = req.params.requestId || req.params.id;
+    const userId = req.user.id || req.user._id;
+
+    const request = await productRequestService.transitionRequestStatus(
+      userId,
+      requestId,
+      'cancelled'
+    );
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(request, 'Sourcing request cancelled successfully')
+    );
+  });
+
+  /**
+   * POST /api/v1/requests/:requestId/submit
+   * Submits a draft sourcing request.
+   */
+  submitDraftRequest = asyncHandler(async (req, res) => {
+    const requestId = req.params.requestId || req.params.id;
+    const userId = req.user.id || req.user._id;
+
+    const request = await productRequestService.transitionRequestStatus(
+      userId,
+      requestId,
+      'submitted'
+    );
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(request, 'Sourcing request submitted successfully')
+    );
+  });
 }
 
 export const productRequestController = new ProductRequestController();
