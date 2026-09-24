@@ -18,3 +18,5 @@ export * from './sanitizeUri.js';
 export * from './securityToken.js';
 export * from './securityAudit.js';
 export * from './ownership.js';
+export * from './urlSecurity.js';
+
