@@ -176,23 +176,49 @@ export class ProductRequestService extends BaseService {
   }
 
   /**
-   * Retrieves a single sourcing request ensuring customer ownership (Mongoose doc).
-   * @param {string} userId - User ID
+   * Calculates and saves authoritative quote snapshot for a customer request.
+   * Updates request state to 'quote_ready' and stores immutable calculation snapshot.
+   * @param {string} userId - Authenticated user ID
    * @param {string} requestId - ProductRequest ID
+   * @param {object} [quoteOptions={}] - Optional payment mode / price override
    * @returns {Promise<import('mongoose').Document>}
    */
-  async getRequestForUser(userId, requestId) {
-    this.validateObjectId(userId, 'User ID');
-    this.validateObjectId(requestId, 'Request ID');
+  async generateAndSaveQuote(userId, requestId, quoteOptions = {}) {
+    const request = await this.getRequestForUser(userId, requestId);
 
-    const request = await ProductRequest.findById(requestId);
-    if (!request) {
-      throw new NotFoundError('Product request not found');
+    // State check: cannot generate quote for terminal states
+    const terminalStates = [
+      REQUEST_STATUSES.COMPLETED,
+      REQUEST_STATUSES.CANCELLED,
+      REQUEST_STATUSES.CONVERTED,
+    ];
+    if (terminalStates.includes(request.status)) {
+      throw new BadRequestError(`Cannot generate quote for request in '${request.status}' state`);
     }
 
-    assertResourceOwnership(request, userId, 'Product request', 'user');
+    const price = quoteOptions.productPriceInr !== undefined
+      ? Number(quoteOptions.productPriceInr)
+      : request.productPriceInr;
 
-    return request;
+    const quantity = quoteOptions.quantity !== undefined
+      ? Math.max(1, Math.floor(Number(quoteOptions.quantity) || 1))
+      : request.quantity || 1;
+
+    const paymentMode = quoteOptions.paymentMode || request.paymentMode || 'online_100';
+
+    if (!price || price <= 0 || !Number.isFinite(price)) {
+      throw new BadRequestError('A valid product price in INR is required to generate a quote');
+    }
+
+    // Authoritative server-side calculation
+    const quoteSnapshot = quoteService.calculateQuote(price, quantity, paymentMode);
+
+    request.productPriceInr = price;
+    request.quantity = quantity;
+    request.quote = quoteSnapshot;
+    request.status = REQUEST_STATUSES.QUOTE_READY;
+
+    return request.save();
   }
 
   /**
