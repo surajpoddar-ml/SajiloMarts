@@ -70,7 +70,7 @@ export class ProductRequestService extends BaseService {
       throw new ForbiddenError('Customer account is deactivated or inactive');
     }
 
-    // Mass assignment and ownership tampering protection
+    // Mass assignment and ownership tampering protection - strict allowlist
     const {
       user: _ignoreUser,
       userId: _ignoreUserId,
@@ -83,31 +83,65 @@ export class ProductRequestService extends BaseService {
       updatedAt: _u,
       role: _r,
       finalAmount: _f,
+      finalAmountNpr: _fn,
       amountPayableNow: _ap,
+      payNowAmountNpr: _pna,
       remainingCodAmount: _rc,
+      remainingCodAmountNpr: _rcn,
       conversionMultiplier: _cm,
+      exchangeRate: _er,
       feeRate: _fr,
-      ...cleanData
+      appliedRate: _ar,
+      rateAmountNpr: _ran,
+      convertedAmountNpr: _can,
+      calculatedAt: _ca,
+      __proto__: _proto,
+      constructor: _const,
+      prototype: _pt,
+      productUrl,
+      productName,
+      marketplace,
+      productPriceInr,
+      quantity,
+      variant,
+      notes,
+      deliveryAddress,
+      paymentMode,
+      currency,
     } = requestData;
 
+    // Normalize and validate the product URL safely
+    const cleanUrl = normalizeProductUrl(productUrl);
+    const cleanMarketplace = resolveAuthoritativeMarketplace(cleanUrl, marketplace);
+
     // Delivery address ownership validation
-    if (cleanData.deliveryAddress) {
-      await this.assertDeliveryAddressOwnership(userId, cleanData.deliveryAddress);
+    if (deliveryAddress) {
+      await this.assertDeliveryAddressOwnership(userId, deliveryAddress);
     }
 
+    const cleanQty = quantity !== undefined ? Math.max(1, Math.floor(Number(quantity) || 1)) : 1;
     let initialQuote = null;
-    if (cleanData.productPriceInr !== undefined && cleanData.productPriceInr !== null) {
-      const mode = cleanData.paymentMode === 'cod_50_50' ? 'cod_50_50' : 'online_100';
+
+    if (productPriceInr !== undefined && productPriceInr !== null && Number(productPriceInr) > 0) {
+      const mode = (paymentMode === 'cod_50_50' || paymentMode === 'COD_50_50') ? 'cod_50_50' : 'online_100';
       initialQuote = quoteService.calculateQuote(
-        cleanData.productPriceInr,
-        cleanData.quantity || 1,
+        Number(productPriceInr),
+        cleanQty,
         mode
       );
     }
 
     const productRequest = new ProductRequest({
-      ...cleanData,
       user: userId,
+      productUrl: cleanUrl,
+      productName: productName.trim(),
+      marketplace: cleanMarketplace,
+      productPriceInr: productPriceInr !== undefined && productPriceInr !== null ? Number(productPriceInr) : undefined,
+      quantity: cleanQty,
+      variant: variant ? String(variant).trim() : null,
+      notes: notes ? String(notes).trim() : null,
+      deliveryAddress: deliveryAddress || null,
+      currency: currency || 'INR',
       status: REQUEST_STATUSES.SUBMITTED,
       quote: initialQuote,
     });
