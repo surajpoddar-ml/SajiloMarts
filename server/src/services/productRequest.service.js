@@ -251,6 +251,17 @@ export class ProductRequestService extends BaseService {
     if (!request.quote) {
       throw new NotFoundError('No quote has been generated for this sourcing request yet');
     }
+    return {
+      requestId: request._id,
+      status: request.status,
+      productName: request.productName,
+      marketplace: request.marketplace,
+      productPriceInr: request.productPriceInr,
+      quantity: request.quantity,
+      quote: request.quote,
+    };
+  }
+
   /**
    * Confirms an authoritative quote by the customer.
    * Transitions status from 'quote_ready' to 'customer_confirmed' and stamps confirmedAt.

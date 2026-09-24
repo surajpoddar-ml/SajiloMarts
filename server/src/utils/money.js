@@ -30,6 +30,11 @@ export const multiplyMoney = (a, b) => {
  * @param  {...number} amounts
  * @returns {number}
  */
+export const addMoney = (...amounts) => {
+  const sum = amounts.reduce((acc, curr) => acc + (Number(curr) || 0), 0);
+  return roundCurrency(sum);
+};
+
 /**
  * Subtracts amounts with fixed decimal precision.
  * @param {number} a
