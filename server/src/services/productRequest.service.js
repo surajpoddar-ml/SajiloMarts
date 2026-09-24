@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { BaseService } from './base.service.js';
 import { ProductRequest, REQUEST_STATUSES } from '../models/productRequest.model.js';
 import { PaymentSubmission } from '../models/paymentSubmission.model.js';
+import { Address } from '../models/address.model.js';
 import { User, USER_ROLES } from '../models/user.model.js';
 import { quoteService } from './quote.service.js';
 import { BadRequestError, NotFoundError, ForbiddenError, assertResourceOwnership } from '../utils/index.js';
@@ -18,6 +19,21 @@ export class ProductRequestService extends BaseService {
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestError(`Invalid ${entityName} format`);
     }
+  }
+
+  /**
+   * Helper: Validates customer delivery address ownership.
+   * Prevents cross-customer address assignment.
+   */
+  async assertDeliveryAddressOwnership(userId, addressId) {
+    if (!addressId) return null;
+    this.validateObjectId(addressId, 'Delivery Address ID');
+    const address = await Address.findById(addressId);
+    if (!address || !address.isActive) {
+      throw new NotFoundError('Delivery address not found or inactive');
+    }
+    assertResourceOwnership(address, userId, 'Delivery address', 'userId');
+    return address;
   }
 
   /**
