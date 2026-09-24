@@ -2,7 +2,7 @@ import { BaseController } from './base.controller.js';
 import { productRequestService } from '../services/productRequest.service.js';
 import { ApiResponse, asyncHandler } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
-import { validateCreateProductRequest } from '../validations/productRequest.validation.js';
+import { validateCreateProductRequest, validateListProductRequests } from '../validations/productRequest.validation.js';
 
 /**
  * Controller handling Sourcing Product Requests for authenticated customers.
@@ -20,6 +20,7 @@ export class ProductRequestController extends BaseController {
 
     return res.status(HTTP_STATUS.CREATED).json(
       ApiResponse.created(request, 'Sourcing request created successfully')
+    );
   });
 
   /**
@@ -40,8 +41,22 @@ export class ProductRequestController extends BaseController {
       )
     );
   });
+
+  /**
+   * GET /api/v1/requests/:requestId
+   * Retrieves detail of an individual sourcing request with ownership isolation.
+   */
+  getRequestById = asyncHandler(async (req, res) => {
+    const requestId = req.params.requestId || req.params.id;
+    const userId = req.user.id || req.user._id;
+
+    const request = await productRequestService.getRequestDetailsForCustomer(userId, requestId);
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(request, 'Sourcing request retrieved successfully')
+    );
+  });
 }
 
 export const productRequestController = new ProductRequestController();
 export default productRequestController;
-
