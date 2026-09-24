@@ -10,6 +10,7 @@ router.use(requireActiveAccount);
 
 // Sourcing Request CRUD & Action routes
 router.post('/', productRequestController.createRequest);
+router.get('/', productRequestController.getUserRequests);
 
 export default router;
 

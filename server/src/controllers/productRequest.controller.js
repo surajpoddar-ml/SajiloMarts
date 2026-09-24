@@ -20,9 +20,28 @@ export class ProductRequestController extends BaseController {
 
     return res.status(HTTP_STATUS.CREATED).json(
       ApiResponse.created(request, 'Sourcing request created successfully')
+  });
+
+  /**
+   * GET /api/v1/requests
+   * Retrieves paginated list of sourcing requests for authenticated customer.
+   */
+  getUserRequests = asyncHandler(async (req, res) => {
+    const paginationOptions = validateListProductRequests(req.query);
+    const userId = req.user.id || req.user._id;
+
+    const result = await productRequestService.listUserRequests(userId, paginationOptions);
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.paginated(
+        result.requests,
+        result.pagination,
+        'Customer sourcing requests retrieved successfully'
+      )
     );
   });
 }
 
 export const productRequestController = new ProductRequestController();
 export default productRequestController;
+
