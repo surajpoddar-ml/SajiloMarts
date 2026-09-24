@@ -5,7 +5,15 @@ import { PaymentSubmission } from '../models/paymentSubmission.model.js';
 import { Address } from '../models/address.model.js';
 import { User, USER_ROLES } from '../models/user.model.js';
 import { quoteService } from './quote.service.js';
-import { BadRequestError, NotFoundError, ForbiddenError, assertResourceOwnership } from '../utils/index.js';
+import {
+  BadRequestError,
+  NotFoundError,
+  ForbiddenError,
+  assertResourceOwnership,
+  normalizeProductUrl,
+  resolveAuthoritativeMarketplace,
+  validateStatusTransition,
+} from '../utils/index.js';
 
 /**
  * Product Request Service
@@ -187,6 +195,26 @@ export class ProductRequestService extends BaseService {
     // Customer safe representation (no internal notes)
     const { internalNotes, __v, ...customerSafeRequest } = request;
     return customerSafeRequest;
+  }
+
+  /**
+   * Retrieves a single sourcing request ensuring customer ownership (Mongoose doc).
+   * @param {string} userId - User ID
+   * @param {string} requestId - ProductRequest ID
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async getRequestForUser(userId, requestId) {
+    this.validateObjectId(userId, 'User ID');
+    this.validateObjectId(requestId, 'Request ID');
+
+    const request = await ProductRequest.findById(requestId);
+    if (!request) {
+      throw new NotFoundError('Product request not found');
+    }
+
+    assertResourceOwnership(request, userId, 'Product request', 'user');
+
+    return request;
   }
 
   /**
