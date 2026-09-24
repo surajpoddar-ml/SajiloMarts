@@ -227,6 +227,28 @@ export class ProductRequestService extends BaseService {
   }
 
   /**
+   * Retrieves authoritative quote snapshot for a customer request with ownership isolation.
+   * @param {string} userId - Authenticated user ID
+   * @param {string} requestId - ProductRequest ID
+   * @returns {Promise<object>}
+   */
+  async getQuoteForUser(userId, requestId) {
+    const request = await this.getRequestForUser(userId, requestId);
+    if (!request.quote) {
+      throw new NotFoundError('No quote has been generated for this sourcing request yet');
+    }
+    return {
+      requestId: request._id,
+      status: request.status,
+      productName: request.productName,
+      marketplace: request.marketplace,
+      productPriceInr: request.productPriceInr,
+      quantity: request.quantity,
+      quote: request.quote,
+    };
+  }
+
+  /**
    * Lists sourcing requests for an authenticated customer.
    * Excludes internal administrative fields and guarantees customer isolation.
    * @param {string} userId - Authenticated user ID
