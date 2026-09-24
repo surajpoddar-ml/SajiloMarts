@@ -186,14 +186,19 @@ export class ProductRequestService extends BaseService {
   async generateAndSaveQuote(userId, requestId, quoteOptions = {}) {
     const request = await this.getRequestForUser(userId, requestId);
 
-    // State check: cannot generate quote for terminal states
-    const terminalStates = [
-      REQUEST_STATUSES.COMPLETED,
-      REQUEST_STATUSES.CANCELLED,
-      REQUEST_STATUSES.CONVERTED,
+    // Explicit state check: only allow quote generation in pre-fulfillment/negotiation states
+    const ALLOWED_QUOTE_STATES = [
+      REQUEST_STATUSES.DRAFT,
+      REQUEST_STATUSES.SUBMITTED,
+      REQUEST_STATUSES.UNDER_REVIEW,
+      REQUEST_STATUSES.QUOTE_READY,
+      REQUEST_STATUSES.QUOTED,
     ];
-    if (terminalStates.includes(request.status)) {
-      throw new BadRequestError(`Cannot generate quote for request in '${request.status}' state`);
+
+    if (!ALLOWED_QUOTE_STATES.includes(request.status)) {
+      throw new BadRequestError(
+        `Cannot calculate or modify quote for request in '${request.status}' status`
+      );
     }
 
     const price = quoteOptions.productPriceInr !== undefined
