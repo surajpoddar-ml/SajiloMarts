@@ -87,14 +87,38 @@ export function SourcingRequestForm({ onRequestCreated, onCancel }) {
     e.preventDefault();
     setError(null);
     setSuccessMsg('');
+
+    // Pre-validate
+    if (!formData.productUrl || !formData.productUrl.trim()) {
+      setError('Please provide a valid Indian marketplace product link.');
+      return;
+    }
+
+    if (!formData.productName || formData.productName.trim().length < 2) {
+      setError('Product title must be at least 2 characters long.');
+      return;
+    }
+
+    const price = parseFloat(formData.productPriceInr);
+    if (!price || price <= 0 || isNaN(price)) {
+      setError('Indian product price in INR must be a valid number greater than ₹0.');
+      return;
+    }
+
+    const qty = parseInt(formData.quantity, 10);
+    if (!qty || qty < 1 || isNaN(qty)) {
+      setError('Quantity must be at least 1 item.');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
       const payload = {
         productUrl: formData.productUrl.trim(),
         productName: formData.productName.trim(),
-        productPriceInr: parseFloat(formData.productPriceInr),
-        quantity: parseInt(formData.quantity, 10) || 1,
+        productPriceInr: price,
+        quantity: qty,
         variant: formData.variant.trim() || undefined,
         notes: formData.notes.trim() || undefined,
         paymentMode: formData.paymentMode,
