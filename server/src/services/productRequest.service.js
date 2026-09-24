@@ -50,8 +50,8 @@ export class ProductRequestService extends BaseService {
   }
 
   /**
-   * Creates a new sourcing request for a customer.
-   * Calculates initial quote snapshot and binds ownership strictly to the authenticated user.
+   * Creates a new sourcing request for an authenticated customer.
+   * Calculates initial quote snapshot if price provided and binds ownership strictly to user.
    * @param {string} userId - Authenticated user ID
    * @param {object} requestData - Input fields
    * @returns {Promise<import('mongoose').Document>}
@@ -61,6 +61,14 @@ export class ProductRequestService extends BaseService {
       throw new BadRequestError('Authenticated User ID is required to create a sourcing request');
     }
     this.validateObjectId(userId, 'User ID');
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new NotFoundError('Customer account not found');
+    }
+    if (user.isActive === false) {
+      throw new ForbiddenError('Customer account is deactivated or inactive');
+    }
 
     // Mass assignment and ownership tampering protection
     const {
@@ -73,14 +81,29 @@ export class ProductRequestService extends BaseService {
       paymentSubmission: _ignorePayment,
       createdAt: _c,
       updatedAt: _u,
+      role: _r,
+      finalAmount: _f,
+      amountPayableNow: _ap,
+      remainingCodAmount: _rc,
+      conversionMultiplier: _cm,
+      feeRate: _fr,
       ...cleanData
     } = requestData;
 
-    const initialQuote = quoteService.calculateQuote(
-      cleanData.productPriceInr,
-      cleanData.quantity || 1,
-      cleanData.paymentMode || 'online_100'
-    );
+    // Delivery address ownership validation
+    if (cleanData.deliveryAddress) {
+      await this.assertDeliveryAddressOwnership(userId, cleanData.deliveryAddress);
+    }
+
+    let initialQuote = null;
+    if (cleanData.productPriceInr !== undefined && cleanData.productPriceInr !== null) {
+      const mode = cleanData.paymentMode === 'cod_50_50' ? 'cod_50_50' : 'online_100';
+      initialQuote = quoteService.calculateQuote(
+        cleanData.productPriceInr,
+        cleanData.quantity || 1,
+        mode
+      );
+    }
 
     const productRequest = new ProductRequest({
       ...cleanData,
