@@ -170,7 +170,54 @@ export class ProductRequestService extends BaseService {
   }
 
   /**
-   * Lists sourcing requests for an authenticated user.
+   * Lists sourcing requests for an authenticated customer.
+   * Excludes internal administrative fields and guarantees customer isolation.
+   * @param {string} userId - Authenticated user ID
+   * @param {object} [options={}] - Query options (page, limit, sortBy, sortOrder)
+   * @returns {Promise<{ requests: Array<object>, pagination: object }>}
+   */
+  async listUserRequests(userId, options = {}) {
+    this.validateObjectId(userId, 'User ID');
+
+    const page = Math.max(1, parseInt(options.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(options.limit, 10) || 10));
+    const sortBy = options.sortBy || 'createdAt';
+    const sortOrder = options.sortOrder === 1 || options.sortOrder === 'asc' ? 1 : -1;
+
+    const skip = (page - 1) * limit;
+    const filter = { user: userId };
+
+    const [requests, total] = await Promise.all([
+      ProductRequest.find(filter)
+        .populate('deliveryAddress', 'fullName phone label tole municipality district province')
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      ProductRequest.countDocuments(filter),
+    ]);
+
+    // Format safe customer response
+    const sanitizedRequests = requests.map((req) => {
+      const { internalNotes, __v, ...safeReq } = req;
+      return safeReq;
+    });
+
+    return {
+      requests: sanitizedRequests,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
+
+  /**
+   * Lists sourcing requests for an authenticated user (legacy helper).
    * @param {string} userId - User ID
    * @returns {Promise<Array<import('mongoose').Document>>}
    */
