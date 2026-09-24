@@ -19,9 +19,12 @@ export const errorHandler = (err, req, res, next) => {
     statusCode = HTTP_STATUS.FORBIDDEN;
   } else if (err.name === 'DuplicateKeyError' || (err.name === 'MongoServerError' && err.code === 11000)) {
     statusCode = HTTP_STATUS.CONFLICT;
-    message = 'A resource with this identifier already exists';
+  } else if (err.name === 'CastError') {
+    statusCode = HTTP_STATUS.BAD_REQUEST;
+    message = `Invalid format for resource identifier '${err.path}'`;
   } else if (err.name === 'ValidationError' && !err.statusCode) {
     statusCode = HTTP_STATUS.UNPROCESSABLE_ENTITY;
+    message = err.message || 'Validation failed';
     errors = Object.keys(err.errors || {}).map((key) => ({
       field: key,
       message: err.errors[key].message,
