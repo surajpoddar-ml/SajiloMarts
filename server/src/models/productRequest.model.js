@@ -11,10 +11,16 @@ export const SUPPORTED_MARKETPLACES = Object.freeze([
   'other',
 ]);
 
+/**
+ * Authoritative Sourcing Request Lifecycle Statuses
+ */
 export const REQUEST_STATUSES = Object.freeze({
   DRAFT: 'draft',
   SUBMITTED: 'submitted',
-  QUOTED: 'quoted',
+  UNDER_REVIEW: 'under_review',
+  QUOTE_READY: 'quote_ready',
+  QUOTED: 'quoted', // Alias for quote_ready for backward compatibility
+  CUSTOMER_CONFIRMED: 'customer_confirmed',
   PAYMENT_PENDING: 'payment_pending',
   PAYMENT_SUBMITTED: 'payment_submitted',
   PAYMENT_UNDER_REVIEW: 'payment_under_review',
@@ -22,6 +28,8 @@ export const REQUEST_STATUSES = Object.freeze({
   PROCESSING: 'processing',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
+  EXPIRED: 'expired',
+  CONVERTED: 'converted',
 });
 
 export const PRODUCT_URL_REGEX = /^https?:\/\/[^\s$.?#].[^\s]*$/i;
@@ -128,6 +136,18 @@ const productRequestSchema = new mongoose.Schema(
       default: null,
       trim: true,
       maxlength: [1000, 'Customer notes cannot exceed 1000 characters'],
+    },
+    currency: {
+      type: String,
+      default: 'INR',
+      trim: true,
+      uppercase: true,
+    },
+    deliveryAddress: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Address',
+      required: false,
+      default: null,
     },
     status: {
       type: String,
