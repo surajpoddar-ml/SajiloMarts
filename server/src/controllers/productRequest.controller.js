@@ -137,6 +137,27 @@ export class ProductRequestController extends BaseController {
       ApiResponse.success(quoteData, 'Quote retrieved successfully')
     );
   });
+
+  /**
+   * POST /api/v1/requests/:requestId/confirm
+   */
+  confirmQuote = asyncHandler(async (req, res) => {
+    const requestId = req.params.requestId || req.params.id;
+    const userId = req.user.id || req.user._id;
+
+    const request = await productRequestService.confirmQuote(userId, requestId);
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(
+        {
+          requestId: request._id,
+          status: request.status,
+          quote: request.quote,
+        },
+        'Quote confirmed successfully'
+      )
+    );
+  });
 }
 
 export const productRequestController = new ProductRequestController();

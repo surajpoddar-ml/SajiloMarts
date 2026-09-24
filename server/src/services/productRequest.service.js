@@ -237,15 +237,41 @@ export class ProductRequestService extends BaseService {
     if (!request.quote) {
       throw new NotFoundError('No quote has been generated for this sourcing request yet');
     }
-    return {
-      requestId: request._id,
-      status: request.status,
-      productName: request.productName,
-      marketplace: request.marketplace,
-      productPriceInr: request.productPriceInr,
-      quantity: request.quantity,
-      quote: request.quote,
-    };
+  /**
+   * Confirms an authoritative quote by the customer.
+   * Transitions status from 'quote_ready' to 'customer_confirmed' and stamps confirmedAt.
+   * @param {string} userId - Authenticated user ID
+   * @param {string} requestId - ProductRequest ID
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async confirmQuote(userId, requestId) {
+    const request = await this.getRequestForUser(userId, requestId);
+
+    if (!request.quote) {
+      throw new BadRequestError('Cannot confirm a request that does not have an active quote');
+    }
+
+    const ALLOWED_CONFIRM_STATES = [REQUEST_STATUSES.QUOTE_READY, REQUEST_STATUSES.QUOTED];
+    if (!ALLOWED_CONFIRM_STATES.includes(request.status)) {
+      throw new BadRequestError(
+        `Cannot confirm quote for request in '${request.status}' state. Quote must be ready.`
+      );
+    }
+
+    if (request.quote.expiresAt && new Date(request.quote.expiresAt) < new Date()) {
+      request.status = REQUEST_STATUSES.EXPIRED;
+      if (request.quote) request.quote.quoteStatus = 'expired';
+      await request.save();
+      throw new BadRequestError('This quote has expired. Please request a new quote.');
+    }
+
+    request.status = REQUEST_STATUSES.CUSTOMER_CONFIRMED;
+    if (request.quote) {
+      request.quote.confirmedAt = new Date();
+      request.quote.quoteStatus = 'accepted';
+    }
+
+    return request.save();
   }
 
   /**

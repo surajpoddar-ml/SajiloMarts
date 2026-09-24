@@ -14,6 +14,7 @@ router.get('/', productRequestController.getUserRequests);
 router.get('/:requestId', productRequestController.getRequestById);
 router.post('/:requestId/quote', productRequestController.generateQuote);
 router.get('/:requestId/quote', productRequestController.getQuote);
+router.post('/:requestId/confirm', productRequestController.confirmQuote);
 router.post('/:requestId/cancel', productRequestController.cancelRequest);
 router.post('/:requestId/submit', productRequestController.submitDraftRequest);
 
