@@ -44,7 +44,7 @@ export const calculateOnlineQuote = (unitPriceInr, quantity = 1) => {
     throw new Error('Invalid product price for online quote calculation');
   }
 
-  const sourceSubtotalInr = roundCurrency(cleanPrice * cleanQty);
+  const sourceSubtotalInr = calculateInrSubtotal(cleanPrice, cleanQty);
   const convertedAmountNpr = roundCurrency(sourceSubtotalInr * EXCHANGE_RATE);
   const rateAmountNpr = roundCurrency(convertedAmountNpr * ONLINE_SURCHARGE_RATE);
   const finalAmountNpr = roundCurrency(convertedAmountNpr + rateAmountNpr);
@@ -54,16 +54,23 @@ export const calculateOnlineQuote = (unitPriceInr, quantity = 1) => {
   return {
     sourceCurrency: SOURCE_CURRENCY,
     destinationCurrency: DESTINATION_CURRENCY,
+    currency: DESTINATION_CURRENCY,
+    productPriceInr: roundCurrency(cleanPrice),
     sourceUnitPriceInr: roundCurrency(cleanPrice),
     quantity: cleanQty,
+    subtotalInr: sourceSubtotalInr,
     sourceSubtotalInr,
+    conversionMultiplier: EXCHANGE_RATE,
     exchangeRate: EXCHANGE_RATE,
     convertedAmountNpr,
     paymentMode: 'online_100',
+    feeRate: ONLINE_SURCHARGE_RATE,
     appliedRate: ONLINE_SURCHARGE_RATE,
     rateAmountNpr,
     finalAmountNpr,
+    amountPayableNow: payNowAmountNpr,
     payNowAmountNpr,
+    remainingCodAmount: remainingCodAmountNpr,
     remainingCodAmountNpr,
     calculatedAt: new Date(),
   };
