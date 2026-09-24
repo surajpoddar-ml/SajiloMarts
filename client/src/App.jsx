@@ -12,35 +12,37 @@ import { ResendVerificationPage } from './pages/Auth/ResendVerificationPage.jsx'
 import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
 import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
+import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
 import './App.css';
 
 const ARCHITECTURE_RULES = [
   {
-    label: 'Authoritative RBAC',
-    description: 'Roles (customer, admin), permissions, and resource ownership are enforced strictly by the backend.',
+    label: 'Authoritative Pricing Engine',
+    description: '1 INR = 1.65 NPR conversion rate, 18% online surcharge, and 22% COD fee calculated strictly server-side.',
   },
   {
-    label: 'Ownership Boundaries',
-    description: 'Customers can only access their own sourcing requests and addresses; IDOR bypasses are blocked.',
+    label: 'Marketplace URL Security',
+    description: 'Automatic Indian marketplace domain validation, SSRF protection, and tracking parameter normalization.',
   },
   {
-    label: 'Admin Safeguards',
-    description: 'Protection against accidental self-deactivation and deletion of the last system administrator.',
+    label: 'Ownership & IDOR Protection',
+    description: 'Customer sourcing requests, address assignments, and quote calculations are strictly bound to the authenticated user.',
   },
   {
-    label: 'Deny-By-Default',
-    description: 'Explicit permission checks with deny-by-default behavior across all operational endpoints.',
+    label: 'Historical Quote Snapshots',
+    description: 'Quotes are immutably snapshotted with breakdown math preserving long-term auditability.',
   },
   {
-    label: 'Role-Aware Frontend',
-    description: 'Client-side state exposes role helpers and route guards while relying on authoritative backend APIs.',
+    label: 'Controlled Sourcing Lifecycle',
+    description: 'Deterministic state transitions (draft → submitted → quote_ready → customer_confirmed) without client tampering.',
   },
 ];
 
 function AppContent() {
   const { user, isAuthenticated, role, isAdmin, isCustomer, logout } = useAuth();
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [currentView, setCurrentView] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -96,7 +98,7 @@ function AppContent() {
     <div className="container">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 14 &bull; Role-Based Access Control &amp; Authorization"
+        stepLabel="Prompt 15 &bull; Sourcing &amp; Quote APIs"
         user={user}
         onLogin={() => setCurrentView('login')}
         onRegister={() => setCurrentView('register')}
@@ -122,6 +124,19 @@ function AppContent() {
 
         <button
           type="button"
+          onClick={() => setCurrentView('sourcing-requests')}
+          className="refresh-btn"
+          style={{
+            background: ['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? '#2563eb' : '#ffffff',
+            color: ['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? '#ffffff' : '#334155',
+            borderColor: ['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? '#2563eb' : '#cbd5e1',
+          }}
+        >
+          📦 Sourcing Portal (Quotes &amp; Requests)
+        </button>
+
+        <button
+          type="button"
           onClick={() => setCurrentView('account')}
           className="refresh-btn"
           style={{
@@ -130,7 +145,7 @@ function AppContent() {
             borderColor: currentView === 'account' ? '#2563eb' : '#cbd5e1',
           }}
         >
-          Customer Portal (Customer Guard)
+          Customer Profile
         </button>
 
         <button
@@ -143,9 +158,53 @@ function AppContent() {
             borderColor: currentView === 'admin-console' ? '#b91c1c' : '#fca5a5',
           }}
         >
-          🛡️ Admin Console (Admin Guard)
+          🛡️ Admin Console
         </button>
       </nav>
+
+      {/* Sourcing Portal Views */}
+      {currentView === 'sourcing-requests' && (
+        <ProtectedRoute
+          onRedirectToLogin={() => setCurrentView('login')}
+          onRedirectToHome={() => setCurrentView('home')}
+        >
+          <SourcingRequestList
+            onCreateNew={() => setCurrentView('sourcing-new')}
+            onSelectRequest={(id) => {
+              setSelectedRequestId(id);
+              setCurrentView('sourcing-detail');
+            }}
+          />
+        </ProtectedRoute>
+      )}
+
+      {currentView === 'sourcing-new' && (
+        <ProtectedRoute
+          onRedirectToLogin={() => setCurrentView('login')}
+          onRedirectToHome={() => setCurrentView('home')}
+        >
+          <SourcingRequestForm
+            onRequestCreated={(req) => {
+              setSelectedRequestId(req._id || req.id);
+              setCurrentView('sourcing-detail');
+            }}
+            onCancel={() => setCurrentView('sourcing-requests')}
+          />
+        </ProtectedRoute>
+      )}
+
+      {currentView === 'sourcing-detail' && (
+        <ProtectedRoute
+          onRedirectToLogin={() => setCurrentView('login')}
+          onRedirectToHome={() => setCurrentView('home')}
+        >
+          <SourcingRequestDetail
+            requestId={selectedRequestId}
+            onBack={() => setCurrentView('sourcing-requests')}
+            onStatusUpdated={() => {}}
+          />
+        </ProtectedRoute>
+      )}
 
       {currentView === 'login' && (
         <LoginPage
