@@ -343,6 +343,39 @@ export class ProductRequestService extends BaseService {
   }
 
   /**
+   * Controlled request status transition engine.
+   * Enforces authoritative transition state machines for both customers and administrators.
+   * @param {string} userId - User ID (Customer or Admin)
+   * @param {string} requestId - ProductRequest ID
+   * @param {string} targetStatus - Desired target status
+   * @param {object} [options={}] - Options (e.g. isAdmin flag, cancellation reason)
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async transitionRequestStatus(userId, requestId, targetStatus, options = {}) {
+    this.validateObjectId(userId, 'User ID');
+    this.validateObjectId(requestId, 'Request ID');
+
+    const request = await ProductRequest.findById(requestId);
+    if (!request) {
+      throw new NotFoundError('Product request not found');
+    }
+
+    const isCallerAdmin = Boolean(options.isAdmin);
+    if (!isCallerAdmin) {
+      assertResourceOwnership(request, userId, 'Product request', 'user');
+    }
+
+    // Validate transition
+    validateStatusTransition(request.status, targetStatus, isCallerAdmin);
+
+    const oldStatus = request.status;
+    request.status = targetStatus;
+
+    const saved = await request.save();
+    return saved;
+  }
+
+  /**
    * Updates request lifecycle status (admin only).
    * @param {string} adminUserId - Admin User ID
    * @param {string} requestId - Request ID
@@ -351,19 +384,7 @@ export class ProductRequestService extends BaseService {
    */
   async updateRequestStatus(adminUserId, requestId, newStatus) {
     await this.assertAdmin(adminUserId);
-    this.validateObjectId(requestId, 'Request ID');
-
-    if (!Object.values(REQUEST_STATUSES).includes(newStatus)) {
-      throw new BadRequestError(`Invalid status: ${newStatus}`);
-    }
-
-    const request = await ProductRequest.findById(requestId);
-    if (!request) {
-      throw new NotFoundError('Product request not found');
-    }
-
-    request.status = newStatus;
-    return request.save();
+    return this.transitionRequestStatus(adminUserId, requestId, newStatus, { isAdmin: true });
   }
 }
 
