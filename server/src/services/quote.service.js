@@ -25,12 +25,16 @@ export class QuoteService extends BaseService {
       throw new BadRequestError('Invalid product price in INR');
     }
 
-    if (paymentMode === 'online_100') {
+    const normalizedMode = String(paymentMode || 'online_100').toLowerCase();
+
+    if (normalizedMode === 'online_100' || normalizedMode === 'online_full') {
       return calculateOnlineQuote(cleanPrice, cleanQty);
-    } else if (paymentMode === 'cod_50_50') {
+    } else if (normalizedMode === 'cod_50_50' || normalizedMode === 'cod') {
       return calculateCodQuote(cleanPrice, cleanQty);
     } else {
-      throw new BadRequestError(`Unsupported payment mode: ${paymentMode}. Must be 'online_100' or 'cod_50_50'`);
+      throw new BadRequestError(
+        `Unsupported payment mode: ${paymentMode}. Must be 'ONLINE_FULL' ('online_100') or 'COD_50_50' ('cod_50_50')`
+      );
     }
   }
 
