@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/auth.middleware.js';
 import { requireActiveAccount } from '../../middlewares/rbac.middleware.js';
+import { sourcingRequestRateLimiter, quoteRateLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import { productRequestController } from '../../controllers/productRequest.controller.js';
 
 const router = Router();
@@ -9,10 +10,10 @@ router.use(authenticate);
 router.use(requireActiveAccount);
 
 // Sourcing Request CRUD & Action routes
-router.post('/', productRequestController.createRequest);
+router.post('/', sourcingRequestRateLimiter, productRequestController.createRequest);
 router.get('/', productRequestController.getUserRequests);
 router.get('/:requestId', productRequestController.getRequestById);
-router.post('/:requestId/quote', productRequestController.generateQuote);
+router.post('/:requestId/quote', quoteRateLimiter, productRequestController.generateQuote);
 router.get('/:requestId/quote', productRequestController.getQuote);
 router.post('/:requestId/confirm', productRequestController.confirmQuote);
 router.post('/:requestId/cancel', productRequestController.cancelRequest);

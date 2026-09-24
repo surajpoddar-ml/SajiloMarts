@@ -67,11 +67,21 @@ export const passwordRecoveryRateLimiter = createRateLimiter(
   'Too many password recovery attempts. Please try again in 15 minutes.'
 );
 
-export const passwordChangeRateLimiter = createRateLimiter(
-  passwordChangeCounts,
+const sourcingCounts = new Map();
+const quoteCounts = new Map();
+
+export const sourcingRequestRateLimiter = createRateLimiter(
+  sourcingCounts,
   15 * 60 * 1000,
-  10,
-  'Too many password change attempts. Please try again in 15 minutes.'
+  60,
+  'Too many sourcing requests created from this address. Please try again in 15 minutes.'
+);
+
+export const quoteRateLimiter = createRateLimiter(
+  quoteCounts,
+  15 * 60 * 1000,
+  120,
+  'Too many quote calculation requests. Please try again shortly.'
 );
 
 export default {
@@ -80,4 +90,7 @@ export default {
   verificationRateLimiter,
   passwordRecoveryRateLimiter,
   passwordChangeRateLimiter,
+  sourcingRequestRateLimiter,
+  quoteRateLimiter,
 };
+
