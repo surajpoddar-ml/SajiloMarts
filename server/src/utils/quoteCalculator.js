@@ -9,6 +9,24 @@ import {
 import { roundCurrency } from './money.js';
 
 /**
+ * Authoritative INR Subtotal calculation helper.
+ * Strictly calculates unitPriceInr * quantity with monetary rounding.
+ * @param {number} unitPriceInr - Product price in INR
+ * @param {number} [quantity=1] - Product quantity
+ * @returns {number} - Authoritative rounded INR subtotal
+ */
+export const calculateInrSubtotal = (unitPriceInr, quantity = 1) => {
+  const cleanPrice = Number(unitPriceInr);
+  const cleanQty = Math.max(1, Math.floor(Number(quantity) || 1));
+
+  if (!cleanPrice || cleanPrice <= 0 || !Number.isFinite(cleanPrice)) {
+    throw new Error('Invalid product price for subtotal calculation');
+  }
+
+  return roundCurrency(cleanPrice * cleanQty);
+};
+
+/**
  * Calculates financial quote for 100% Online Payment mode.
  * Formula:
  *   Converted NPR = INR Subtotal * 1.65
