@@ -94,7 +94,7 @@ export const calculateCodQuote = (unitPriceInr, quantity = 1) => {
     throw new Error('Invalid product price for COD quote calculation');
   }
 
-  const sourceSubtotalInr = roundCurrency(cleanPrice * cleanQty);
+  const sourceSubtotalInr = calculateInrSubtotal(cleanPrice, cleanQty);
   const convertedAmountNpr = roundCurrency(sourceSubtotalInr * EXCHANGE_RATE);
   const rateAmountNpr = roundCurrency(convertedAmountNpr * COD_SURCHARGE_RATE);
   const finalAmountNpr = roundCurrency(convertedAmountNpr + rateAmountNpr);
@@ -104,16 +104,23 @@ export const calculateCodQuote = (unitPriceInr, quantity = 1) => {
   return {
     sourceCurrency: SOURCE_CURRENCY,
     destinationCurrency: DESTINATION_CURRENCY,
+    currency: DESTINATION_CURRENCY,
+    productPriceInr: roundCurrency(cleanPrice),
     sourceUnitPriceInr: roundCurrency(cleanPrice),
     quantity: cleanQty,
+    subtotalInr: sourceSubtotalInr,
     sourceSubtotalInr,
+    conversionMultiplier: EXCHANGE_RATE,
     exchangeRate: EXCHANGE_RATE,
     convertedAmountNpr,
     paymentMode: 'cod_50_50',
+    feeRate: COD_SURCHARGE_RATE,
     appliedRate: COD_SURCHARGE_RATE,
     rateAmountNpr,
     finalAmountNpr,
+    amountPayableNow: payNowAmountNpr,
     payNowAmountNpr,
+    remainingCodAmount: remainingCodAmountNpr,
     remainingCodAmountNpr,
     calculatedAt: new Date(),
   };
