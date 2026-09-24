@@ -90,6 +90,11 @@ export class ProductRequestController extends BaseController {
       'submitted'
     );
 
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(request, 'Sourcing request submitted successfully')
+    );
+  });
+
   /**
    * POST /api/v1/requests/:requestId/quote
    * Generates or recalculates authoritative quote for customer sourcing request.
@@ -115,6 +120,21 @@ export class ProductRequestController extends BaseController {
         },
         'Quote generated successfully'
       )
+    );
+  });
+
+  /**
+   * GET /api/v1/requests/:requestId/quote
+   * Retrieves current authoritative quote snapshot for a customer request.
+   */
+  getQuote = asyncHandler(async (req, res) => {
+    const requestId = req.params.requestId || req.params.id;
+    const userId = req.user.id || req.user._id;
+
+    const quoteData = await productRequestService.getQuoteForUser(userId, requestId);
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(quoteData, 'Quote retrieved successfully')
     );
   });
 }
