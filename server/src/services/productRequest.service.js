@@ -151,6 +151,32 @@ export class ProductRequestService extends BaseService {
 
   /**
    * Retrieves a single sourcing request ensuring customer ownership.
+   * Populates delivery address summary and sanitizes internal administrative notes.
+   * @param {string} userId - User ID
+   * @param {string} requestId - ProductRequest ID
+   * @returns {Promise<object>}
+   */
+  async getRequestDetailsForCustomer(userId, requestId) {
+    this.validateObjectId(userId, 'User ID');
+    this.validateObjectId(requestId, 'Request ID');
+
+    const request = await ProductRequest.findById(requestId)
+      .populate('deliveryAddress', 'fullName phone label tole municipality district province country postalCode')
+      .lean();
+
+    if (!request) {
+      throw new NotFoundError('Product request not found');
+    }
+
+    assertResourceOwnership(request, userId, 'Product request', 'user');
+
+    // Customer safe representation (no internal notes)
+    const { internalNotes, __v, ...customerSafeRequest } = request;
+    return customerSafeRequest;
+  }
+
+  /**
+   * Retrieves a single sourcing request ensuring customer ownership (Mongoose doc).
    * @param {string} userId - User ID
    * @param {string} requestId - ProductRequest ID
    * @returns {Promise<import('mongoose').Document>}
