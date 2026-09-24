@@ -114,6 +114,20 @@ export class ProductRequestService extends BaseService {
     const cleanUrl = normalizeProductUrl(productUrl);
     const cleanMarketplace = resolveAuthoritativeMarketplace(cleanUrl, marketplace);
 
+    // Duplicate submission protection (prevent double-clicks within 30 seconds)
+    const DUPLICATE_WINDOW_MS = 30 * 1000;
+    const recentDuplicate = await ProductRequest.findOne({
+      user: userId,
+      productUrl: cleanUrl,
+      createdAt: { $gte: new Date(Date.now() - DUPLICATE_WINDOW_MS) },
+      status: { $in: [REQUEST_STATUSES.SUBMITTED, REQUEST_STATUSES.DRAFT, REQUEST_STATUSES.QUOTE_READY] },
+    });
+
+    if (recentDuplicate) {
+      // Return existing duplicate safely or throw helpful conflict
+      return recentDuplicate;
+    }
+
     // Delivery address ownership validation
     if (deliveryAddress) {
       await this.assertDeliveryAddressOwnership(userId, deliveryAddress);
