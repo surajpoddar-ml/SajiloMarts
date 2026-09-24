@@ -12,6 +12,7 @@ router.use(requireActiveAccount);
 router.post('/', productRequestController.createRequest);
 router.get('/', productRequestController.getUserRequests);
 router.get('/:requestId', productRequestController.getRequestById);
+router.post('/:requestId/quote', productRequestController.generateQuote);
 router.post('/:requestId/cancel', productRequestController.cancelRequest);
 router.post('/:requestId/submit', productRequestController.submitDraftRequest);
 

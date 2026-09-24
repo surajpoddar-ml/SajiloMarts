@@ -90,8 +90,31 @@ export class ProductRequestController extends BaseController {
       'submitted'
     );
 
+  /**
+   * POST /api/v1/requests/:requestId/quote
+   * Generates or recalculates authoritative quote for customer sourcing request.
+   */
+  generateQuote = asyncHandler(async (req, res) => {
+    const requestId = req.params.requestId || req.params.id;
+    const userId = req.user.id || req.user._id;
+
+    const request = await productRequestService.generateAndSaveQuote(
+      userId,
+      requestId,
+      req.body
+    );
+
     return res.status(HTTP_STATUS.OK).json(
-      ApiResponse.success(request, 'Sourcing request submitted successfully')
+      ApiResponse.success(
+        {
+          quote: request.quote,
+          requestId: request._id,
+          status: request.status,
+          productPriceInr: request.productPriceInr,
+          quantity: request.quantity,
+        },
+        'Quote generated successfully'
+      )
     );
   });
 }
