@@ -110,6 +110,52 @@ export const normalizeProductUrl = (rawUrl) => {
   return parsed.toString();
 };
 
+/**
+ * Detects Indian marketplace slug based on URL hostname.
+ * @param {string} url - Normalized URL
+ * @returns {string} - Marketplace enum slug
+ */
+export const detectMarketplace = (url) => {
+  if (!url) return 'other';
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname.toLowerCase();
+
+    if (hostname.includes('amazon.')) return 'amazon-india';
+    if (hostname.includes('flipkart.')) return 'flipkart';
+    if (hostname.includes('myntra.')) return 'myntra';
+    if (hostname.includes('meesho.')) return 'meesho';
+    if (hostname.includes('nykaa.') || hostname.includes('nykaaman.')) return 'nykaa';
+    if (hostname.includes('1mg.') || hostname.includes('tata1mg.')) return 'tata-1mg';
+    if (hostname.includes('ajio.')) return 'ajio';
+
+    return 'other';
+  } catch {
+    return 'other';
+  }
+};
+
+/**
+ * Validates that the submitted marketplace matches the URL domain if both are provided.
+ * @param {string} url - Product URL
+ * @param {string} [providedMarketplace] - Optional client provided marketplace
+ * @returns {string} - Authoritative marketplace slug
+ */
+export const resolveAuthoritativeMarketplace = (url, providedMarketplace) => {
+  const detected = detectMarketplace(url);
+  if (detected !== 'other') {
+    return detected;
+  }
+  if (providedMarketplace && typeof providedMarketplace === 'string') {
+    const normalized = providedMarketplace.toLowerCase().trim();
+    return normalized;
+  }
+  return 'other';
+};
+
 export default {
   normalizeProductUrl,
+  detectMarketplace,
+  resolveAuthoritativeMarketplace,
 };
+
