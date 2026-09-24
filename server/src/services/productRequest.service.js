@@ -187,10 +187,13 @@ export class ProductRequestService extends BaseService {
     const skip = (page - 1) * limit;
     const filter = { user: userId };
 
+    // Deterministic compound sort with _id as tie-breaker
+    const sortCriteria = { [sortBy]: sortOrder, _id: -1 };
+
     const [requests, total] = await Promise.all([
       ProductRequest.find(filter)
         .populate('deliveryAddress', 'fullName phone label tole municipality district province')
-        .sort({ [sortBy]: sortOrder })
+        .sort(sortCriteria)
         .skip(skip)
         .limit(limit)
         .lean(),
