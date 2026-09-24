@@ -53,12 +53,48 @@ export class QuoteService extends BaseService {
   }
 
   /**
-   * Creates an immutable quote snapshot payload for persistence.
+   * Strips client-supplied calculated amounts, forcing pure server-side calculation.
+   * @param {object} clientPayload - Unverified request body
+   * @returns {{ cleanPrice: number, cleanQty: number, cleanMode: string }}
    */
-  createQuoteSnapshot(unitPriceInr, quantity = 1, paymentMode = 'online_100') {
-    return this.calculateQuote(unitPriceInr, quantity, paymentMode);
+  sanitizeQuotePayload(clientPayload = {}) {
+    const {
+      productPriceInr,
+      sourceUnitPriceInr,
+      price,
+      quantity,
+      qty,
+      paymentMode,
+      mode,
+    } = clientPayload;
+
+    const rawPrice = productPriceInr ?? sourceUnitPriceInr ?? price;
+    const rawQty = quantity ?? qty ?? 1;
+    const rawMode = paymentMode ?? mode ?? 'online_100';
+
+    const cleanPrice = Number(rawPrice);
+    if (!cleanPrice || !Number.isFinite(cleanPrice) || cleanPrice <= 0) {
+      throw new BadRequestError('Valid product price in INR is required');
+    }
+
+    const cleanQty = Math.max(1, Math.floor(Number(rawQty) || 1));
+    return {
+      cleanPrice,
+      cleanQty,
+      cleanMode: String(rawMode).toLowerCase(),
+    };
+  }
+
+  /**
+   * Generates quote safely from potentially untrusted input.
+   * Discards any client submitted totals or rates.
+   */
+  generateSafeQuote(clientPayload = {}) {
+    const { cleanPrice, cleanQty, cleanMode } = this.sanitizeQuotePayload(clientPayload);
+    return this.calculateQuote(cleanPrice, cleanQty, cleanMode);
   }
 }
 
 export const quoteService = new QuoteService();
 export default quoteService;
+
