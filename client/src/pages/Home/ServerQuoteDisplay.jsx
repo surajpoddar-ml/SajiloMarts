@@ -209,75 +209,85 @@ export const ServerQuoteDisplay = ({
                 overflow: 'hidden',
                 backgroundColor: 'var(--bg-surface-secondary)',
               }}>
-                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)', fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Authoritative Price Snapshot
+                <div style={{
+                  padding: '12px 16px',
+                  borderBottom: '1px solid var(--border-subtle)',
+                  fontWeight: 600,
+                  fontSize: '0.875rem',
+                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                  <span>Authoritative Price Snapshot Breakdown</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Verified INR &rarr; NPR</span>
                 </div>
 
-                <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
+                <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.875rem' }}>
                   {quoteData.productPriceInr !== undefined && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Store Price (INR):</span>
-                      <span style={{ fontWeight: 500 }}>₹{Number(quoteData.productPriceInr).toLocaleString()}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Product Store Price (India):</span>
+                      <span style={{ fontWeight: 500 }}>₹{Number(quoteData.productPriceInr).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
 
                   {quoteData.quantity !== undefined && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Quantity:</span>
-                      <span style={{ fontWeight: 500 }}>{quoteData.quantity}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Quantity Ordered:</span>
+                      <span style={{ fontWeight: 500 }}>{quoteData.quantity} {quoteData.quantity === 1 ? 'item' : 'items'}</span>
                     </div>
                   )}
 
                   {quoteData.subtotalInr !== undefined && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Subtotal (INR):</span>
-                      <span style={{ fontWeight: 600 }}>₹{Number(quoteData.subtotalInr).toLocaleString()}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Store Subtotal (INR):</span>
+                      <span style={{ fontWeight: 600 }}>₹{Number(quoteData.subtotalInr).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
 
                   {quoteData.conversionRate !== undefined && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Exchange Rate Multiplier:</span>
-                      <span>1 INR = {quoteData.conversionRate} NPR</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Official Exchange Multiplier:</span>
+                      <span>1 INR = {Number(quoteData.conversionRate).toFixed(2)} NPR</span>
                     </div>
                   )}
 
                   {quoteData.convertedNpr !== undefined && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Base Converted (NPR):</span>
-                      <span>NPR {Number(quoteData.convertedNpr).toLocaleString()}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Base Converted Value:</span>
+                      <span>NPR {Number(quoteData.convertedNpr).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
 
                   {quoteData.serviceFeeNpr !== undefined && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>
-                        Service &amp; Surcharge Fee ({quoteData.feePercentage || (paymentMode === 'online_100' ? '18%' : '22%')}):
+                        Fulfillment, Customs Clearance &amp; Logistics Fee:
                       </span>
-                      <span>NPR {Number(quoteData.serviceFeeNpr).toLocaleString()}</span>
+                      <span>NPR {Number(quoteData.serviceFeeNpr).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
 
-                  <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)', margin: '4px 0' }} />
+                  <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)', margin: '6px 0' }} />
 
                   {quoteData.finalTotalNpr !== undefined && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-brand)' }}>
-                      <span>Total Estimated Cost (NPR):</span>
-                      <span>NPR {Number(quoteData.finalTotalNpr).toLocaleString()}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-brand)' }}>
+                      <span>Final Total Landed Cost (Nepal):</span>
+                      <span>NPR {Number(quoteData.finalTotalNpr).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
 
                   {quoteData.amountPayableNow !== undefined && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                      <span>Amount Payable Now (Advance):</span>
-                      <span>NPR {Number(quoteData.amountPayableNow).toLocaleString()}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: '4px' }}>
+                      <span>Advance Amount Payable Now:</span>
+                      <span>NPR {Number(quoteData.amountPayableNow).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
 
                   {quoteData.remainingCodBalance !== undefined && Number(quoteData.remainingCodBalance) > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                      <span>Remaining Balance at Delivery (COD):</span>
-                      <span>NPR {Number(quoteData.remainingCodBalance).toLocaleString()}</span>
+                      <span>Remaining Balance at Nepal Delivery (COD):</span>
+                      <span>NPR {Number(quoteData.remainingCodBalance).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
                 </div>
