@@ -13,6 +13,7 @@ import { HowItWorksSection } from './HowItWorksSection.jsx';
 import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx';
 import { ServiceBenefitsSection } from './ServiceBenefitsSection.jsx';
 import { TrackOrderSection } from './TrackOrderSection.jsx';
+import { AccountEntrySection } from './AccountEntrySection.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
@@ -149,8 +150,15 @@ export function HomePage({
       {/* 6. Real Track Order Entry Section */}
       <TrackOrderSection onTrackOrder={onTrackOrder} />
 
-      {/* 7. Customer Account & Support Entry Section Anchor */}
-      <section id="account-support-section" aria-label="Account and Support Access">
+      {/* 7. Customer Account Entry Section */}
+      <AccountEntrySection
+        user={user}
+        isAuthenticated={isAuthenticated}
+        onNavigate={onNavigate}
+      />
+
+      {/* 8. Support Entry Section Anchor */}
+      <section id="support-entry-section" aria-label="Support Access">
         {/* Established in upcoming commits */}
       </section>
     </div>

@@ -97,4 +97,12 @@ assert.ok(trackContent.includes('export const TrackOrderSection'), 'TrackOrderSe
 assert.ok(trackContent.includes('No order was found for that tracking code'), 'Must support real not found state');
 console.log('✅ Track Order entry experience verified');
 
+// Test 12: Customer Account Entry section verification
+const accPath = path.resolve('src/pages/Home/AccountEntrySection.jsx');
+assert.ok(fs.existsSync(accPath), 'AccountEntrySection.jsx must exist');
+const accContent = fs.readFileSync(accPath, 'utf8');
+assert.ok(accContent.includes('export const AccountEntrySection'), 'AccountEntrySection must be exported');
+assert.ok(accContent.includes('Customer Account & Sourcing History'), 'Must render customer account heading');
+console.log('✅ Customer account entry points verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
