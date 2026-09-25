@@ -130,6 +130,27 @@ export const ProductUrlForm = ({
             </Button>
           </div>
 
+          {/* State Feedback: Loading, Verified Marketplace, or Error Banner */}
+          {isLoading && (
+            <div
+              role="status"
+              aria-live="polite"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                backgroundColor: 'var(--bg-surface)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: '0.85rem',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <span className="spinner spinner--sm" aria-hidden="true" />
+              <span>Verifying product URL with SastoMarts backend...</span>
+            </div>
+          )}
+
           {/* Inline Error Message */}
           {(validationError || serverError) && (
             <div
@@ -137,15 +158,18 @@ export const ProductUrlForm = ({
               role="alert"
               style={{
                 color: 'var(--color-error)',
+                backgroundColor: 'var(--bg-surface)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '8px 12px',
                 fontSize: '0.85rem',
                 textAlign: 'left',
-                paddingLeft: '4px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
+                borderLeft: '3px solid var(--color-error)',
               }}
             >
-              <span>&bull;</span>
+              <span aria-hidden="true">⚠️</span>
               <span>{validationError || serverError}</span>
             </div>
           )}
@@ -161,12 +185,13 @@ export const ProductUrlForm = ({
                   key={domain}
                   type="button"
                   onClick={() => handlePasteSample(domain)}
+                  disabled={isLoading}
                   style={{
                     background: 'none',
                     border: 'none',
                     fontSize: '0.75rem',
                     color: 'var(--color-brand)',
-                    cursor: 'pointer',
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
                     padding: '2px 4px',
                     textDecoration: 'underline',
                   }}
