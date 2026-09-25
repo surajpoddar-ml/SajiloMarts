@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { authenticate } from '../../middlewares/auth.middleware.js';
+import { requireAuth } from '../../middlewares/auth.middleware.js';
 import { requireActiveAccount } from '../../middlewares/rbac.middleware.js';
 import { sourcingRequestRateLimiter, quoteRateLimiter } from '../../middlewares/rateLimiter.middleware.js';
 import { productRequestController } from '../../controllers/productRequest.controller.js';
 
 const router = Router();
 
-router.use(authenticate);
+router.use(requireAuth);
 router.use(requireActiveAccount);
 
 // Sourcing Request CRUD & Action routes
