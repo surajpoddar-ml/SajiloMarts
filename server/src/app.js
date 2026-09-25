@@ -19,7 +19,7 @@ app.use(sanitizeInput);
 
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to SastoMarts Backend API',
+    message: 'Welcome to SajiloMarts Backend API',
     status: 'online',
     docs: `${config.apiPrefix}/health`,
   });

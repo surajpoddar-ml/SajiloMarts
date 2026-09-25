@@ -132,7 +132,7 @@ export const AccountEntrySection = ({
             </Typography>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Button variant="primary" onClick={() => onNavigate('login')}>
-                Sign In to SastoMarts
+                Sign In to SajiloMarts
               </Button>
               <Button variant="outline" onClick={() => onNavigate('register')}>
                 Register Account

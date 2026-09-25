@@ -81,7 +81,7 @@ export function HomePage({
   };
 
   return (
-    <div className="homepage" id="sastomarts-homepage">
+    <div className="homepage" id="sajilomarts-homepage">
       {/* 1. Hero / Brand Value Section */}
       <HeroSection />
 
@@ -132,7 +132,7 @@ export function HomePage({
         )}
       </SourcingPortalSection>
 
-      {/* 3. How SastoMarts Works Section */}
+      {/* 3. How SajiloMarts Works Section */}
       <HowItWorksSection />
 
       {/* 4. Supported Marketplaces Section */}

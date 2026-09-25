@@ -11,7 +11,7 @@ const WORKFLOW_STEPS = [
   {
     step: '2',
     title: 'Paste Product URL',
-    description: 'Paste the direct product web link into SastoMarts. We verify the marketplace listing and capture product parameters.',
+    description: 'Paste the direct product web link into SajiloMarts. We verify the marketplace listing and capture product parameters.',
   },
   {
     step: '3',
@@ -46,7 +46,7 @@ export const HowItWorksSection = () => {
             Simple 5-Step Process
           </Typography>
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
-            How SastoMarts Works
+            How SajiloMarts Works
           </Typography>
           <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '580px', margin: 'var(--space-2) auto 0' }}>
             We bridge the gap between Indian e-commerce platforms and customers across Nepal with full pricing transparency.

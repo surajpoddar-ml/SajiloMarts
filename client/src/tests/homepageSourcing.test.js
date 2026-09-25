@@ -5,11 +5,11 @@ console.log('====================================================');
 console.log('🚀 Executing SastoMarts Homepage & Sourcing Test Suite');
 console.log('====================================================');
 
-// Test 1: Baseline SastoMarts brand identity
-assert.strictEqual(PUBLIC_CONFIG.BRAND_NAME, 'SastoMarts');
+// Test 1: Baseline SajiloMarts brand identity
+assert.strictEqual(PUBLIC_CONFIG.BRAND_NAME, 'SajiloMarts');
 assert.strictEqual(PUBLIC_CONFIG.TAGLINE, 'Shop from India. We Deliver to Nepal.');
-assert.ok(PUBLIC_CONFIG.SUPPORT_EMAIL.includes('@sastomarts.com'));
-console.log('✅ SastoMarts homepage brand configuration verified');
+assert.ok(PUBLIC_CONFIG.SUPPORT_EMAIL.includes('@sajilomarts.com'));
+console.log('✅ SajiloMarts homepage brand configuration verified');
 
 // Test 2: Marketplace detection and URL validation
 import { validateProductUrl, detectMarketplace } from '../utils/formValidation.js';
@@ -136,9 +136,9 @@ assert.ok(titleHookContent.includes('Shop from India. We Deliver to Nepal.'), 'M
 
 const indexHtmlPath = path.resolve('index.html');
 const indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8');
-assert.ok(indexHtmlContent.includes('SastoMarts — Shop from India. We Deliver to Nepal.'), 'index.html must contain SastoMarts title');
+assert.ok(indexHtmlContent.includes('SajiloMarts — Shop from India. We Deliver to Nepal.'), 'index.html must contain SajiloMarts title');
 assert.ok(!indexHtmlContent.includes('Vite'), 'index.html must not contain Vite title or default starter text');
-console.log('✅ SastoMarts SEO metadata and dynamic titles verified');
+console.log('✅ SajiloMarts SEO metadata and dynamic titles verified');
 
 // Test 16: Responsive Homepage Compositions verification
 const homepageCssPath = path.resolve('src/styles/homepage.css');

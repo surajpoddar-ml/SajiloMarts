@@ -3,7 +3,7 @@ import { Button } from '../common/Button.jsx';
 import { Logo } from '../common/Logo.jsx';
 
 /**
- * SastoMarts Accessible Mobile Drawer Navigation
+ * SajiloMarts Accessible Mobile Drawer Navigation
  */
 export const MobileNav = ({
   isOpen = false,
@@ -41,6 +41,20 @@ export const MobileNav = ({
     onClose();
   };
 
+  const handleSectionClick = (sectionId) => {
+    onClose();
+    if (currentView !== 'home') {
+      onNavigate('home');
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="mobile-nav-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label="Mobile Navigation">
       <div className="mobile-nav-drawer" onClick={(e) => e.stopPropagation()}>
@@ -64,7 +78,10 @@ export const MobileNav = ({
               <button
                 type="button"
                 className={`mobile-nav-item ${currentView === 'home' ? 'mobile-nav-item--active' : ''}`}
-                onClick={() => handleNavClick('home')}
+                onClick={() => {
+                  handleNavClick('home');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               >
                 Home
               </button>
@@ -72,7 +89,7 @@ export const MobileNav = ({
             <li>
               <button
                 type="button"
-                className={`mobile-nav-item ${['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? 'mobile-nav-item--active' : ''}`}
+                className={`mobile-nav-item ${['sourcing-requests', 'sourcing-new', 'sourcing-detail', 'checkout'].includes(currentView) ? 'mobile-nav-item--active' : ''}`}
                 onClick={() => handleNavClick('sourcing-requests')}
               >
                 📦 Sourcing Portal
@@ -81,8 +98,8 @@ export const MobileNav = ({
             <li>
               <button
                 type="button"
-                className={`mobile-nav-item ${currentView === 'how-it-works' ? 'mobile-nav-item--active' : ''}`}
-                onClick={() => handleNavClick('how-it-works')}
+                className="mobile-nav-item"
+                onClick={() => handleSectionClick('how-it-works')}
               >
                 How It Works
               </button>
@@ -90,8 +107,8 @@ export const MobileNav = ({
             <li>
               <button
                 type="button"
-                className={`mobile-nav-item ${currentView === 'track-order' ? 'mobile-nav-item--active' : ''}`}
-                onClick={() => handleNavClick('track-order')}
+                className="mobile-nav-item"
+                onClick={() => handleSectionClick('track-order-section')}
               >
                 Track Order
               </button>
@@ -99,8 +116,8 @@ export const MobileNav = ({
             <li>
               <button
                 type="button"
-                className={`mobile-nav-item ${currentView === 'support' ? 'mobile-nav-item--active' : ''}`}
-                onClick={() => handleNavClick('support')}
+                className="mobile-nav-item"
+                onClick={() => handleSectionClick('support-section')}
               >
                 Customer Support
               </button>

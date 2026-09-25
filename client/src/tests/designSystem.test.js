@@ -6,12 +6,12 @@ console.log('🚀 Executing SastoMarts Frontend Design System Tests');
 console.log('====================================================');
 
 // Test 1: Brand identity verification
-assert.strictEqual(PUBLIC_CONFIG.BRAND_NAME, 'SastoMarts');
+assert.strictEqual(PUBLIC_CONFIG.BRAND_NAME, 'SajiloMarts');
 assert.strictEqual(PUBLIC_CONFIG.TAGLINE, 'Shop from India. We Deliver to Nepal.');
-console.log('✅ SastoMarts brand identity and core messaging verified');
+console.log('✅ SajiloMarts brand identity and core messaging verified');
 
 // Test 2: Architecture rules & constants integrity
-assert.ok(PUBLIC_CONFIG.SUPPORT_EMAIL.includes('@sastomarts.com'));
+assert.ok(PUBLIC_CONFIG.SUPPORT_EMAIL.includes('@sajilomarts.com'));
 console.log('✅ Frontend configuration baseline verified');
 
 // Test 3: Design Tokens structure & Warm Neutral Color System
@@ -162,7 +162,7 @@ const logoJsxPath = path.resolve('src/components/common/Logo.jsx');
 assert.ok(fs.existsSync(logoJsxPath), 'Logo.jsx must exist');
 const logoContent = fs.readFileSync(logoJsxPath, 'utf8');
 assert.ok(logoContent.includes('export const Logo'), 'Logo must be exported');
-assert.ok(logoContent.includes('SastoMarts'), 'Logo must have SastoMarts brand text');
+assert.ok(logoContent.includes('SajiloMarts'), 'Logo must have SajiloMarts brand text');
 
 // Test 28: Complete Design System Foundation Verification
 const appJsxPath = path.resolve('src/App.jsx');
@@ -171,6 +171,6 @@ const appContent = fs.readFileSync(appJsxPath, 'utf8');
 assert.ok(appContent.includes('ErrorBoundary'), 'App must be wrapped in ErrorBoundary');
 assert.ok(appContent.includes('ToastProvider'), 'App must provide Toast notifications');
 assert.ok(appContent.includes('AppShell') || appContent.includes('app-shell'), 'App must render standard app shell');
-console.log('✅ Complete SastoMarts frontend design system foundation verified');
+console.log('✅ Complete SajiloMarts frontend design system foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');

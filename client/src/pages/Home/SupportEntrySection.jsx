@@ -10,7 +10,7 @@ import { PUBLIC_CONFIG } from '../../config/public.js';
  */
 export const SupportEntrySection = ({ onNavigate = () => {} }) => {
   return (
-    <Section id="support-entry" size="md" style={{
+    <Section id="support-section" size="md" style={{
       backgroundColor: 'var(--bg-page)',
       borderBottom: '1px solid var(--border-subtle)',
     }}>

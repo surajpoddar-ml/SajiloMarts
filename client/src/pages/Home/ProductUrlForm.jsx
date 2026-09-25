@@ -147,7 +147,7 @@ export const ProductUrlForm = ({
               }}
             >
               <span className="spinner spinner--sm" aria-hidden="true" />
-              <span>Verifying product URL with SastoMarts backend...</span>
+              <span>Verifying product URL with SajiloMarts backend...</span>
             </div>
           )}
 

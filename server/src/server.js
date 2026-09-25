@@ -20,7 +20,7 @@ const startServer = async () => {
 
     const server = app.listen(PORT, () => {
       console.log(`=================================`);
-      console.log(`🚀 SastoMarts Backend Running!`);
+      console.log(`🚀 SajiloMarts Backend Running!`);
       console.log(`🌍 Environment: ${config.nodeEnv}`);
       console.log(`🔗 Health Check: http://localhost:${PORT}${config.apiPrefix}/health`);
       console.log(`=================================`);

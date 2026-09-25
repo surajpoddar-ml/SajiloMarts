@@ -10,7 +10,7 @@ export const getSystemHealth = () => {
     timestamp: new Date().toISOString(),
     uptime: `${process.uptime().toFixed(2)}s`,
     environment: envConfig.nodeEnv,
-    service: 'SastoMarts Backend API',
+    service: 'SajiloMarts Backend API',
     database: {
       status: dbState.status,
       code: dbState.code,

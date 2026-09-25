@@ -3,12 +3,25 @@ import { Logo } from '../common/Logo.jsx';
 import { Container } from './Container.jsx';
 
 /**
- * SastoMarts Professional Application Footer & Legal Navigation
+ * SajiloMarts Professional Application Footer & Legal Navigation
  */
 export const Footer = ({
-  brandName = 'SastoMarts',
+  brandName = 'SajiloMarts',
   onNavigate = () => {},
 }) => {
+  const handleSectionScroll = (sectionId) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      onNavigate('home');
+      setTimeout(() => {
+        const target = document.getElementById(sectionId);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
   return (
     <footer className="site-footer">
       <Container size="wide">
@@ -42,7 +55,7 @@ export const Footer = ({
                 </button>
               </li>
               <li>
-                <button type="button" className="footer-link" onClick={() => onNavigate('how-it-works')}>
+                <button type="button" className="footer-link" onClick={() => handleSectionScroll('how-it-works')}>
                   How It Works
                 </button>
               </li>
@@ -54,7 +67,7 @@ export const Footer = ({
             <div className="footer-column__title">Customer Care</div>
             <ul className="footer-column__list">
               <li>
-                <button type="button" className="footer-link" onClick={() => onNavigate('track-order')}>
+                <button type="button" className="footer-link" onClick={() => handleSectionScroll('track-order-section')}>
                   Track Order
                 </button>
               </li>
@@ -64,7 +77,7 @@ export const Footer = ({
                 </button>
               </li>
               <li>
-                <button type="button" className="footer-link" onClick={() => onNavigate('support')}>
+                <button type="button" className="footer-link" onClick={() => handleSectionScroll('support-section')}>
                   Help &amp; Support
                 </button>
               </li>

@@ -2,7 +2,7 @@ import React from 'react';
 import logoImage from '../../assets/logo.jpg';
 
 /**
- * Official SastoMarts Logo Component
+ * Official SajiloMarts Logo Component
  * Incorporates the official brand logo asset with high-fidelity rendering.
  */
 export const Logo = ({
@@ -24,7 +24,7 @@ export const Logo = ({
 
   const content = (
     <div
-      className={`sastomarts-logo-wrapper ${className}`}
+      className={`sajilomarts-logo-wrapper ${className}`}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -36,8 +36,8 @@ export const Logo = ({
     >
       <img
         src={logoImage}
-        alt="SastoMarts - Shop from India. We Deliver to Nepal."
-        className="sastomarts-logo-img"
+        alt="SajiloMarts - Shop from India. We Deliver to Nepal."
+        className="sajilomarts-logo-img"
         style={{
           height: selectedSize.height,
           maxHeight: selectedSize.maxHeight,
@@ -56,7 +56,7 @@ export const Logo = ({
       <button
         type="button"
         onClick={onClick}
-        className="sastomarts-logo-button"
+        className="sajilomarts-logo-button"
         style={{
           background: 'none',
           border: 'none',
@@ -65,7 +65,7 @@ export const Logo = ({
           display: 'inline-flex',
           alignItems: 'center',
         }}
-        aria-label="SastoMarts Home"
+        aria-label="SajiloMarts Home"
       >
         {content}
       </button>

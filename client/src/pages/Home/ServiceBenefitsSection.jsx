@@ -41,7 +41,7 @@ export const ServiceBenefitsSection = () => {
             Reliable Cross-Border Logistics
           </Typography>
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
-            Why Source with SastoMarts
+            Why Source with SajiloMarts
           </Typography>
           <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '580px', margin: 'var(--space-2) auto 0' }}>
             Built specifically to solve cross-border e-commerce hurdles between India and Nepal with verifiable fulfillment.

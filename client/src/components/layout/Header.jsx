@@ -4,10 +4,10 @@ import { Logo } from '../common/Logo.jsx';
 import { Container } from './Container.jsx';
 
 /**
- * SastoMarts Global Site Header with Responsive Public & Auth Navigation
+ * SajiloMarts Global Site Header with Responsive Public & Auth Navigation
  */
 export const Header = ({
-  brandName = 'SastoMarts',
+  brandName = 'SajiloMarts',
   currentView = 'home',
   onNavigate = () => {},
   user,
@@ -18,11 +18,28 @@ export const Header = ({
   onToggleMobileMenu,
   isMobileMenuOpen = false,
 }) => {
+  const handleSectionClick = (sectionId, viewName) => {
+    if (currentView !== 'home') {
+      onNavigate('home');
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else if (onNavigate) {
+        onNavigate(viewName || 'home');
+      }
+    }
+  };
+
   return (
     <header className="site-header">
       <Container size="wide">
         <div className="nav-container">
-          {/* SastoMarts Official Logo */}
+          {/* SajiloMarts Official Logo */}
           <div className="header-brand">
             <Logo
               size="md"
@@ -37,7 +54,10 @@ export const Header = ({
                 <button
                   type="button"
                   className={`nav-link ${currentView === 'home' ? 'nav-link--active' : ''}`}
-                  onClick={() => onNavigate('home')}
+                  onClick={() => {
+                    onNavigate('home');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                 >
                   Home
                 </button>
@@ -45,7 +65,7 @@ export const Header = ({
               <li>
                 <button
                   type="button"
-                  className={`nav-link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? 'nav-link--active' : ''}`}
+                  className={`nav-link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail', 'checkout'].includes(currentView) ? 'nav-link--active' : ''}`}
                   onClick={() => onNavigate('sourcing-requests')}
                 >
                   Sourcing Portal
@@ -54,8 +74,8 @@ export const Header = ({
               <li>
                 <button
                   type="button"
-                  className={`nav-link ${currentView === 'how-it-works' ? 'nav-link--active' : ''}`}
-                  onClick={() => onNavigate('how-it-works')}
+                  className="nav-link"
+                  onClick={() => handleSectionClick('how-it-works', 'home')}
                 >
                   How It Works
                 </button>
@@ -63,8 +83,8 @@ export const Header = ({
               <li>
                 <button
                   type="button"
-                  className={`nav-link ${currentView === 'track-order' ? 'nav-link--active' : ''}`}
-                  onClick={() => onNavigate('track-order')}
+                  className="nav-link"
+                  onClick={() => handleSectionClick('track-order-section', 'home')}
                 >
                   Track Order
                 </button>
@@ -72,8 +92,8 @@ export const Header = ({
               <li>
                 <button
                   type="button"
-                  className={`nav-link ${currentView === 'support' ? 'nav-link--active' : ''}`}
-                  onClick={() => onNavigate('support')}
+                  className="nav-link"
+                  onClick={() => handleSectionClick('support-section', 'home')}
                 >
                   Support
                 </button>

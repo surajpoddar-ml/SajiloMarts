@@ -62,7 +62,7 @@ export const TrackOrderSection = ({ onTrackOrder }) => {
   };
 
   return (
-    <Section id="track-order-entry" size="md" style={{
+    <Section id="track-order-section" size="md" style={{
       backgroundColor: 'var(--bg-page)',
       borderBottom: '1px solid var(--border-subtle)',
     }}>
@@ -75,7 +75,7 @@ export const TrackOrderSection = ({ onTrackOrder }) => {
             Track Your Cross-Border Order
           </Typography>
           <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '540px', margin: 'var(--space-2) auto 0' }}>
-            Enter your SastoMarts Order ID or Courier Reference to view real-time customs, clearance, and delivery updates across Nepal.
+            Enter your SajiloMarts Order ID or Courier Reference to view real-time customs, clearance, and delivery updates across Nepal.
           </Typography>
         </div>
 
@@ -121,7 +121,7 @@ export const TrackOrderSection = ({ onTrackOrder }) => {
                   <div style={{ textAlign: 'center', padding: '16px 0' }}>
                     <Spinner size="sm" />
                     <span style={{ marginLeft: '8px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                      Locating parcel record in SastoMarts courier network...
+                      Locating parcel record in SajiloMarts courier network...
                     </span>
                   </div>
                 )}
