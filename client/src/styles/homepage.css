@@ -1,0 +1,53 @@
+/**
+ * SastoMarts Homepage & Sourcing Experience Styling
+ * Premium, restrained, warm-neutral responsive layouts.
+ */
+
+.homepage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-page);
+}
+
+/* Hero Section */
+.hero-section {
+  padding-top: clamp(2.5rem, 6vw, 5rem);
+  padding-bottom: clamp(3rem, 8vw, 6rem);
+}
+
+/* Product URL Form */
+.product-url-form-container {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .product-url-form-container .sastomarts-btn {
+    width: 100%;
+  }
+}
+
+/* Sourcing Portal Interactive Container */
+.sourcing-portal-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Responsive Grid Adapters */
+@media (max-width: 768px) {
+  .quantity-input-stepper {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+/* Safe Scroll & Overflow Guards */
+#sastomarts-homepage {
+  overflow-x: hidden;
+}
+
+.sastomarts-logo-img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}

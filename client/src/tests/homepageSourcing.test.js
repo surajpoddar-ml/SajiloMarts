@@ -140,4 +140,12 @@ assert.ok(indexHtmlContent.includes('SastoMarts — Shop from India. We Deliver 
 assert.ok(!indexHtmlContent.includes('Vite'), 'index.html must not contain Vite title or default starter text');
 console.log('✅ SastoMarts SEO metadata and dynamic titles verified');
 
+// Test 16: Responsive Homepage Compositions verification
+const homepageCssPath = path.resolve('src/styles/homepage.css');
+assert.ok(fs.existsSync(homepageCssPath), 'homepage.css must exist');
+const cssContent = fs.readFileSync(homepageCssPath, 'utf8');
+assert.ok(cssContent.includes('.hero-section'), 'Must style hero section');
+assert.ok(cssContent.includes('.product-url-form-container'), 'Must style product url form container');
+console.log('✅ Responsive Homepage compositions verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
