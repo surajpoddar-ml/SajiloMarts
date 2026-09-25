@@ -30,4 +30,12 @@ assert.ok(quantityContent.includes('export const QuantityInput'), 'QuantityInput
 assert.ok(quantityContent.includes('aria-valuemin'), 'QuantityInput must contain accessible aria attributes');
 console.log('✅ Accessible Quantity Controls component verified');
 
+// Test 4: Variant and Sourcing Notes verification
+const formPath = path.resolve('src/pages/Home/SourcingRequestInteractiveForm.jsx');
+assert.ok(fs.existsSync(formPath), 'SourcingRequestInteractiveForm.jsx must exist');
+const formContent = fs.readFileSync(formPath, 'utf8');
+assert.ok(formContent.includes('variant'), 'Form must handle variant field');
+assert.ok(formContent.includes('notes'), 'Form must handle notes field');
+console.log('✅ Variant & Sourcing Notes handling verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');

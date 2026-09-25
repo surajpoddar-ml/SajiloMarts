@@ -152,6 +152,38 @@ export const SourcingRequestInteractiveForm = ({
               />
             </FormField>
 
+            {/* Variant */}
+            <FormField
+              label="Variant / Options (Optional)"
+              error={errors.variant}
+              hint="Specify size, color, storage capacity, model number, etc."
+            >
+              <Input
+                name="variant"
+                type="text"
+                value={formData.variant}
+                onChange={(e) => handleChange('variant', e.target.value)}
+                placeholder="e.g. 256GB Midnight Black / Size UK 9"
+                disabled={isLoading}
+              />
+            </FormField>
+
+            {/* Sourcing Notes */}
+            <FormField
+              label="Sourcing Notes / Instructions (Optional)"
+              error={errors.notes}
+              hint="Any special packaging requests, seller conditions, or fulfillment instructions"
+            >
+              <Textarea
+                name="notes"
+                value={formData.notes}
+                onChange={(e) => handleChange('notes', e.target.value)}
+                rows={3}
+                placeholder="e.g. Please ensure sealed box packaging and verified warranty card."
+                disabled={isLoading}
+              />
+            </FormField>
+
             {/* Estimated Price in INR (Optional initial customer estimate) */}
             <FormField
               label="Product Price in INR (₹) — As listed on store"
