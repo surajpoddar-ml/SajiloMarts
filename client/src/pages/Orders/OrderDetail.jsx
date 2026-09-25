@@ -230,6 +230,81 @@ export const OrderDetail = ({
               </div>
             </div>
           )}
+
+          {/* Chronological Order Status History */}
+          <div
+            style={{
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-4)',
+            }}
+          >
+            <Typography variant="h3" style={{ fontSize: '1rem', marginBottom: 'var(--space-3)' }}>
+              Order Status History &amp; Tracking Timeline
+            </Typography>
+
+            {order.statusHistory && order.statusHistory.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {order.statusHistory
+                  .slice()
+                  .sort((a, b) => new Date(a.changedAt) - new Date(b.changedAt))
+                  .map((historyItem, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '12px',
+                        position: 'relative',
+                        paddingLeft: '4px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '10px',
+                          height: '10px',
+                          borderRadius: '50%',
+                          backgroundColor: idx === order.statusHistory.length - 1 ? 'var(--color-brand)' : 'var(--border-hover)',
+                          marginTop: '6px',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <div style={{ flex: 1, fontSize: '0.875rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <StatusBadge status={historyItem.status} />
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            {new Date(historyItem.changedAt).toLocaleString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+                        {historyItem.note && (
+                          <div style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '0.825rem' }}>
+                            {historyItem.note}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <StatusBadge status={order.status} />
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {new Date(order.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <div style={{ marginTop: '4px', fontSize: '0.825rem' }}>
+                  Order record initialized.
+                </div>
+              </div>
+            )}
+          </div>
         </CardBody>
       </Card>
     </div>
