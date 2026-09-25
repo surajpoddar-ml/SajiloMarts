@@ -6,3 +6,4 @@ export * from './Card.jsx';
 export * from './StatusBadge.jsx';
 export * from './Table.jsx';
 export * from './Logo.jsx';
+export * from './PaymentStatusBadge.jsx';
