@@ -95,15 +95,6 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Initial Auth Loading State
-  if (isAuthLoading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
   // Mandatory Auth Gate: Unauthenticated users must log in or sign up before accessing the main website
   if (!isAuthenticated) {
     const authViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];

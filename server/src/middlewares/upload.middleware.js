@@ -8,11 +8,13 @@ const MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
  * Validates uploaded payment proof payload (base64 image data or file reference).
  */
 export const validatePaymentProofPayload = (req, res, next) => {
-  const { paymentProof, paymentProofData, fileName, fileType, fileSize } = req.body;
+  const { paymentProof, paymentProofData, fileType, fileSize } = req.body || {};
 
-  const proof = paymentProof || paymentProofData;
+  const proof = paymentProof || paymentProofData || (req.file ? req.file.path : null);
+  
+  // If no proof image provided, continue (controller and validation will check transaction code)
   if (!proof) {
-    return next(new ApiError(HTTP_STATUS.BAD_REQUEST, 'Payment proof screenshot or receipt file is required'));
+    return next();
   }
 
   if (fileType && !ALLOWED_MIME_TYPES.includes(fileType.toLowerCase())) {
@@ -34,6 +36,16 @@ export const validatePaymentProofPayload = (req, res, next) => {
   next();
 };
 
+/**
+ * Middleware wrapper for handling proof file uploads.
+ */
+export const uploadProof = {
+  single: (fieldName = 'paymentProof') => (req, res, next) => {
+    validatePaymentProofPayload(req, res, next);
+  },
+};
+
 export default {
+  uploadProof,
   validatePaymentProofPayload,
 };

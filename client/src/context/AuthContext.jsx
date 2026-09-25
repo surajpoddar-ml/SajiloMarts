@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/auth.service.js';
+import { APP_CONSTANTS } from '../constants/appConstants.js';
 
 export const AuthContext = createContext({
   user: null,
@@ -9,7 +10,7 @@ export const AuthContext = createContext({
   isCustomer: false,
   isEmailVerified: false,
   hasRole: () => false,
-  isLoading: true,
+  isLoading: false,
   error: null,
   login: async () => {},
   register: async () => {},
@@ -18,24 +19,43 @@ export const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = typeof localStorage !== 'undefined' ? localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.USER) : null;
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const refreshUser = useCallback(async () => {
+    const hasToken = typeof localStorage !== 'undefined' && localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
+    if (!hasToken) {
+      setUser(null);
+      return;
+    }
+
     try {
-      setIsLoading(true);
-      setError(null);
       const res = await authService.getMe();
-      if (res && res.data) {
-        setUser(res.data);
+      if (res && (res.data || res.user)) {
+        const userData = res.data?.user || res.data;
+        setUser(userData);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
+        }
       } else {
         setUser(null);
       }
     } catch {
+      // If unauthorized or network error, reset user state
       setUser(null);
-    } finally {
-      setIsLoading(false);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER);
+      }
     }
   }, []);
 
@@ -49,6 +69,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authService.login(credentials);
       const userData = res.data?.user || res.data;
+      const token = res.data?.token || res.token;
+      if (token && typeof localStorage !== 'undefined') {
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN, token);
+      }
+      if (userData && typeof localStorage !== 'undefined') {
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
+      }
       setUser(userData);
       return { success: true, user: userData };
     } catch (err) {
@@ -65,6 +92,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authService.register(customerData);
       const userData = res.data?.user || res.data;
+      const token = res.data?.token || res.token;
+      if (token && typeof localStorage !== 'undefined') {
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN, token);
+      }
+      if (userData && typeof localStorage !== 'undefined') {
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
+      }
       setUser(userData);
       return { success: true, user: userData };
     } catch (err) {
@@ -84,6 +118,10 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null);
       setError(null);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER);
+      }
       setIsLoading(false);
     }
   };

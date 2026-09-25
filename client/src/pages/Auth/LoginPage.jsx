@@ -76,7 +76,7 @@ export const LoginPage = ({
         <div className="auth-header">
           <span className="auth-badge">Secure Access</span>
           <h2 className="auth-title">Welcome Back</h2>
-          <p className="auth-subtitle">Sign in to your SastoMarts account</p>
+          <p className="auth-subtitle">Sign in to your SajiloMarts account</p>
         </div>
 
         {apiError && <div className="auth-alert-error">{apiError}</div>}

@@ -3,8 +3,8 @@ import { APP_CONSTANTS } from '../constants/index.js';
 import { ApiClientError, normalizeApiError } from '../utils/apiError.js';
 
 /**
- * SastoMarts Centralized API Client
- * Supports cookies, auth tokens, and safe customer-facing error envelopes.
+ * SajiloMarts Centralized API Client
+ * Supports cookies, auth tokens, automatic timeout aborts, and safe error envelopes.
  */
 export const apiClient = async (endpoint, options = {}) => {
   const defaultHeaders = {
@@ -19,15 +19,22 @@ export const apiClient = async (endpoint, options = {}) => {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
+  const timeoutMs = options.timeout || 4000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
     const response = await fetch(`${ENV.API_BASE_URL}${endpoint}`, {
       credentials: 'include',
+      signal: controller.signal,
       ...options,
       headers: {
         ...defaultHeaders,
         ...options.headers,
       },
     });
+
+    clearTimeout(timeoutId);
 
     let data = null;
     const contentType = response.headers.get('content-type');
@@ -45,6 +52,10 @@ export const apiClient = async (endpoint, options = {}) => {
 
     return data;
   } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new ApiClientError('Server request timed out. Backend may be offline.', 408);
+    }
     throw normalizeApiError(error);
   }
 };

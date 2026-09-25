@@ -97,7 +97,7 @@ export const RegisterPage = ({ onNavigateToLogin, onRegisterSuccess }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <span className="auth-badge">Join SastoMarts</span>
+          <span className="auth-badge">Join SajiloMarts</span>
           <h2 className="auth-title">Create an Account</h2>
           <p className="auth-subtitle">Source products smoothly from India to Nepal</p>
         </div>
