@@ -163,11 +163,14 @@ export const updateCustomerProfile = async (userId, updateData) => {
     throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
   }
 
-  if (updateData.name !== undefined) {
-    user.name = updateData.name;
+  // Strict allowlist: only name and phone can be modified by customer
+  if (updateData.name !== undefined && typeof updateData.name === 'string') {
+    user.name = updateData.name.trim();
   }
   if (updateData.phone !== undefined) {
-    user.phone = updateData.phone;
+    user.phone = updateData.phone && typeof updateData.phone === 'string' && updateData.phone.trim()
+      ? updateData.phone.trim()
+      : null;
   }
 
   await user.save();
