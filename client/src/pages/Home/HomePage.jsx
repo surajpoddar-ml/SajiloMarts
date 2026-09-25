@@ -14,6 +14,7 @@ import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx
 import { ServiceBenefitsSection } from './ServiceBenefitsSection.jsx';
 import { TrackOrderSection } from './TrackOrderSection.jsx';
 import { AccountEntrySection } from './AccountEntrySection.jsx';
+import { SupportEntrySection } from './SupportEntrySection.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
@@ -157,10 +158,8 @@ export function HomePage({
         onNavigate={onNavigate}
       />
 
-      {/* 8. Support Entry Section Anchor */}
-      <section id="support-entry-section" aria-label="Support Access">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 8. Support Entry Section */}
+      <SupportEntrySection onNavigate={onNavigate} />
     </div>
   );
 }

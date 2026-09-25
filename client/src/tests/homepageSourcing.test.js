@@ -105,4 +105,12 @@ assert.ok(accContent.includes('export const AccountEntrySection'), 'AccountEntry
 assert.ok(accContent.includes('Customer Account & Sourcing History'), 'Must render customer account heading');
 console.log('✅ Customer account entry points verified');
 
+// Test 13: Customer Support Entry section verification
+const suppPath = path.resolve('src/pages/Home/SupportEntrySection.jsx');
+assert.ok(fs.existsSync(suppPath), 'SupportEntrySection.jsx must exist');
+const suppContent = fs.readFileSync(suppPath, 'utf8');
+assert.ok(suppContent.includes('export const SupportEntrySection'), 'SupportEntrySection must be exported');
+assert.ok(suppContent.includes('Direct Email Helpdesk'), 'Must render direct email helpdesk channel');
+console.log('✅ Customer support entry experience verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
