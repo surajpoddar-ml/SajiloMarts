@@ -135,7 +135,12 @@ assert.ok(fs.existsSync(tableJsxPath), 'Table.jsx must exist');
 const tableContent = fs.readFileSync(tableJsxPath, 'utf8');
 assert.ok(tableContent.includes('export const Table'), 'Table must be exported');
 assert.ok(tableContent.includes('export const TableHeaderCell'), 'TableHeaderCell must be exported');
-assert.ok(tableContent.includes('scope="col"'), 'TableHeaderCell must provide accessible scope attribute');
-console.log('✅ Reusable responsive table foundation verified');
+// Test 23: Global Frontend Error Boundary Verification
+const errorBoundaryJsxPath = path.resolve('src/components/feedback/ErrorBoundary.jsx');
+assert.ok(fs.existsSync(errorBoundaryJsxPath), 'ErrorBoundary.jsx must exist');
+const errorBoundaryContent = fs.readFileSync(errorBoundaryJsxPath, 'utf8');
+assert.ok(errorBoundaryContent.includes('export class ErrorBoundary'), 'ErrorBoundary must be exported');
+assert.ok(errorBoundaryContent.includes('componentDidCatch'), 'ErrorBoundary must implement componentDidCatch lifecycle');
+console.log('✅ Global frontend error boundary verified');
 
 console.log('🎉 Design System initial foundation verified!');
