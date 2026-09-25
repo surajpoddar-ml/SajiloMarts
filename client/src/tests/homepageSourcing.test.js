@@ -55,4 +55,9 @@ assert.ok(quoteContent.includes('Authoritative Price Snapshot'), 'Must render au
 assert.ok(quoteContent.includes('Quote not available yet'), 'Must support quote not available state');
 console.log('✅ Server quote flow, presentation, breakdown and states verified');
 
+// Test 7: Quote success and error states verification
+assert.ok(quoteContent.includes('Quote Confirmed Successfully!'), 'Must support quote confirmed success state');
+assert.ok(quoteContent.includes('Retry Quote Request'), 'Must support retry on error state');
+console.log('✅ Quote success and error states verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
