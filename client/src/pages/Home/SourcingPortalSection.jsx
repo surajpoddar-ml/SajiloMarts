@@ -16,23 +16,13 @@ export const SourcingPortalSection = ({
   children,
 }) => {
   return (
-    <Section id="sourcing-portal" size="md" style={{
+    <Section id="sourcing-portal" size="sm" style={{
       backgroundColor: 'var(--bg-page)',
       borderBottom: '1px solid var(--border-subtle)',
+      paddingTop: 'var(--space-4)',
+      paddingBottom: 'var(--space-8)',
     }}>
       <Container size="standard">
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-          <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)', fontWeight: 600 }}>
-            Interactive Product Sourcing
-          </Typography>
-          <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
-            Configure Your Product Request
-          </Typography>
-          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '560px', margin: 'var(--space-2) auto 0' }}>
-            Enter your exact product specifications below. Our Kathmandu fulfillment team will verify the listing and calculate the official cross-border quote.
-          </Typography>
-        </div>
-
         {/* Sourcing Portal Inner Flow / Slot */}
         <div className="sourcing-portal-container" style={{ maxWidth: '720px', margin: '0 auto' }}>
           {children}
