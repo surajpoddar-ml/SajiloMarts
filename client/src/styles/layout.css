@@ -1,0 +1,112 @@
+/**
+ * SajiloMarts Responsive Spacing & Container Layout System
+ */
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Container Width Constraints */
+  --container-narrow: 680px;
+  --container-medium: 960px;
+  --container-wide: 1200px;
+  --container-full: 100%;
+}
+
+.layout-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+.layout-container--narrow {
+  max-width: var(--container-narrow);
+}
+
+.layout-container--medium {
+  max-width: var(--container-medium);
+}
+
+.layout-container--wide {
+  max-width: var(--container-wide);
+}
+
+.layout-container--full {
+  max-width: var(--container-full);
+}
+
+.layout-section {
+  padding-top: var(--space-10);
+  padding-bottom: var(--space-10);
+  width: 100%;
+}
+
+.layout-section--sm {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-6);
+}
+
+.layout-section--lg {
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-16);
+}
+
+.layout-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.layout-stack--sm {
+  gap: var(--space-2);
+}
+
+.layout-stack--lg {
+  gap: var(--space-6);
+}
+
+.layout-stack--xl {
+  gap: var(--space-8);
+}
+
+.layout-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .layout-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-grid-2 {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .layout-section {
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-6);
+  }
+}

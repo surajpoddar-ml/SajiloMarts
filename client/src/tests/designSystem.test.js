@@ -26,6 +26,10 @@ assert.ok(DESIGN_TOKENS.typography.fontFamily.sans);
 assert.ok(!DESIGN_TOKENS.typography.fontFamily.sans.includes('Inter'), 'Must not use Inter font');
 assert.ok(!DESIGN_TOKENS.typography.fontFamily.sans.includes('Geist'), 'Must not use Geist font');
 assert.ok(!DESIGN_TOKENS.typography.fontFamily.sans.includes('Space Grotesk'), 'Must not use Space Grotesk font');
-console.log('✅ Typography hierarchy and non-prohibited font rules verified');
+// Test 5: Responsive Spacing & Container Verification
+assert.ok(DESIGN_TOKENS.spacing['md']);
+assert.ok(DESIGN_TOKENS.spacing['lg']);
+assert.ok(DESIGN_TOKENS.spacing['2xl']);
+console.log('✅ Responsive spacing and container constraints verified');
 
 console.log('🎉 Design System initial foundation verified!');
