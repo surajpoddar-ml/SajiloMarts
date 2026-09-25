@@ -81,10 +81,30 @@ export const requirePermission = (permission) => {
   };
 };
 
+/**
+ * Middleware ensuring authenticated user has an active account status.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+export const requireActiveAccount = (req, res, next) => {
+  if (!req.user || !req.user.id) {
+    throw new UnauthorizedError(AUTH_ERRORS.UNAUTHENTICATED);
+  }
+
+  if (req.user.isActive === false) {
+    throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
+  }
+
+  next();
+};
+
 export default {
   requireRole,
   requireAdmin,
   requireCustomer,
   requireAnyRole,
   requirePermission,
+  requireActiveAccount,
 };
