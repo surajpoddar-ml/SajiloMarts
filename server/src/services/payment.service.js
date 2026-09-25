@@ -69,16 +69,35 @@ export class PaymentService extends BaseService {
     const amountPaidNpr = quote.payNowAmountNpr;
     const remainingAmountNpr = quote.remainingCodAmountNpr;
 
-    const paymentSubmission = new PaymentSubmission({
+    // Check for existing payment submission to prevent duplicate records
+    let paymentSubmission = await PaymentSubmission.findOne({
       productRequest: request._id,
       user: userId,
-      paymentMode,
-      paymentMethod,
-      amountDueNpr,
-      amountPaidNpr,
-      remainingAmountNpr,
-      paymentStatus: PAYMENT_STATUSES.PENDING,
     });
+
+    if (paymentSubmission) {
+      if ([PAYMENT_STATUSES.PROOF_SUBMITTED, PAYMENT_STATUSES.UNDER_REVIEW, PAYMENT_STATUSES.VERIFIED].includes(paymentSubmission.paymentStatus)) {
+        throw new BadRequestError(`A payment submission is already ${paymentSubmission.paymentStatus.replace('_', ' ')} for this request`);
+      }
+      // Update pending submission
+      paymentSubmission.paymentMode = paymentMode;
+      paymentSubmission.paymentMethod = paymentMethod;
+      paymentSubmission.amountDueNpr = amountDueNpr;
+      paymentSubmission.amountPaidNpr = amountPaidNpr;
+      paymentSubmission.remainingAmountNpr = remainingAmountNpr;
+      paymentSubmission.paymentStatus = PAYMENT_STATUSES.PENDING;
+    } else {
+      paymentSubmission = new PaymentSubmission({
+        productRequest: request._id,
+        user: userId,
+        paymentMode,
+        paymentMethod,
+        amountDueNpr,
+        amountPaidNpr,
+        remainingAmountNpr,
+        paymentStatus: PAYMENT_STATUSES.PENDING,
+      });
+    }
 
     const savedPayment = await paymentSubmission.save();
     request.paymentSubmission = savedPayment._id;
@@ -106,9 +125,18 @@ export class PaymentService extends BaseService {
 
     assertResourceOwnership(payment, userId, 'Payment submission', 'user');
 
+    if (payment.paymentStatus === PAYMENT_STATUSES.VERIFIED) {
+      throw new BadRequestError('Payment is already verified and confirmed');
+    }
+
     const { transactionCode, paymentProof } = proofData;
     if (!transactionCode && !paymentProof) {
       throw new BadRequestError('Either transaction code or payment proof image must be provided');
+    }
+
+    // Duplicate check: if same transaction code already recorded and in review
+    if (transactionCode && payment.transactionCode === String(transactionCode).trim() && payment.paymentStatus === PAYMENT_STATUSES.PROOF_SUBMITTED) {
+      return payment; // Idempotent return without duplicate overhead
     }
 
     if (transactionCode) {
