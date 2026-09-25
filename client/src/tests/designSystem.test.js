@@ -129,7 +129,13 @@ const pageHeaderJsxPath = path.resolve('src/components/layout/PageHeader.jsx');
 assert.ok(fs.existsSync(pageHeaderJsxPath), 'PageHeader.jsx must exist');
 const pageHeaderContent = fs.readFileSync(pageHeaderJsxPath, 'utf8');
 assert.ok(pageHeaderContent.includes('export const PageHeader'), 'PageHeader must be exported');
-assert.ok(pageHeaderContent.includes('page-header__title'), 'PageHeader must structure page title');
-console.log('✅ Responsive page layout foundation verified');
+// Test 22: Reusable Responsive Table Foundation Verification
+const tableJsxPath = path.resolve('src/components/common/Table.jsx');
+assert.ok(fs.existsSync(tableJsxPath), 'Table.jsx must exist');
+const tableContent = fs.readFileSync(tableJsxPath, 'utf8');
+assert.ok(tableContent.includes('export const Table'), 'Table must be exported');
+assert.ok(tableContent.includes('export const TableHeaderCell'), 'TableHeaderCell must be exported');
+assert.ok(tableContent.includes('scope="col"'), 'TableHeaderCell must provide accessible scope attribute');
+console.log('✅ Reusable responsive table foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');

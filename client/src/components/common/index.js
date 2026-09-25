@@ -4,3 +4,4 @@ export * from './Typography.jsx';
 export * from './Button.jsx';
 export * from './Card.jsx';
 export * from './StatusBadge.jsx';
+export * from './Table.jsx';
