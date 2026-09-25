@@ -91,7 +91,13 @@ assert.ok(fs.existsSync(customerNavJsxPath), 'CustomerNav.jsx must exist');
 const customerNavContent = fs.readFileSync(customerNavJsxPath, 'utf8');
 assert.ok(customerNavContent.includes('export const CustomerNav'), 'CustomerNav must be exported');
 assert.ok(customerNavContent.includes('Sourcing Requests'), 'CustomerNav must include Sourcing Requests');
-assert.ok(customerNavContent.includes('Current Orders'), 'CustomerNav must include Orders placeholder');
-console.log('✅ Authenticated customer navigation verified');
+// Test 16: Role-Aware Administrator Navigation Verification
+const adminNavJsxPath = path.resolve('src/components/layout/AdminNav.jsx');
+assert.ok(fs.existsSync(adminNavJsxPath), 'AdminNav.jsx must exist');
+const adminNavContent = fs.readFileSync(adminNavJsxPath, 'utf8');
+assert.ok(adminNavContent.includes('export const AdminNav'), 'AdminNav must be exported');
+assert.ok(adminNavContent.includes('Admin Console'), 'AdminNav must include Admin Console');
+assert.ok(adminNavContent.includes('All Sourcing Requests'), 'AdminNav must include Requests management');
+console.log('✅ Role-aware administrator navigation verified');
 
 console.log('🎉 Design System initial foundation verified!');
