@@ -9,6 +9,7 @@ import { SourcingPortalSection } from './SourcingPortalSection.jsx';
 import { SourcingRequestInteractiveForm } from './SourcingRequestInteractiveForm.jsx';
 import { RequestReviewCard } from './RequestReviewCard.jsx';
 import { ServerQuoteDisplay } from './ServerQuoteDisplay.jsx';
+import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
@@ -138,10 +139,8 @@ export function HomePage({
         {/* Established in upcoming commits */}
       </section>
 
-      {/* 4. Supported Marketplaces Section Anchor */}
-      <section id="supported-marketplaces-section" aria-label="Supported Indian Marketplaces">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 4. Supported Marketplaces Section */}
+      <SupportedMarketplacesSection />
 
       {/* 5. Service Benefits Section Anchor */}
       <section id="service-benefits-section" aria-label="Service Benefits">

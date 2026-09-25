@@ -60,4 +60,14 @@ assert.ok(quoteContent.includes('Quote Confirmed Successfully!'), 'Must support 
 assert.ok(quoteContent.includes('Retry Quote Request'), 'Must support retry on error state');
 console.log('✅ Quote success and error states verified');
 
+// Test 8: Supported Marketplaces section verification
+const mpPath = path.resolve('src/pages/Home/SupportedMarketplacesSection.jsx');
+assert.ok(fs.existsSync(mpPath), 'SupportedMarketplacesSection.jsx must exist');
+const mpContent = fs.readFileSync(mpPath, 'utf8');
+assert.ok(mpContent.includes('export const SupportedMarketplacesSection'), 'SupportedMarketplacesSection must be exported');
+assert.ok(mpContent.includes('Amazon India'), 'Must include Amazon India');
+assert.ok(mpContent.includes('Flipkart'), 'Must include Flipkart');
+assert.ok(mpContent.includes('Tata 1mg'), 'Must include Tata 1mg');
+console.log('✅ Supported Marketplaces section verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
