@@ -68,3 +68,13 @@
     font-size: 0.95rem;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout-page *,
+  .checkout-payment-selector [role="radio"],
+  .payment-qr-container,
+  .payment-proof-uploader {
+    transition: none !important;
+    animation: none !important;
+  }
+}
