@@ -38,4 +38,12 @@ assert.ok(formContent.includes('variant'), 'Form must handle variant field');
 assert.ok(formContent.includes('notes'), 'Form must handle notes field');
 console.log('✅ Variant & Sourcing Notes handling verified');
 
+// Test 5: Sourcing Request Review experience verification
+const reviewPath = path.resolve('src/pages/Home/RequestReviewCard.jsx');
+assert.ok(fs.existsSync(reviewPath), 'RequestReviewCard.jsx must exist');
+const reviewContent = fs.readFileSync(reviewPath, 'utf8');
+assert.ok(reviewContent.includes('export const RequestReviewCard'), 'RequestReviewCard must be exported');
+assert.ok(reviewContent.includes('Step 2: Review Sourcing Request'), 'Review card must render step 2 title');
+console.log('✅ Request Review experience verification passed');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
