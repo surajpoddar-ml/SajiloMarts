@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SastoMarts Accessible Error Alert Component
+ * SajiloMarts Accessible Error Alert Component
  */
 export const ErrorAlert = ({
   title,
