@@ -15,13 +15,23 @@ import { Container } from '../../components/layout/Container.jsx';
 export const AccountPage = ({
   initialTab = 'overview',
   onNavigate = () => {},
+  onLogout,
 }) => {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, logout } = useAuth();
   const { showSuccess, showError } = useToast();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [isSaving, setIsSaving] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+
+  const handleLogout = async () => {
+    if (onLogout) {
+      await onLogout();
+    } else if (logout) {
+      await logout();
+      onNavigate('login');
+    }
+  };
 
   const handleTabChange = (tabId) => {
     setApiError(null);
@@ -62,6 +72,7 @@ export const AccountPage = ({
     <CustomerPortal
       activeTab={activeTab}
       onTabChange={handleTabChange}
+      onLogout={handleLogout}
     >
       {activeTab === 'overview' && (
         <AccountOverview

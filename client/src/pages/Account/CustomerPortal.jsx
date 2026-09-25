@@ -48,6 +48,20 @@ export const CustomerPortal = ({
                   );
                 })}
               </nav>
+
+              {onLogout && (
+                <div style={{ marginTop: 'var(--space-3)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--border-subtle)' }}>
+                  <button
+                    type="button"
+                    className="customer-portal__nav-btn"
+                    onClick={onLogout}
+                    style={{ color: 'var(--color-error)' }}
+                  >
+                    <span className="customer-portal__nav-icon" aria-hidden="true">🚪</span>
+                    <span className="customer-portal__nav-text">Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           </aside>
 

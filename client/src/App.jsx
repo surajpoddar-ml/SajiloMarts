@@ -298,6 +298,10 @@ function AppContent() {
             <AccountPage
               initialTab={currentView === 'account-security' ? 'security' : currentView === 'account-profile' ? 'profile' : 'overview'}
               onNavigate={handleNavigate}
+              onLogout={async () => {
+                await logout();
+                handleNavigate('login');
+              }}
             />
           </ProtectedRoute>
         )}
