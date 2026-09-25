@@ -1,6 +1,7 @@
 @import './variables.css';
 @import './typography.css';
 @import './layout.css';
+@import './button.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
