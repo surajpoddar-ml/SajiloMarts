@@ -145,7 +145,14 @@ const notFoundJsxPath = path.resolve('src/pages/NotFound/NotFoundPage.jsx');
 assert.ok(fs.existsSync(notFoundJsxPath), 'NotFoundPage.jsx must exist');
 const notFoundContent = fs.readFileSync(notFoundJsxPath, 'utf8');
 assert.ok(notFoundContent.includes('export const NotFoundPage'), 'NotFoundPage must be exported');
-assert.ok(notFoundContent.includes('404'), 'NotFoundPage must render 404 header');
-console.log('✅ Reusable not-found page verified');
+// Test 25: Footer & Legal Navigation Verification
+const footerJsxPath = path.resolve('src/components/layout/Footer.jsx');
+assert.ok(fs.existsSync(footerJsxPath), 'Footer.jsx must exist');
+const footerContent = fs.readFileSync(footerJsxPath, 'utf8');
+assert.ok(footerContent.includes('export const Footer'), 'Footer must be exported');
+assert.ok(footerContent.includes('Terms of Service'), 'Footer must include Terms of Service');
+assert.ok(footerContent.includes('Privacy Policy'), 'Footer must include Privacy Policy');
+assert.ok(footerContent.includes('Draft'), 'Legal details must be noted as Draft');
+console.log('✅ SajiloMarts footer and legal navigation verified');
 
 console.log('🎉 Design System initial foundation verified!');

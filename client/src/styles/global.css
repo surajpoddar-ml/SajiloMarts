@@ -12,6 +12,7 @@
 @import './toast.css';
 @import './page.css';
 @import './table.css';
+@import './footer.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
