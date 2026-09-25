@@ -1,6 +1,16 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { productRequestService } from '../../services';
+import { Card, CardHeader, CardBody } from '../../components/common/Card.jsx';
+import { Button } from '../../components/common/Button.jsx';
+import { Typography } from '../../components/common/Typography.jsx';
+import { StatusBadge } from '../../components/common/StatusBadge.jsx';
+import { Spinner } from '../../components/feedback/Spinner.jsx';
 
+/**
+ * SajiloMarts Customer Sourcing Request Detail View
+ * Displays customer-safe request specifications, verified quote breakdown, and lifecycle actions.
+ * Enforces ownership protection and isolates internal notes.
+ */
 export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onProceedToCheckout }) {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +43,7 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onPr
     setFeedback('');
     try {
       const res = await productRequestService.confirmQuote(requestId);
-      setFeedback('Quote confirmed successfully! Sourcing order is queued for payment.');
+      setFeedback('Quote confirmed successfully! Proceeding to payment and checkout.');
       setRequest((prev) => ({ ...prev, ...(res.data || res) }));
       if (onStatusUpdated) onStatusUpdated();
       if (onProceedToCheckout) {
@@ -65,19 +75,29 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onPr
 
   if (loading) {
     return (
-      <div style={{ maxWidth: '720px', margin: '2rem auto', textAlign: 'center', color: '#64748b' }}>
-        Loading sourcing request details...
+      <div style={{ maxWidth: '800px', margin: '3rem auto', textAlign: 'center' }}>
+        <Spinner size="lg" />
+        <Typography variant="body" style={{ marginTop: 'var(--space-3)', color: 'var(--text-secondary)' }}>
+          Loading sourcing request details...
+        </Typography>
       </div>
     );
   }
 
   if (!request) {
     return (
-      <div style={{ maxWidth: '720px', margin: '2rem auto', textAlign: 'center' }}>
-        <p style={{ color: '#991b1b' }}>{error || 'Sourcing request not found.'}</p>
-        <button type="button" onClick={onBack} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
-          &larr; Back to Requests
-        </button>
+      <div style={{ maxWidth: '800px', margin: '2rem auto' }}>
+        <Card style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+          <Typography variant="h3" style={{ color: 'var(--color-error)', marginBottom: 'var(--space-2)' }}>
+            Request Not Found
+          </Typography>
+          <Typography variant="body" style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
+            {error || 'The requested sourcing record could not be found or does not belong to your account.'}
+          </Typography>
+          <Button variant="primary" onClick={onBack}>
+            &larr; Back to Sourcing Requests
+          </Button>
+        </Card>
       </div>
     );
   }
@@ -87,127 +107,269 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onPr
   const isCancellable = ['draft', 'submitted', 'under_review', 'quote_ready', 'quoted'].includes(request.status);
 
   return (
-    <div style={{ maxWidth: '720px', margin: '1.5rem auto', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-      <button
-        type="button"
-        onClick={onBack}
-        style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 600, cursor: 'pointer', padding: 0, marginBottom: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
-      >
-        &larr; Back to My Requests
-      </button>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-        <div>
-          <h2 style={{ margin: '0 0 0.25rem', color: '#0f172a' }}>{request.productName}</h2>
-          <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Request ID: {request._id}</span>
-        </div>
-        <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '0.35rem 0.75rem', borderRadius: '9999px', fontSize: '0.85rem', fontWeight: 600, textTransform: 'capitalize' }}>
-          Status: {request.status.replace('_', ' ')}
-        </span>
+    <div className="sourcing-request-detail-view" style={{ maxWidth: '840px', margin: '0 auto' }}>
+      <div style={{ marginBottom: 'var(--space-4)' }}>
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          &larr; Back to Sourcing Requests
+        </Button>
       </div>
 
-      {error && (
-        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-          <strong>Error:</strong> {error}
-        </div>
-      )}
+      <Card>
+        <CardHeader
+          title={request.productName}
+          description={`Request Ref: ${request._id || request.id}`}
+          action={<StatusBadge status={request.status} />}
+        />
+        <CardBody>
+          {error && (
+            <div
+              role="alert"
+              style={{
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: 'var(--color-error)',
+                padding: '0.75rem 1rem',
+                borderRadius: 'var(--radius-sm)',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
+              <strong>Error:</strong> {error}
+            </div>
+          )}
 
-      {feedback && (
-        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-          &check; {feedback}
-        </div>
-      )}
+          {feedback && (
+            <div
+              role="status"
+              style={{
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                color: 'var(--color-success)',
+                padding: '0.75rem 1rem',
+                borderRadius: 'var(--radius-sm)',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
+              &check; {feedback}
+            </div>
+          )}
 
-      <div style={{ display: 'grid', gap: '1rem', background: '#f8fafc', padding: '1.25rem', borderRadius: '12px', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-        <div>
-          <strong>Product URL:</strong>{' '}
-          <a href={request.productUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', wordBreak: 'break-all' }}>
-            {request.productUrl}
-          </a>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
-          <div><strong>Marketplace:</strong> <span style={{ textTransform: 'capitalize' }}>{request.marketplace}</span></div>
-          <div><strong>Quantity:</strong> {request.quantity}</div>
-          <div><strong>Price in India:</strong> ₹{request.productPriceInr} INR</div>
-          <div><strong>Variant:</strong> {request.variant || 'Standard'}</div>
-        </div>
-        {request.notes && (
-          <div><strong>Customer Notes:</strong> {request.notes}</div>
-        )}
-      </div>
+          {/* Product Specifications Summary */}
+          <div
+            style={{
+              display: 'grid',
+              gap: 'var(--space-3)',
+              backgroundColor: 'var(--bg-surface-secondary)',
+              padding: 'var(--space-4)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              marginBottom: 'var(--space-6)',
+              fontSize: '0.9rem',
+            }}
+          >
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                Indian Product URL
+              </span>
+              <div style={{ marginTop: '2px', wordBreak: 'break-all' }}>
+                <a
+                  href={request.productUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--color-brand)', textDecoration: 'underline' }}
+                >
+                  {request.productUrl} &#8599;
+                </a>
+              </div>
+            </div>
 
-      {quote ? (
-        <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', background: '#ffffff' }}>
-          <h3 style={{ margin: '0 0 1rem', color: '#0f172a', fontSize: '1.1rem' }}>Authoritative Quotation Details</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.85rem', fontSize: '0.9rem', color: '#334155' }}>
-            <div>INR Subtotal: <strong>₹{quote.subtotalInr || quote.sourceSubtotalInr}</strong></div>
-            <div>Exchange Rate: <strong>1 INR = {quote.conversionMultiplier || quote.exchangeRate} NPR</strong></div>
-            <div>Converted NPR: <strong>NPR {quote.convertedAmountNpr}</strong></div>
-            <div>Surcharge Rate: <strong>{((quote.feeRate || quote.appliedRate) * 100).toFixed(0)}%</strong></div>
-            <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #e2e8f0', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-3)', marginTop: '4px' }}>
               <div>
-                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Final Total Amount:</span>
-                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#2563eb' }}>
-                  NPR {quote.finalAmountNpr}
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Marketplace
+                </span>
+                <div style={{ fontWeight: 600, textTransform: 'capitalize', marginTop: '2px' }}>
+                  {request.marketplace}
                 </div>
               </div>
+
               <div>
-                <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Amount Payable Now:</span>
-                <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#16a34a' }}>
-                  NPR {quote.amountPayableNow || quote.payNowAmountNpr}
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Quantity
+                </span>
+                <div style={{ fontWeight: 600, marginTop: '2px' }}>
+                  {request.quantity} {request.quantity === 1 ? 'Unit' : 'Units'}
                 </div>
               </div>
-              {Number(quote.remainingCodAmount || quote.remainingCodAmountNpr) > 0 && (
+
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Store Price (INR)
+                </span>
+                <div style={{ fontWeight: 600, marginTop: '2px' }}>
+                  ₹{Number(request.productPriceInr).toLocaleString()}
+                </div>
+              </div>
+
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Variant / Specs
+                </span>
+                <div style={{ marginTop: '2px' }}>
+                  {request.variant || 'Standard'}
+                </div>
+              </div>
+            </div>
+
+            {request.notes && (
+              <div style={{ marginTop: '4px', borderTop: '1px solid var(--border-subtle)', paddingTop: 'var(--space-2)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Customer Notes
+                </span>
+                <div style={{ marginTop: '2px', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                  &ldquo;{request.notes}&rdquo;
+                </div>
+              </div>
+            )}
+
+            {request.deliveryAddress && (
+              <div style={{ marginTop: '4px', borderTop: '1px solid var(--border-subtle)', paddingTop: 'var(--space-2)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Destination Delivery Address
+                </span>
+                <div style={{ marginTop: '2px', color: 'var(--text-secondary)' }}>
+                  {request.deliveryAddress.fullName} ({request.deliveryAddress.phone}) &bull; {request.deliveryAddress.tole}, {request.deliveryAddress.municipality}, {request.deliveryAddress.district}, {request.deliveryAddress.province}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Authoritative Quote Card */}
+          {quote ? (
+            <div
+              style={{
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-6)',
+                backgroundColor: 'var(--bg-surface)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                <Typography variant="h3" style={{ fontSize: '1.05rem', margin: 0 }}>
+                  Authoritative Quote Breakdown
+                </Typography>
+                <StatusBadge status="quote_ready" label="Verified Server Calculation" />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 'var(--space-3)', fontSize: '0.9rem' }}>
                 <div>
-                  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Pay on Delivery (50% COD):</span>
-                  <div style={{ fontSize: '1.15rem', fontWeight: 700, color: '#ea580c' }}>
-                    NPR {quote.remainingCodAmount || quote.remainingCodAmountNpr}
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Store Subtotal:</span>
+                  <div style={{ fontWeight: 600 }}>₹{Number(quote.subtotalInr || quote.sourceSubtotalInr).toLocaleString()} INR</div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Exchange Multiplier:</span>
+                  <div style={{ fontWeight: 600 }}>1 INR = {Number(quote.conversionMultiplier || quote.exchangeRate || 1.65).toFixed(2)} NPR</div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Converted Value:</span>
+                  <div style={{ fontWeight: 600 }}>NPR {Number(quote.convertedAmountNpr).toLocaleString()}</div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Fee Surcharge:</span>
+                  <div style={{ fontWeight: 600 }}>{((quote.feeRate || quote.appliedRate || 0.18) * 100).toFixed(0)}%</div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  borderTop: '1px solid var(--border-subtle)',
+                  marginTop: 'var(--space-4)',
+                  paddingTop: 'var(--space-3)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 'var(--space-3)',
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Final Landed Cost:</span>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--color-brand)' }}>
+                    NPR {Number(quote.finalAmountNpr).toLocaleString()}
                   </div>
                 </div>
-              )}
+
+                <div>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Advance Payable Now:</span>
+                  <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-success)' }}>
+                    NPR {Number(quote.amountPayableNow || quote.payNowAmountNpr).toLocaleString()}
+                  </div>
+                </div>
+
+                {Number(quote.remainingCodAmount || quote.remainingCodAmountNpr) > 0 && (
+                  <div>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>COD at Nepal Delivery:</span>
+                    <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-warning)' }}>
+                      NPR {Number(quote.remainingCodAmount || quote.remainingCodAmountNpr).toLocaleString()}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+          ) : (
+            <div
+              style={{
+                backgroundColor: 'var(--bg-surface-secondary)',
+                border: '1px dashed var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-6)',
+                textAlign: 'center',
+                color: 'var(--text-secondary)',
+                fontSize: '0.9rem',
+              }}
+            >
+              India store availability is currently being reviewed by our Kathmandu sourcing desk. An official quote will be published here once verified.
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+            {isConfirmable && (
+              <Button
+                variant="primary"
+                disabled={actionLoading}
+                onClick={handleConfirmQuote}
+                aria-busy={actionLoading}
+              >
+                {actionLoading ? 'Confirming...' : 'Confirm Quote &amp; Proceed to Checkout &rarr;'}
+              </Button>
+            )}
+
+            {request.status === 'customer_confirmed' && onProceedToCheckout && (
+              <Button
+                variant="primary"
+                onClick={() => onProceedToCheckout(requestId)}
+              >
+                Proceed to Payment &amp; Proof Submission &rarr;
+              </Button>
+            )}
+
+            {isCancellable && (
+              <Button
+                variant="outline"
+                disabled={actionLoading}
+                onClick={handleCancelRequest}
+                style={{ color: 'var(--color-error)', borderColor: 'var(--color-error-border)' }}
+              >
+                Cancel Sourcing Request
+              </Button>
+            )}
           </div>
-        </div>
-      ) : (
-        <div style={{ background: '#fefce8', border: '1px solid #fef08a', color: '#854d0e', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
-          Quote is currently being verified by sourcing staff.
-        </div>
-      )}
-
-      {/* Action buttons */}
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        {isConfirmable && (
-          <button
-            type="button"
-            disabled={actionLoading}
-            onClick={handleConfirmQuote}
-            style={{ padding: '0.75rem 1.5rem', background: '#16a34a', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
-          >
-            {actionLoading ? 'Processing...' : 'Confirm Quote &amp; Proceed to Checkout'}
-          </button>
-        )}
-
-        {request.status === 'customer_confirmed' && onProceedToCheckout && (
-          <button
-            type="button"
-            onClick={() => onProceedToCheckout(requestId)}
-            style={{ padding: '0.75rem 1.5rem', background: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-          >
-            Proceed to Payment &amp; Checkout &rarr;
-          </button>
-        )}
-
-        {isCancellable && (
-          <button
-            type="button"
-            disabled={actionLoading}
-            onClick={handleCancelRequest}
-            style={{ padding: '0.75rem 1.25rem', background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: '8px', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
-          >
-            Cancel Sourcing Request
-          </button>
-        )}
-      </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }
+
+export default SourcingRequestDetail;
