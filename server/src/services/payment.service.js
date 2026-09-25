@@ -284,13 +284,17 @@ export class PaymentService extends BaseService {
     this.validateObjectId(userId, 'User ID');
     this.validateObjectId(paymentId, 'Payment ID');
 
-    const payment = await PaymentSubmission.findById(paymentId).populate('productRequest');
+    const payment = await PaymentSubmission.findById(paymentId)
+      .populate('productRequest', 'productName productUrl marketplace quantity variant status quote')
+      .lean();
     if (!payment) {
       throw new NotFoundError('Payment submission not found');
     }
 
     assertResourceOwnership(payment, userId, 'Payment submission', 'user');
-    return payment;
+
+    const { internalNotes, __v, verifiedBy, ...customerSafePayment } = payment;
+    return customerSafePayment;
   }
 }
 
