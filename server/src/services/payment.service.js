@@ -43,6 +43,10 @@ export class PaymentService extends BaseService {
 
     assertResourceOwnership(request, userId, 'Product request', 'user');
 
+    if ([REQUEST_STATUSES.CANCELLED, REQUEST_STATUSES.FULFILLED].includes(request.status)) {
+      throw new BadRequestError(`Cannot initiate payment for a request with status: ${request.status}`);
+    }
+
     const { paymentMode, paymentMethod } = paymentData;
 
     if (!Object.values(PAYMENT_MODES).includes(paymentMode)) {
