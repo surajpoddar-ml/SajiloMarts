@@ -137,6 +137,25 @@ export const ServerQuoteDisplay = ({
           {/* Real Authoritative Quote Breakdown Interface */}
           {!isLoading && quoteData && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {/* Authoritative Calculation Notice Banner */}
+              <div style={{
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.8rem',
+                color: 'var(--text-secondary)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ color: 'var(--color-brand)' }}>🔒</span>
+                  <span><strong>Authoritative Server Pricing Engine:</strong> Fixed 1 INR = 1.65 NPR conversion rate.</span>
+                </div>
+                <StatusBadge status="quote_ready" label="Official Server Quote" />
+              </div>
+
               {/* Payment Mode Selector */}
               <div>
                 <Typography variant="label" style={{ display: 'block', marginBottom: '8px' }}>
