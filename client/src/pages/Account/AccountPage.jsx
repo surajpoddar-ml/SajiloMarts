@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CustomerPortal } from './CustomerPortal.jsx';
 import { AccountOverview } from './AccountOverview.jsx';
 import { ProfileSection } from './ProfileSection.jsx';
-import { ChangePasswordSection } from './ChangePasswordSection.jsx';
+import { SecuritySection } from './SecuritySection.jsx';
 import { authService } from '../../services/auth.service.js';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -97,9 +97,10 @@ export const AccountPage = ({
       )}
 
       {activeTab === 'security' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-          <ChangePasswordSection />
-        </div>
+        <SecuritySection
+          user={user}
+          onNavigate={onNavigate}
+        />
       )}
     </CustomerPortal>
   );
