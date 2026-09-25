@@ -9,15 +9,15 @@ export const AuthoritativeQuoteReview = ({ request }) => {
   if (!request) return null;
 
   const quote = request.quote || {};
-  const inrPrice = request.productPriceInr || quote.productPriceInr || quote.sourceSubtotalInr;
-  const quantity = request.quantity || 1;
-  const inrSubtotal = quote.subtotalInr || (inrPrice ? inrPrice * quantity : null);
+  const inrPrice = request.productPriceInr || quote.productPriceInr || quote.sourceUnitPriceInr;
+  const quantity = request.quantity || quote.quantity || 1;
+  const inrSubtotal = quote.subtotalInr || quote.sourceSubtotalInr || (inrPrice ? inrPrice * quantity : null);
   const conversionRate = quote.conversionMultiplier || quote.exchangeRate || 1.65;
-  const convertedNpr = quote.convertedAmountNpr || quote.convertedNpr || (inrSubtotal ? (inrSubtotal * conversionRate).toFixed(2) : null);
+  const convertedNpr = quote.convertedAmountNpr || (inrSubtotal ? inrSubtotal * conversionRate : null);
   const feeRate = quote.appliedRate || quote.feeRate || (request.paymentMode === 'cod_50_50' ? 0.22 : 0.18);
-  const finalNpr = quote.finalAmountNpr || quote.finalNprTotal;
-  const payNowNpr = quote.amountPayableNow || quote.payNowAmountNpr || (request.paymentMode === 'cod_50_50' && finalNpr ? (finalNpr * 0.5).toFixed(2) : finalNpr);
-  const codNpr = quote.remainingCodAmount || quote.remainingCodAmountNpr || (request.paymentMode === 'cod_50_50' && finalNpr ? (finalNpr * 0.5).toFixed(2) : 0);
+  const finalNpr = quote.finalAmountNpr;
+  const payNowNpr = quote.amountPayableNow || quote.payNowAmountNpr;
+  const codNpr = quote.remainingCodAmount || quote.remainingCodAmountNpr || 0;
 
   return (
     <Card className="checkout-quote-review" style={{ backgroundColor: 'var(--bg-surface)' }}>
