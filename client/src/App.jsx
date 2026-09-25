@@ -15,6 +15,7 @@ import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
 import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
 import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
+import { HomePage } from './pages/Home';
 import { DesignSystemShowcase } from './pages/Showcase/DesignSystemShowcase.jsx';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
@@ -379,94 +380,20 @@ function AppContent() {
           </Container>
         )}
 
-        {/* Home & System Health View */}
+        {/* Real SastoMarts Homepage */}
         {currentView === 'home' && (
-          <div>
-            <Section size="sm" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
-              <Container size="wide" style={{ textAlign: 'center', padding: 'var(--space-8) var(--space-4)' }}>
-                <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)' }}>
-                  {PUBLIC_CONFIG.BRAND_NAME} &bull; Cross-Border Logistics
-                </Typography>
-                <Typography variant="display" style={{ marginTop: 'var(--space-2)' }}>
-                  {PUBLIC_CONFIG.TAGLINE}
-                </Typography>
-                <Typography variant="body" style={{ maxWidth: '640px', margin: 'var(--space-3) auto 0' }}>
-                  Professional frontend design system and global layout foundation connecting Indian marketplaces to verified delivery across Nepal.
-                </Typography>
-                <div style={{ marginTop: 'var(--space-6)', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <Button variant="primary" onClick={() => handleNavigate('showcase')}>
-                    Explore Design System Showcase
-                  </Button>
-                  <Button variant="secondary" onClick={() => handleNavigate('sourcing-requests')}>
-                    Sourcing Portal
-                  </Button>
-                </div>
-              </Container>
-            </Section>
-
-            <Container size="wide" style={{ marginTop: 'var(--space-8)' }}>
-              <div className="layout-grid-2">
-                <Card>
-                  <CardHeader title="Frontend System State" description={`React 19 &bull; ${ENV.NODE_ENV}`} />
-                  <CardBody>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
-                      <div><strong>Session State:</strong> {isAuthenticated ? `Authenticated (${user?.name} - ${role})` : 'Guest / Unauthenticated'}</div>
-                      <div><strong>Design Tokens:</strong> Warm Neutral Theme, Restrained Himalayan Crimson</div>
-                      <div><strong>Font System:</strong> High-Legibility System Stack (No Inter/Geist)</div>
-                    </div>
-                  </CardBody>
-                </Card>
-
-                <Card>
-                  <CardHeader title="Backend API &amp; Database Health" description="Express API &bull; MongoDB Atlas" />
-                  <CardBody>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
-                      <div>
-                        <strong>Connection:</strong>{' '}
-                        {backendStatus.connected ? (
-                          <StatusBadge status="customer_confirmed" label="Online & Connected" />
-                        ) : backendStatus.loading ? (
-                          <StatusBadge status="under_review" label="Checking Health..." />
-                        ) : (
-                          <StatusBadge status="cancelled" label="Offline" />
-                        )}
-                      </div>
-                      {backendStatus.data?.uptime && (
-                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-                          Uptime: {backendStatus.data.uptime} | Env: {backendStatus.data.environment}
-                        </div>
-                      )}
-                      <div>
-                        <Button variant="outline" size="sm" onClick={checkHealth}>
-                          Recheck Backend Health
-                        </Button>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
-
-              <Section size="sm" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-12)' }}>
-                <Card>
-                  <CardHeader title="SajiloMarts Sourcing &amp; Security Principles" description="Authoritative pricing and verified cross-border fulfillment" />
-                  <CardBody>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
-                      {ARCHITECTURE_RULES.map((rule) => (
-                        <div key={rule.label} style={{ background: 'var(--bg-surface-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)' }}>
-                          <Typography variant="label" style={{ display: 'block', marginBottom: '4px' }}>
-                            {rule.label}
-                          </Typography>
-                          <Typography variant="small">
-                            {rule.description}
-                          </Typography>
-                        </div>
-                      ))}
-                    </div>
-                  </CardBody>
-                </Card>
-              </Section>
-            </Container>
-          </div>
+          <HomePage
+            onNavigate={handleNavigate}
+            user={user}
+            isAuthenticated={isAuthenticated}
+            onRequestCreated={(req) => {
+              setSelectedRequestId(req._id || req.id);
+              handleNavigate('sourcing-detail');
+            }}
+            onTrackOrder={(orderCode) => {
+              handleNavigate('track-order');
+            }}
+          />
         )}
       </main>
 
