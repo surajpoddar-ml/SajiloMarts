@@ -26,6 +26,22 @@ export const AuthoritativeQuoteReview = ({ request }) => {
         description="Calculated server-side with verified customs, courier, and import clearance fees"
       />
       <CardBody>
+        {(!inrPrice && !finalNpr) && (
+          <div
+            role="note"
+            style={{
+              padding: 'var(--space-3) var(--space-4)',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              border: '1px solid var(--color-warning, #f59e0b)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--color-warning, #d97706)',
+              fontSize: '0.875rem',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
+            ⚠️ <strong>Price Verification in Progress:</strong> The exact listing price from the Indian marketplace is currently being confirmed by our team. Authoritative calculations will update automatically.
+          </div>
+        )}
         <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
           {/* Product Overview */}
           <div style={{
