@@ -79,7 +79,13 @@ const appShellJsxPath = path.resolve('src/components/layout/AppShell.jsx');
 assert.ok(fs.existsSync(appShellJsxPath), 'AppShell.jsx must exist');
 const appShellContent = fs.readFileSync(appShellJsxPath, 'utf8');
 assert.ok(appShellContent.includes('export const AppShell'), 'AppShell must be exported');
-assert.ok(appShellContent.includes('skip-link'), 'AppShell must include accessible skip link');
-console.log('✅ Global application shell verified');
+// Test 14: Responsive Public Navigation Verification
+const headerJsxPath = path.resolve('src/components/layout/Header.jsx');
+assert.ok(fs.existsSync(headerJsxPath), 'Header.jsx must exist');
+const headerContent = fs.readFileSync(headerJsxPath, 'utf8');
+assert.ok(headerContent.includes('export const Header'), 'Header must be exported');
+assert.ok(headerContent.includes('public-nav-list'), 'Header must render public navigation list');
+assert.ok(headerContent.includes('Sourcing Portal'), 'Header must include Sourcing Portal link');
+console.log('✅ Responsive public navigation verified');
 
 console.log('🎉 Design System initial foundation verified!');

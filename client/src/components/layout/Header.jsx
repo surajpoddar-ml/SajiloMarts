@@ -1,51 +1,155 @@
-export const Header = ({ brandName, stepLabel, user, onLogin, onRegister, onLogout }) => {
+import React from 'react';
+import { Button } from '../common/Button.jsx';
+import { Container } from './Container.jsx';
+
+/**
+ * SajiloMarts Global Site Header with Responsive Public & Auth Navigation
+ */
+export const Header = ({
+  brandName = 'SajiloMarts',
+  currentView = 'home',
+  onNavigate = () => {},
+  user,
+  isAdmin = false,
+  onLogin,
+  onRegister,
+  onLogout,
+  onToggleMobileMenu,
+  isMobileMenuOpen = false,
+}) => {
   return (
-    <header className="header">
-      <div className="logo-badge">
-        <span className="logo-dot"></span>
-        <span className="logo-text">{brandName}</span>
-      </div>
-      <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {stepLabel && <span className="step-pill">{stepLabel}</span>}
-        {user ? (
-          <div className="user-nav-badge" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e293b' }}>
-              👤 {user.name} <span style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'capitalize' }}>({user.role})</span>
-            </span>
-            <button
-              type="button"
-              onClick={onLogout}
-              className="refresh-btn"
-              style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fca5a5' }}
-            >
-              Sign Out
-            </button>
-          </div>
-        ) : (
-          <div className="auth-nav-buttons" style={{ display: 'flex', gap: '0.5rem' }}>
-            {onLogin && (
+    <header className="site-header">
+      <Container size="wide">
+        <div className="nav-container">
+          {/* Logo */}
+          <button
+            type="button"
+            className="brand-logo"
+            onClick={() => onNavigate('home')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <span className="brand-logo__dot" aria-hidden="true" />
+            <span>{brandName}</span>
+          </button>
+
+          {/* Public Desktop Navigation Links */}
+          <nav aria-label="Main Navigation">
+            <ul className="public-nav-list">
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${currentView === 'home' ? 'nav-link--active' : ''}`}
+                  onClick={() => onNavigate('home')}
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? 'nav-link--active' : ''}`}
+                  onClick={() => onNavigate('sourcing-requests')}
+                >
+                  Sourcing Portal
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${currentView === 'how-it-works' ? 'nav-link--active' : ''}`}
+                  onClick={() => onNavigate('how-it-works')}
+                >
+                  How It Works
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${currentView === 'track-order' ? 'nav-link--active' : ''}`}
+                  onClick={() => onNavigate('track-order')}
+                >
+                  Track Order
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${currentView === 'support' ? 'nav-link--active' : ''}`}
+                  onClick={() => onNavigate('support')}
+                >
+                  Support
+                </button>
+              </li>
+            </ul>
+          </nav>
+
+          {/* Desktop Right Actions: Auth or Guest buttons */}
+          <div className="header-actions">
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onNavigate('account')}
+                >
+                  Account
+                </Button>
+                {isAdmin && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onNavigate('admin-console')}
+                    style={{ color: 'var(--color-error)', borderColor: 'var(--color-error-border)' }}
+                  >
+                    Admin
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onLogout}
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onLogin || (() => onNavigate('login'))}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={onRegister || (() => onNavigate('register'))}
+                >
+                  Get Started
+                </Button>
+              </div>
+            )}
+
+            {/* Mobile Menu Toggle Button */}
+            {onToggleMobileMenu && (
               <button
                 type="button"
-                onClick={onLogin}
-                className="refresh-btn"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
+                className="mobile-nav-toggle"
+                onClick={onToggleMobileMenu}
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isMobileMenuOpen}
               >
-                Sign In
-              </button>
-            )}
-            {onRegister && (
-              <button
-                type="button"
-                onClick={onRegister}
-                className="refresh-btn"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', background: '#2563eb', color: '#ffffff', borderColor: '#2563eb' }}
-              >
-                Register
+                <span className="mobile-nav-toggle__bar" />
+                <span className="mobile-nav-toggle__bar" />
+                <span className="mobile-nav-toggle__bar" />
               </button>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      </Container>
     </header>
   );
 };
+
+export default Header;
