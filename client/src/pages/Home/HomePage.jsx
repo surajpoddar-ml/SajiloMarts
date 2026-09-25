@@ -6,6 +6,7 @@ import { HeroSection } from './HeroSection.jsx';
 import { ProductUrlForm } from './ProductUrlForm.jsx';
 import { AuthContinuationPrompt } from './AuthContinuationPrompt.jsx';
 import { SourcingPortalSection } from './SourcingPortalSection.jsx';
+import { SourcingRequestInteractiveForm } from './SourcingRequestInteractiveForm.jsx';
 
 export function HomePage({
   onNavigate,
@@ -17,6 +18,8 @@ export function HomePage({
   const [productUrl, setProductUrl] = React.useState('');
   const [isUrlValidating, setIsUrlValidating] = React.useState(false);
   const [urlError, setUrlError] = React.useState(null);
+  const [activeStep, setActiveStep] = React.useState('form'); // 'form' | 'review' | 'quote'
+  const [requestDraft, setRequestDraft] = React.useState(null);
 
   const handleUrlSubmit = (url) => {
     setProductUrl(url);
@@ -24,6 +27,11 @@ export function HomePage({
     if (portalEl) {
       portalEl.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleReviewStep = (draft) => {
+    setRequestDraft(draft);
+    setActiveStep('review');
   };
 
   return (
@@ -46,7 +54,12 @@ export function HomePage({
         onNavigate={onNavigate}
         onRequestCreated={onRequestCreated}
       >
-        {/* Step-by-step request flow */}
+        {activeStep === 'form' && (
+          <SourcingRequestInteractiveForm
+            initialProductUrl={productUrl}
+            onSubmitReview={handleReviewStep}
+          />
+        )}
       </SourcingPortalSection>
 
       {/* 3. How SastoMarts Works Section Anchor */}
