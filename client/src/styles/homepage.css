@@ -34,11 +34,46 @@
   margin: 0 auto;
 }
 
-/* Responsive Grid Adapters */
+/* Responsive Grid Adapters & Mobile Form Behaviors */
 @media (max-width: 768px) {
   .quantity-input-stepper {
     width: 100%;
-    max-width: 200px;
+    max-width: 240px;
+    height: 46px;
+  }
+
+  .quantity-input-stepper button {
+    width: 48px;
+    min-height: 44px;
+  }
+
+  .quantity-input-stepper input {
+    font-size: 1.05rem;
+  }
+
+  .sourcing-portal-container .sastomarts-card {
+    padding: var(--space-4);
+  }
+
+  .product-url-form-container input {
+    font-size: 16px; /* Prevents iOS auto-zoom */
+  }
+}
+
+/* Mobile Touch Target Standards */
+@media (max-width: 480px) {
+  .hero-section {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-10);
+  }
+
+  .sastomarts-btn {
+    min-height: 44px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 }
 

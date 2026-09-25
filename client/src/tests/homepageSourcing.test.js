@@ -148,4 +148,9 @@ assert.ok(cssContent.includes('.hero-section'), 'Must style hero section');
 assert.ok(cssContent.includes('.product-url-form-container'), 'Must style product url form container');
 console.log('✅ Responsive Homepage compositions verified');
 
+// Test 17: Mobile Sourcing Form behavior verification
+assert.ok(cssContent.includes('min-height: 44px'), 'Must enforce minimum 44px mobile touch targets');
+assert.ok(cssContent.includes('font-size: 16px'), 'Must enforce 16px mobile input to prevent iOS auto-zoom');
+console.log('✅ Mobile sourcing form behavior verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
