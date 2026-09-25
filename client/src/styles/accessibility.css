@@ -43,3 +43,13 @@
     animation: none !important;
   }
 }
+
+/* Homepage Input & Stepper Accessible Focus States */
+.product-url-form-container input:focus,
+.quantity-input-stepper input:focus,
+.quantity-input-stepper button:focus-visible,
+.sastomarts-btn:focus-visible {
+  outline: 2px solid var(--border-focus, #0F2852);
+  outline-offset: 1px;
+}
+

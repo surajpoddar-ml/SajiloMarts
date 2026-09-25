@@ -153,4 +153,12 @@ assert.ok(cssContent.includes('min-height: 44px'), 'Must enforce minimum 44px mo
 assert.ok(cssContent.includes('font-size: 16px'), 'Must enforce 16px mobile input to prevent iOS auto-zoom');
 console.log('✅ Mobile sourcing form behavior verified');
 
+// Test 18: Accessibility and reduced motion verification
+const a11yCssPath = path.resolve('src/styles/accessibility.css');
+assert.ok(fs.existsSync(a11yCssPath), 'accessibility.css must exist');
+const a11yContent = fs.readFileSync(a11yCssPath, 'utf8');
+assert.ok(a11yContent.includes('prefers-reduced-motion'), 'Must support prefers-reduced-motion');
+assert.ok(a11yContent.includes(':focus-visible'), 'Must support focus-visible indicators');
+console.log('✅ Homepage accessibility and reduced motion verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
