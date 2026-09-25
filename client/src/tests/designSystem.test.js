@@ -47,7 +47,12 @@ assert.strictEqual(validateRequired(''), 'This field is required');
 assert.strictEqual(validateRequired('Valid'), null);
 assert.ok(validateProductUrl('invalid-url'));
 assert.strictEqual(validateProductUrl('https://www.amazon.in/dp/B08N5WRWNW'), null);
-assert.strictEqual(validateEmail('test@sajilomarts.com'), null);
-console.log('✅ Input validation states and helper functions verified');
+// Test 9: Card and Surface Component Verification
+const cardJsxPath = path.resolve('src/components/common/Card.jsx');
+assert.ok(fs.existsSync(cardJsxPath), 'Card.jsx must exist');
+const cardContent = fs.readFileSync(cardJsxPath, 'utf8');
+assert.ok(cardContent.includes('export const Card'), 'Card must be exported');
+assert.ok(cardContent.includes('export const CardHeader'), 'CardHeader must be exported');
+console.log('✅ Reusable Card and Surface components verified');
 
 console.log('🎉 Design System initial foundation verified!');

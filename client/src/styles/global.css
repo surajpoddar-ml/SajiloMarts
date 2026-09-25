@@ -3,6 +3,7 @@
 @import './layout.css';
 @import './button.css';
 @import './forms.css';
+@import './card.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
