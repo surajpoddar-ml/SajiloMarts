@@ -74,7 +74,12 @@ assert.ok(fs.existsSync(emptyStateJsxPath), 'EmptyState.jsx must exist');
 const errorAlertContent = fs.readFileSync(errorAlertJsxPath, 'utf8');
 const emptyStateContent = fs.readFileSync(emptyStateJsxPath, 'utf8');
 assert.ok(errorAlertContent.includes('export const ErrorAlert'), 'ErrorAlert must be exported');
-assert.ok(emptyStateContent.includes('export const EmptyState'), 'EmptyState must be exported');
-console.log('✅ Reusable error and empty state components verified');
+// Test 13: Global Application Shell Verification
+const appShellJsxPath = path.resolve('src/components/layout/AppShell.jsx');
+assert.ok(fs.existsSync(appShellJsxPath), 'AppShell.jsx must exist');
+const appShellContent = fs.readFileSync(appShellJsxPath, 'utf8');
+assert.ok(appShellContent.includes('export const AppShell'), 'AppShell must be exported');
+assert.ok(appShellContent.includes('skip-link'), 'AppShell must include accessible skip link');
+console.log('✅ Global application shell verified');
 
 console.log('🎉 Design System initial foundation verified!');

@@ -1,0 +1,34 @@
+/**
+ * SajiloMarts Global Application Shell Layout Styling
+ */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+}
+
+.app-shell__skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-brand);
+  color: #ffffff;
+  padding: 8px 16px;
+  z-index: 100;
+  transition: top 0.2s;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+.app-shell__skip-link:focus {
+  top: 0;
+}
+
+.app-shell__main {
+  flex: 1 0 auto;
+  width: 100%;
+}
