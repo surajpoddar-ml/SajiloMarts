@@ -21,6 +21,11 @@ assert.strictEqual(DESIGN_TOKENS.colors.text.primary, '#1C1917');
 assert.strictEqual(DESIGN_TOKENS.colors.brand.primary, '#B83A20');
 assert.ok(DESIGN_TOKENS.colors.background.surface);
 assert.ok(DESIGN_TOKENS.colors.border.subtle);
-console.log('✅ Warm neutral color system tokens verified');
+// Test 4: Typography Hierarchy Verification
+assert.ok(DESIGN_TOKENS.typography.fontFamily.sans);
+assert.ok(!DESIGN_TOKENS.typography.fontFamily.sans.includes('Inter'), 'Must not use Inter font');
+assert.ok(!DESIGN_TOKENS.typography.fontFamily.sans.includes('Geist'), 'Must not use Geist font');
+assert.ok(!DESIGN_TOKENS.typography.fontFamily.sans.includes('Space Grotesk'), 'Must not use Space Grotesk font');
+console.log('✅ Typography hierarchy and non-prohibited font rules verified');
 
 console.log('🎉 Design System initial foundation verified!');
