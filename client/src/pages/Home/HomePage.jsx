@@ -4,6 +4,7 @@ import { Typography, Card, CardBody } from '../../components/common';
 import { PUBLIC_CONFIG } from '../../config/public.js';
 import { HeroSection } from './HeroSection.jsx';
 import { ProductUrlForm } from './ProductUrlForm.jsx';
+import { AuthContinuationPrompt } from './AuthContinuationPrompt.jsx';
 
 export function HomePage({
   onNavigate,
