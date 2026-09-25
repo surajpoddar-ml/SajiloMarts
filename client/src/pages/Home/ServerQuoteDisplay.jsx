@@ -8,7 +8,7 @@ import { productRequestService } from '../../services/productRequest.service.js'
 
 /**
  * ServerQuoteDisplay
- * Authoritative quote presentation fetching calculation directly from SastoMarts backend engine.
+ * Authoritative quote presentation fetching calculation directly from SajiloMarts backend engine.
  * Strictly avoids client-side price computation.
  */
 export const ServerQuoteDisplay = ({
@@ -74,7 +74,7 @@ export const ServerQuoteDisplay = ({
     <Card style={{ backgroundColor: 'var(--bg-surface)' }}>
       <CardHeader
         title="Step 3: Server-Authoritative Quote"
-        description="Official cross-border pricing calculated by SastoMarts backend engine"
+        description="Official cross-border pricing calculated by SajiloMarts backend engine"
       />
       <CardBody>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -124,7 +124,7 @@ export const ServerQuoteDisplay = ({
                 Quote Confirmed Successfully!
               </Typography>
               <Typography variant="body" style={{ color: '#15803D', fontSize: '0.9rem' }}>
-                Your sourcing request has been confirmed. SastoMarts logistics desk will initiate procurement and notify you with tracking updates.
+                Your sourcing request has been confirmed. SajiloMarts logistics desk will initiate procurement and notify you with tracking updates.
               </Typography>
               {requestId && (
                 <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#166534', fontFamily: 'monospace' }}>
@@ -159,7 +159,7 @@ export const ServerQuoteDisplay = ({
               {/* Payment Mode Selector */}
               <div>
                 <Typography variant="label" style={{ display: 'block', marginBottom: '8px' }}>
-                  Select SastoMarts Payment Arrangement
+                  Select SajiloMarts Payment Arrangement
                 </Typography>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <button

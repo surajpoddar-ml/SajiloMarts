@@ -81,7 +81,7 @@ export const ChangePasswordSection = () => {
     <div style={{ marginTop: '2rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem' }}>
       <h3 style={{ margin: '0 0 0.5rem', color: '#0f172a', fontSize: '1.2rem' }}>Account Security</h3>
       <p style={{ margin: '0 0 1.25rem', color: '#64748b', fontSize: '0.9rem' }}>
-        Change your login password to keep your SastoMarts account secure.
+        Change your login password to keep your SajiloMarts account secure.
       </p>
 
       {apiError && <div className="auth-alert-error" style={{ marginBottom: '1rem' }}>{apiError}</div>}

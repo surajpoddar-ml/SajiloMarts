@@ -11,7 +11,7 @@ export const PrivacyPage = ({ onNavigate = () => {} }) => {
       <Card>
         <CardHeader
           title="Privacy Policy"
-          description="Information collection and data handling for SastoMarts sourcing services"
+          description="Information collection and data handling for SajiloMarts sourcing services"
         />
         <CardBody>
           <div style={{

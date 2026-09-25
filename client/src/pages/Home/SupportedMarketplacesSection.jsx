@@ -55,8 +55,8 @@ const SUPPORTED_MARKETPLACES = [
 
 /**
  * SupportedMarketplacesSection
- * Factually presents the Indian e-commerce stores supported by SastoMarts sourcing API.
- * Note: SastoMarts is an independent cross-border courier and sourcing platform; no fake partnerships are claimed.
+ * Factually presents the Indian e-commerce stores supported by SajiloMarts sourcing API.
+ * Note: SajiloMarts is an independent cross-border courier and sourcing platform; no fake partnerships are claimed.
  */
 export const SupportedMarketplacesSection = ({ onSelectMarketplace }) => {
   return (

@@ -35,7 +35,7 @@ export const RequestReviewCard = ({
     <Card style={{ backgroundColor: 'var(--bg-surface)' }}>
       <CardHeader
         title="Step 2: Review Sourcing Request"
-        description="Verify your Indian product details before submitting to SastoMarts"
+        description="Verify your Indian product details before submitting to SajiloMarts"
       />
       <CardBody>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
