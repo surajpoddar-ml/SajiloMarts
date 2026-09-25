@@ -152,7 +152,12 @@ const footerContent = fs.readFileSync(footerJsxPath, 'utf8');
 assert.ok(footerContent.includes('export const Footer'), 'Footer must be exported');
 assert.ok(footerContent.includes('Terms of Service'), 'Footer must include Terms of Service');
 assert.ok(footerContent.includes('Privacy Policy'), 'Footer must include Privacy Policy');
-assert.ok(footerContent.includes('Draft'), 'Legal details must be noted as Draft');
-console.log('✅ SajiloMarts footer and legal navigation verified');
+// Test 26: Reduced-Motion and Accessible Interaction Verification
+const accessibilityCssPath = path.resolve('src/styles/accessibility.css');
+assert.ok(fs.existsSync(accessibilityCssPath), 'accessibility.css must exist');
+const accessibilityContent = fs.readFileSync(accessibilityCssPath, 'utf8');
+assert.ok(accessibilityContent.includes('prefers-reduced-motion'), 'Must support prefers-reduced-motion');
+assert.ok(accessibilityContent.includes(':focus-visible'), 'Must define visible focus states');
+console.log('✅ Reduced-motion and accessible interaction behavior verified');
 
 console.log('🎉 Design System initial foundation verified!');

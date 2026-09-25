@@ -13,6 +13,7 @@
 @import './page.css';
 @import './table.css';
 @import './footer.css';
+@import './accessibility.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
