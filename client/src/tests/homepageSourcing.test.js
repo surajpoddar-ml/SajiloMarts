@@ -161,4 +161,12 @@ assert.ok(a11yContent.includes('prefers-reduced-motion'), 'Must support prefers-
 assert.ok(a11yContent.includes(':focus-visible'), 'Must support focus-visible indicators');
 console.log('✅ Homepage accessibility and reduced motion verified');
 
+// Test 19: Strict No-Dummy-Data Audit verification
+const bannedPatterns = ['SM12345', 'iPhone 15 Pro', 'NPR 120,000', 'Delivered yesterday', '★★★★★', '5,000+ Happy Customers'];
+const homePageFileContent = fs.readFileSync(path.resolve('src/pages/Home/HomePage.jsx'), 'utf8');
+for (const pattern of bannedPatterns) {
+  assert.ok(!homePageFileContent.includes(pattern), `HomePage must not contain fabricated dummy pattern: ${pattern}`);
+}
+console.log('✅ Strict No-Dummy-Data Audit verified (0 fake records)');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
