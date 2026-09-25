@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "test": "node src/tests/authFrontend.test.js && node src/tests/sourcingFrontend.test.js && node src/tests/designSystem.test.js",
+    "test": "node src/tests/authFrontend.test.js && node src/tests/sourcingFrontend.test.js && node src/tests/designSystem.test.js && node src/tests/homepageSourcing.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
