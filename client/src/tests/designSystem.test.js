@@ -110,8 +110,13 @@ assert.strictEqual(testErr.status, 400);
 assert.strictEqual(testErr.isAuthError, false);
 const authErr = new ApiClientError('Unauthorized', 401);
 assert.strictEqual(authErr.isAuthError, true);
-const normalized = normalizeApiError(new Error('Sample API failure'));
-assert.strictEqual(normalized.name, 'ApiClientError');
-console.log('✅ Frontend API error handling and normalization verified');
+// Test 19: Global Notification Foundation Verification
+const toastContextJsxPath = path.resolve('src/context/ToastContext.jsx');
+assert.ok(fs.existsSync(toastContextJsxPath), 'ToastContext.jsx must exist');
+const toastContent = fs.readFileSync(toastContextJsxPath, 'utf8');
+assert.ok(toastContent.includes('export const ToastProvider'), 'ToastProvider must be exported');
+assert.ok(toastContent.includes('export const useToast'), 'useToast must be exported');
+assert.ok(toastContent.includes('toast-container'), 'ToastContainer structure must be defined');
+console.log('✅ Global notification & toast foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');

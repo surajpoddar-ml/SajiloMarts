@@ -9,6 +9,7 @@
 @import './feedback.css';
 @import './appShell.css';
 @import './navigation.css';
+@import './toast.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
