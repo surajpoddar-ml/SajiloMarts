@@ -8,6 +8,7 @@ import { AuthContinuationPrompt } from './AuthContinuationPrompt.jsx';
 import { SourcingPortalSection } from './SourcingPortalSection.jsx';
 import { SourcingRequestInteractiveForm } from './SourcingRequestInteractiveForm.jsx';
 import { RequestReviewCard } from './RequestReviewCard.jsx';
+import { ServerQuoteDisplay } from './ServerQuoteDisplay.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
@@ -110,6 +111,24 @@ export function HomePage({
             isAuthenticated={isAuthenticated}
             onLogin={() => onNavigate('login')}
             onRegister={() => onNavigate('register')}
+          />
+        )}
+
+        {activeStep === 'quote' && createdRequest && (
+          <ServerQuoteDisplay
+            requestId={createdRequest._id || createdRequest.id}
+            initialQuote={createdRequest.quote}
+            onRequestConfirmed={(confirmedData) => {
+              if (onRequestCreated) {
+                onRequestCreated(confirmedData);
+              }
+            }}
+            onReset={() => {
+              setActiveStep('form');
+              setRequestDraft(null);
+              setCreatedRequest(null);
+              setProductUrl('');
+            }}
           />
         )}
       </SourcingPortalSection>

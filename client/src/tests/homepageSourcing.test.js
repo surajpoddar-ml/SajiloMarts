@@ -46,4 +46,13 @@ assert.ok(reviewContent.includes('export const RequestReviewCard'), 'RequestRevi
 assert.ok(reviewContent.includes('Step 2: Review Sourcing Request'), 'Review card must render step 2 title');
 console.log('✅ Request Review experience verification passed');
 
+// Test 6: Server quote presentation and breakdown verification
+const quoteDisplayPath = path.resolve('src/pages/Home/ServerQuoteDisplay.jsx');
+assert.ok(fs.existsSync(quoteDisplayPath), 'ServerQuoteDisplay.jsx must exist');
+const quoteContent = fs.readFileSync(quoteDisplayPath, 'utf8');
+assert.ok(quoteContent.includes('export const ServerQuoteDisplay'), 'ServerQuoteDisplay must be exported');
+assert.ok(quoteContent.includes('Authoritative Price Snapshot'), 'Must render authoritative quote breakdown');
+assert.ok(quoteContent.includes('Quote not available yet'), 'Must support quote not available state');
+console.log('✅ Server quote flow, presentation, breakdown and states verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
