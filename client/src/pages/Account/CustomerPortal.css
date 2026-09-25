@@ -1,0 +1,103 @@
+.customer-portal {
+  padding: var(--space-6) 0 var(--space-12);
+  min-height: 70vh;
+}
+
+.customer-portal__layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.customer-portal__sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+.customer-portal__menu-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.customer-portal__menu-heading {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-2);
+}
+
+.customer-portal__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.customer-portal__nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.customer-portal__nav-btn:hover {
+  background: var(--bg-surface-secondary);
+  color: var(--text-primary);
+}
+
+.customer-portal__nav-btn--active {
+  background: var(--bg-surface-secondary);
+  color: var(--color-brand);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--color-brand);
+}
+
+.customer-portal__nav-icon {
+  font-size: 1.1rem;
+}
+
+.customer-portal__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .customer-portal__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .customer-portal__sidebar {
+    position: static;
+  }
+
+  .customer-portal__nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .customer-portal__nav-btn {
+    white-space: nowrap;
+    width: auto;
+    padding: 8px 12px;
+  }
+}

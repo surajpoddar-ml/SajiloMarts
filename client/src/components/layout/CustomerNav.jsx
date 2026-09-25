@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SastoMarts Authenticated Customer Navigation Bar
+ * SajiloMarts Authenticated Customer Navigation Bar
  */
 export const CustomerNav = ({
   currentView = 'account',
@@ -9,18 +9,21 @@ export const CustomerNav = ({
   className = '',
 }) => {
   const links = [
-    { id: 'sourcing-requests', label: 'My Orders' },
-    { id: 'sourcing-new', label: 'New Request' },
+    { id: 'account', label: 'Overview' },
+    { id: 'sourcing-requests', label: 'Sourcing Requests' },
     { id: 'current-orders', label: 'Current Orders' },
     { id: 'order-history', label: 'Order History' },
-    { id: 'account', label: 'Account Profile' },
+    { id: 'addresses', label: 'Addresses' },
+    { id: 'account-security', label: 'Account Security' },
   ];
 
   return (
     <nav className={`customer-nav ${className}`.trim()} aria-label="Customer Portal Navigation">
       <ul className="customer-nav__list">
         {links.map((link) => {
-          const isActive = currentView === link.id;
+          const isActive = currentView === link.id ||
+            (link.id === 'sourcing-requests' && ['sourcing-new', 'sourcing-detail'].includes(currentView)) ||
+            (link.id === 'account' && currentView === 'account-profile');
           return (
             <li key={link.id}>
               <button
