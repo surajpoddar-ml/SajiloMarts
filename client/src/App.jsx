@@ -290,13 +290,19 @@ function AppContent() {
         )}
 
         {/* Customer Account Portal */}
-        {['account', 'account-security', 'account-profile'].includes(currentView) && (
+        {['account', 'account-security', 'account-profile', 'current-orders', 'order-history', 'addresses'].includes(currentView) && (
           <ProtectedRoute
             onRedirectToLogin={() => handleNavigate('login')}
             onRedirectToHome={() => handleNavigate('home')}
           >
             <AccountPage
-              initialTab={currentView === 'account-security' ? 'security' : currentView === 'account-profile' ? 'profile' : 'overview'}
+              initialTab={
+                currentView === 'account-security' ? 'security' :
+                currentView === 'account-profile' ? 'profile' :
+                currentView === 'current-orders' ? 'orders' :
+                currentView === 'order-history' ? 'history' :
+                currentView === 'addresses' ? 'addresses' : 'overview'
+              }
               onNavigate={handleNavigate}
               onLogout={async () => {
                 await logout();
@@ -341,8 +347,8 @@ function AppContent() {
         {currentView === 'terms' && <TermsPage onNavigate={handleNavigate} />}
         {currentView === 'privacy' && <PrivacyPage onNavigate={handleNavigate} />}
 
-        {/* Placeholder Nav views for remaining future routes */}
-        {['current-orders', 'order-history', 'admin-requests', 'admin-users', 'admin-audit'].includes(currentView) && (
+        {/* Admin nav placeholder views */}
+        {['admin-requests', 'admin-users', 'admin-audit'].includes(currentView) && (
           <Container size="narrow" style={{ marginTop: 'var(--space-8)' }}>
             <Card style={{ textAlign: 'center', padding: 'var(--space-10) var(--space-6)' }}>
               <Typography variant="h2" style={{ textTransform: 'capitalize', marginBottom: 'var(--space-2)' }}>

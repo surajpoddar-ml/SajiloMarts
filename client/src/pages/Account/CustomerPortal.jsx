@@ -9,6 +9,7 @@ import './CustomerPortal.css';
 export const CustomerPortal = ({
   activeTab = 'overview',
   onTabChange = () => {},
+  onLogout,
   children,
 }) => {
   const tabs = [

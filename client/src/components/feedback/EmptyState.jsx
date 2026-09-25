@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '../common/Button.jsx';
 
 /**
- * SastoMarts Accessible Empty State Component
+ * SajiloMarts Accessible Empty State Component
  */
 export const EmptyState = ({
   title = 'No items found',
