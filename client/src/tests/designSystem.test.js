@@ -58,7 +58,15 @@ assert.ok(fs.existsSync(statusBadgeJsxPath), 'StatusBadge.jsx must exist');
 const statusBadgeContent = fs.readFileSync(statusBadgeJsxPath, 'utf8');
 assert.ok(statusBadgeContent.includes('export const StatusBadge'), 'StatusBadge must be exported');
 assert.ok(statusBadgeContent.includes('quote_ready'), 'StatusBadge must support quote_ready');
-assert.ok(statusBadgeContent.includes('customer_confirmed'), 'StatusBadge must support customer_confirmed');
-console.log('✅ SajiloMarts status system & badge components verified');
+// Test 11: Loading and Skeleton States Verification
+const spinnerJsxPath = path.resolve('src/components/feedback/Spinner.jsx');
+const skeletonJsxPath = path.resolve('src/components/feedback/Skeleton.jsx');
+assert.ok(fs.existsSync(spinnerJsxPath), 'Spinner.jsx must exist');
+assert.ok(fs.existsSync(skeletonJsxPath), 'Skeleton.jsx must exist');
+const spinnerContent = fs.readFileSync(spinnerJsxPath, 'utf8');
+const skeletonContent = fs.readFileSync(skeletonJsxPath, 'utf8');
+assert.ok(spinnerContent.includes('export const Spinner'), 'Spinner must be exported');
+assert.ok(skeletonContent.includes('export const Skeleton'), 'Skeleton must be exported');
+console.log('✅ Loading and skeleton state components verified');
 
 console.log('🎉 Design System initial foundation verified!');

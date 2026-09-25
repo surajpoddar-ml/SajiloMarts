@@ -5,6 +5,7 @@
 @import './forms.css';
 @import './card.css';
 @import './status.css';
+@import './loading.css';
 
 *, *::before, *::after {
   box-sizing: border-box;
