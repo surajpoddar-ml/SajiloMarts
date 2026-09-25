@@ -55,11 +55,17 @@
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .customer-portal__nav-btn:hover {
   background: var(--bg-surface-secondary);
   color: var(--text-primary);
+}
+
+.customer-portal__nav-btn:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
 }
 
 .customer-portal__nav-btn--active {
@@ -71,33 +77,71 @@
 
 .customer-portal__nav-icon {
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .customer-portal__content {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  min-width: 0; /* Prevents flex children from causing horizontal scroll */
 }
 
 @media (max-width: 900px) {
+  .customer-portal {
+    padding: var(--space-4) 0 var(--space-8);
+  }
+
   .customer-portal__layout {
     grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 
   .customer-portal__sidebar {
     position: static;
   }
 
+  .customer-portal__menu-card {
+    padding: var(--space-3);
+  }
+
+  .customer-portal__menu-heading {
+    display: none;
+  }
+
   .customer-portal__nav {
     flex-direction: row;
     overflow-x: auto;
-    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    gap: 6px;
     scrollbar-width: thin;
   }
 
   .customer-portal__nav-btn {
     white-space: nowrap;
     width: auto;
-    padding: 8px 12px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    border-radius: var(--radius-full, 9999px);
+    background: var(--bg-surface-secondary);
+  }
+
+  .customer-portal__nav-btn--active {
+    background: var(--color-brand);
+    color: #ffffff;
+    box-shadow: none;
+  }
+
+  .customer-portal__nav-btn--active .customer-portal__nav-icon {
+    filter: brightness(0) invert(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .customer-portal__nav-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    gap: 6px;
   }
 }
