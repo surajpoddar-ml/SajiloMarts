@@ -26,6 +26,9 @@ export class AddressService extends BaseService {
    * @returns {Promise<import('mongoose').Document>}
    */
   async verifyOwnership(userId, addressId) {
+    if (!userId) {
+      throw new BadRequestError('Authenticated User ID is required');
+    }
     this.validateObjectId(userId, 'User ID');
     this.validateObjectId(addressId, 'Address ID');
 
