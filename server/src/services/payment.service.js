@@ -208,6 +208,58 @@ export class PaymentService extends BaseService {
 
     return savedPayment;
   }
+
+  /**
+   * Retrieves payment proof securely for the customer who owns it or an administrator.
+   * Prevents public static unauthorized access to financial receipts.
+   * @param {string} requesterUserId - User ID of the requester
+   * @param {string} paymentId - PaymentSubmission ID
+   * @param {boolean} isAdmin - Whether requester holds admin privilege
+   */
+  async getPaymentProofAccess(requesterUserId, paymentId, isAdmin = false) {
+    this.validateObjectId(requesterUserId, 'User ID');
+    this.validateObjectId(paymentId, 'Payment ID');
+
+    const payment = await PaymentSubmission.findById(paymentId);
+    if (!payment) {
+      throw new NotFoundError('Payment submission not found');
+    }
+
+    if (!isAdmin) {
+      assertResourceOwnership(payment, requesterUserId, 'Payment submission', 'user');
+    }
+
+    if (!payment.paymentProof) {
+      throw new NotFoundError('No payment proof file attached to this submission');
+    }
+
+    return {
+      paymentId: payment._id,
+      paymentProof: payment.paymentProof,
+      paymentStatus: payment.paymentStatus,
+      transactionCode: payment.transactionCode,
+      submittedAt: payment.submittedAt,
+    };
+  }
+
+  /**
+   * Retrieves payment details for the customer or admin with ownership verification.
+   * @param {string} userId - Requesting user ID
+   * @param {string} paymentId - PaymentSubmission ID
+   * @returns {Promise<import('mongoose').Document>}
+   */
+  async getPaymentDetailsForCustomer(userId, paymentId) {
+    this.validateObjectId(userId, 'User ID');
+    this.validateObjectId(paymentId, 'Payment ID');
+
+    const payment = await PaymentSubmission.findById(paymentId).populate('productRequest');
+    if (!payment) {
+      throw new NotFoundError('Payment submission not found');
+    }
+
+    assertResourceOwnership(payment, userId, 'Payment submission', 'user');
+    return payment;
+  }
 }
 
 export const paymentService = new PaymentService();
