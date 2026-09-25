@@ -6,6 +6,7 @@
 @import './card.css';
 @import './status.css';
 @import './loading.css';
+@import './feedback.css';
 
 *, *::before, *::after {
   box-sizing: border-box;

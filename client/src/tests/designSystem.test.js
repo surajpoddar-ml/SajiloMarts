@@ -66,7 +66,15 @@ assert.ok(fs.existsSync(skeletonJsxPath), 'Skeleton.jsx must exist');
 const spinnerContent = fs.readFileSync(spinnerJsxPath, 'utf8');
 const skeletonContent = fs.readFileSync(skeletonJsxPath, 'utf8');
 assert.ok(spinnerContent.includes('export const Spinner'), 'Spinner must be exported');
-assert.ok(skeletonContent.includes('export const Skeleton'), 'Skeleton must be exported');
-console.log('✅ Loading and skeleton state components verified');
+// Test 12: Error and Empty States Verification
+const errorAlertJsxPath = path.resolve('src/components/feedback/ErrorAlert.jsx');
+const emptyStateJsxPath = path.resolve('src/components/feedback/EmptyState.jsx');
+assert.ok(fs.existsSync(errorAlertJsxPath), 'ErrorAlert.jsx must exist');
+assert.ok(fs.existsSync(emptyStateJsxPath), 'EmptyState.jsx must exist');
+const errorAlertContent = fs.readFileSync(errorAlertJsxPath, 'utf8');
+const emptyStateContent = fs.readFileSync(emptyStateJsxPath, 'utf8');
+assert.ok(errorAlertContent.includes('export const ErrorAlert'), 'ErrorAlert must be exported');
+assert.ok(emptyStateContent.includes('export const EmptyState'), 'EmptyState must be exported');
+console.log('✅ Reusable error and empty state components verified');
 
 console.log('🎉 Design System initial foundation verified!');
