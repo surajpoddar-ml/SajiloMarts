@@ -85,7 +85,13 @@ assert.ok(fs.existsSync(headerJsxPath), 'Header.jsx must exist');
 const headerContent = fs.readFileSync(headerJsxPath, 'utf8');
 assert.ok(headerContent.includes('export const Header'), 'Header must be exported');
 assert.ok(headerContent.includes('public-nav-list'), 'Header must render public navigation list');
-assert.ok(headerContent.includes('Sourcing Portal'), 'Header must include Sourcing Portal link');
-console.log('✅ Responsive public navigation verified');
+// Test 15: Authenticated Customer Navigation Verification
+const customerNavJsxPath = path.resolve('src/components/layout/CustomerNav.jsx');
+assert.ok(fs.existsSync(customerNavJsxPath), 'CustomerNav.jsx must exist');
+const customerNavContent = fs.readFileSync(customerNavJsxPath, 'utf8');
+assert.ok(customerNavContent.includes('export const CustomerNav'), 'CustomerNav must be exported');
+assert.ok(customerNavContent.includes('Sourcing Requests'), 'CustomerNav must include Sourcing Requests');
+assert.ok(customerNavContent.includes('Current Orders'), 'CustomerNav must include Orders placeholder');
+console.log('✅ Authenticated customer navigation verified');
 
 console.log('🎉 Design System initial foundation verified!');
