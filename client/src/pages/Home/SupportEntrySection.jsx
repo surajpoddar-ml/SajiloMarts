@@ -1,12 +1,12 @@
 import React from 'react';
 import { Container, Section } from '../../components/layout';
-import { Card, CardHeader, CardBody, Button, Typography } from '../../components/common';
+import { Card, Button, Typography } from '../../components/common';
 import { PUBLIC_CONFIG } from '../../config/public.js';
 
 /**
  * SupportEntrySection
- * Provides genuine customer support entry channels (Email desk, FAQ guidance, and Request Inquiries)
- * without fake chat bots, fake agents, or unverified response claims.
+ * Provides genuine customer support entry channels (Direct Email Helpdesk & DM on Instagram)
+ * without fake chat bots or unverified claims.
  */
 export const SupportEntrySection = ({ onNavigate = () => {} }) => {
   return (
@@ -34,6 +34,7 @@ export const SupportEntrySection = ({ onNavigate = () => {} }) => {
           maxWidth: '680px',
           margin: '0 auto',
         }}>
+          {/* Email Helpdesk */}
           <Card style={{
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
@@ -63,6 +64,7 @@ export const SupportEntrySection = ({ onNavigate = () => {} }) => {
             </a>
           </Card>
 
+          {/* DM on Instagram */}
           <Card style={{
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
@@ -70,21 +72,36 @@ export const SupportEntrySection = ({ onNavigate = () => {} }) => {
             textAlign: 'center',
           }}>
             <div style={{ fontSize: '1.8rem', marginBottom: '8px' }} aria-hidden="true">
-              📋
+              📸
             </div>
             <Typography variant="h3" style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '6px' }}>
-              Order &amp; Quote Inquiries
+              DM on Instagram
             </Typography>
             <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Track an existing consignment or submit a new inquiry regarding an Indian product request.
+              Send us a direct message on Instagram for fast sourcing quotes, product links, and support updates.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onNavigate('support')}
+            <a
+              href={PUBLIC_CONFIG.INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                color: '#FFFFFF',
+                background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                borderRadius: 'var(--radius-md)',
+                textDecoration: 'none',
+                transition: 'opacity 0.2s ease',
+              }}
             >
-              Open Support Portal
-            </Button>
+              <span>DM @sajilomarts</span>
+              <span aria-hidden="true">&rarr;</span>
+            </a>
           </Card>
         </div>
       </Container>

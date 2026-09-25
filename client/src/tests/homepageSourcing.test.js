@@ -8,7 +8,7 @@ console.log('====================================================');
 // Test 1: Baseline SajiloMarts brand identity
 assert.strictEqual(PUBLIC_CONFIG.BRAND_NAME, 'SajiloMarts');
 assert.strictEqual(PUBLIC_CONFIG.TAGLINE, 'Shop from India. We Deliver to Nepal.');
-assert.ok(PUBLIC_CONFIG.SUPPORT_EMAIL.includes('@sajilomarts.com'));
+assert.strictEqual(PUBLIC_CONFIG.SUPPORT_EMAIL, 'sajilomarts@gmail.com');
 console.log('✅ SajiloMarts homepage brand configuration verified');
 
 // Test 2: Marketplace detection and URL validation

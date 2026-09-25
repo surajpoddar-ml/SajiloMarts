@@ -7,4 +7,6 @@ export const appConfig = {
     windowMs: 15 * 60 * 1000,
     maxRequests: 100,
   },
+  supportEmail: process.env.SUPPORT_EMAIL || 'sajilomarts@gmail.com',
+  instagramUrl: process.env.INSTAGRAM_URL || 'https://www.instagram.com/sajilomarts',
 };

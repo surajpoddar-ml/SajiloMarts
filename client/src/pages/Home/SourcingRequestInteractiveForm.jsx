@@ -93,8 +93,12 @@ export const SourcingRequestInteractiveForm = ({
   return (
     <Card style={{ backgroundColor: 'var(--bg-surface)' }}>
       <CardHeader
-        title="Step 1: Product Specifications"
-        description="Provide the exact item details to ensure accurate sourcing from India"
+        title={
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#000000', fontWeight: 700 }}>
+            <span aria-hidden="true" style={{ fontSize: '1.2rem' }}>🛍️</span>
+            <span>Enter product details…</span>
+          </span>
+        }
       />
       <CardBody>
         <form onSubmit={handleProceed} noValidate>
