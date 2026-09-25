@@ -1,5 +1,5 @@
 /**
- * SajiloMarts Frontend API Error Normalizer
+ * SastoMarts Frontend API Error Normalizer
  * Provides safe, customer-friendly error objects without exposing internal database or stack traces.
  */
 

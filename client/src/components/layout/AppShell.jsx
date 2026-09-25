@@ -3,7 +3,7 @@ import { Header } from './Header.jsx';
 import { Footer } from './Footer.jsx';
 
 /**
- * SajiloMarts Global Application Shell
+ * SastoMarts Global Application Shell
  * Provides consistent layout across public, customer, and admin screens.
  */
 export const AppShell = ({

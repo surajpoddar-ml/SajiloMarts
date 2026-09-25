@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Typography Component
+ * SastoMarts Typography Component
  * Encapsulates standard typographic hierarchy for the application.
  */
 export const Typography = ({

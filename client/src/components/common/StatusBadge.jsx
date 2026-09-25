@@ -12,7 +12,7 @@ export const STATUS_LABELS = {
 };
 
 /**
- * SajiloMarts Accessible Status Badge Component
+ * SastoMarts Accessible Status Badge Component
  */
 export const StatusBadge = ({
   status = 'draft',

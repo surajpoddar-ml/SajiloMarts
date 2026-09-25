@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Role-Aware Administrator Navigation Bar
+ * SastoMarts Role-Aware Administrator Navigation Bar
  * Only rendered when authenticated account holds administrative role.
  */
 export const AdminNav = ({

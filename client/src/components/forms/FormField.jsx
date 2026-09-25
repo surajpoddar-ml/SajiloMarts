@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Form Field Wrapper
+ * SastoMarts Accessible Form Field Wrapper
  */
 export const FormField = ({
   id,

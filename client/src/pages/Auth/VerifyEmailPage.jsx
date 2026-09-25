@@ -55,7 +55,7 @@ export const VerifyEmailPage = ({ initialToken, onNavigateToLogin, onNavigateToR
         <div className="auth-header">
           <span className="auth-badge">Account Security</span>
           <h2 className="auth-title">Email Verification</h2>
-          <p className="auth-subtitle">Confirming your SajiloMarts account</p>
+          <p className="auth-subtitle">Confirming your SastoMarts account</p>
         </div>
 
         {status === 'verifying' && (

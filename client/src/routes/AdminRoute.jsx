@@ -5,7 +5,7 @@ import { Card } from '../components/common/Card.jsx';
 import { Spinner } from '../components/feedback/Spinner.jsx';
 
 /**
- * SajiloMarts Admin Route Guard
+ * SastoMarts Admin Route Guard
  * Enforces authenticated administrator access.
  */
 export const AdminRoute = ({

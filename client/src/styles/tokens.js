@@ -1,5 +1,5 @@
 /**
- * SajiloMarts Visual Design System Tokens
+ * SastoMarts Visual Design System Tokens
  * Defines foundational values for color, typography, spacing, radius, and shadows.
  */
 export const DESIGN_TOKENS = {

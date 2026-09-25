@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Textarea Component
+ * SastoMarts Accessible Textarea Component
  */
 export const Textarea = ({
   id,

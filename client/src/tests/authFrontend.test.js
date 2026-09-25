@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { authService } from '../services/auth.service.js';
 
 console.log('====================================================');
-console.log('🚀 Executing SajiloMarts Frontend RBAC & Authorization Test Suite');
+console.log('🚀 Executing SastoMarts Frontend RBAC & Authorization Test Suite');
 console.log('====================================================');
 
 // 1. Email Regex & Phone Regex Validation Check

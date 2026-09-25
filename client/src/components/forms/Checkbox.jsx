@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Checkbox Component
+ * SastoMarts Accessible Checkbox Component
  */
 export const Checkbox = ({
   id,

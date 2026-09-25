@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Input Component
+ * SastoMarts Accessible Input Component
  */
 export const Input = ({
   id,

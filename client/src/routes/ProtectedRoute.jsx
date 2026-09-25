@@ -5,7 +5,7 @@ import { Card } from '../components/common/Card.jsx';
 import { Spinner } from '../components/feedback/Spinner.jsx';
 
 /**
- * SajiloMarts Protected Route Guard
+ * SastoMarts Protected Route Guard
  * Enforces authenticated customer session and active account status.
  */
 export const ProtectedRoute = ({

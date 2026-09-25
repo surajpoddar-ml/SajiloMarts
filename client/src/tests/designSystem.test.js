@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { PUBLIC_CONFIG } from '../config/public.js';
 
 console.log('====================================================');
-console.log('🚀 Executing SajiloMarts Frontend Design System Tests');
+console.log('🚀 Executing SastoMarts Frontend Design System Tests');
 console.log('====================================================');
 
 // Test 1: Brand identity verification
@@ -170,6 +170,6 @@ const appContent = fs.readFileSync(appJsxPath, 'utf8');
 assert.ok(appContent.includes('ErrorBoundary'), 'App must be wrapped in ErrorBoundary');
 assert.ok(appContent.includes('ToastProvider'), 'App must provide Toast notifications');
 assert.ok(appContent.includes('DesignSystemShowcase'), 'App must support showcase navigation');
-console.log('✅ Complete SajiloMarts frontend design system foundation verified');
+console.log('✅ Complete SastoMarts frontend design system foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');

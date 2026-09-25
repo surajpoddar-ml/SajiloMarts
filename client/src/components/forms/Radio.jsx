@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Radio Component
+ * SastoMarts Accessible Radio Component
  */
 export const Radio = ({
   id,

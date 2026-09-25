@@ -1,5 +1,5 @@
 /**
- * SajiloMarts Form Validation & Input State Helpers
+ * SastoMarts Form Validation & Input State Helpers
  */
 
 export const validateRequired = (value, fieldName = 'This field') => {

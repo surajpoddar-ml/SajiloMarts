@@ -3,7 +3,7 @@ import { Button } from '../common/Button.jsx';
 import { Card } from '../common/Card.jsx';
 
 /**
- * SajiloMarts Global Frontend Error Boundary
+ * SastoMarts Global Frontend Error Boundary
  * Catches unhandled React rendering errors and displays a safe, customer-friendly recovery view.
  */
 export class ErrorBoundary extends Component {
@@ -18,7 +18,7 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     if (typeof console !== 'undefined' && console.error) {
-      console.error('[SajiloMarts UI ErrorBoundary caught error]:', error, errorInfo);
+      console.error('[SastoMarts UI ErrorBoundary caught error]:', error, errorInfo);
     }
   }
 

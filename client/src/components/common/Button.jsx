@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Reusable Button Component
+ * SastoMarts Reusable Button Component
  *
  * Variants: primary, secondary, outline, ghost, danger
  * Sizes: sm, md, lg

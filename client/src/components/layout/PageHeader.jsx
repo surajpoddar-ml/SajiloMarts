@@ -2,7 +2,7 @@ import React from 'react';
 import { Container } from './Container.jsx';
 
 /**
- * SajiloMarts Reusable Page Header
+ * SastoMarts Reusable Page Header
  */
 export const PageHeader = ({
   title,

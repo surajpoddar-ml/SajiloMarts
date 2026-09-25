@@ -3,7 +3,7 @@ import { productRequestService } from '../services/productRequest.service.js';
 import { quoteService } from '../services/quote.service.js';
 
 console.log('====================================================');
-console.log('🚀 Executing SajiloMarts Frontend Sourcing & Quote Test Suite');
+console.log('🚀 Executing SastoMarts Frontend Sourcing & Quote Test Suite');
 console.log('====================================================');
 
 // Test 1: Sourcing service method signatures

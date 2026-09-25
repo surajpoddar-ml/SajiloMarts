@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Reusable Accessible Table Foundation Component
+ * SastoMarts Reusable Accessible Table Foundation Component
  */
 export const Table = ({ children, className = '', ...props }) => {
   return (

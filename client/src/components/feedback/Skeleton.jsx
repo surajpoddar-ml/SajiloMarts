@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Skeleton Component
+ * SastoMarts Accessible Skeleton Component
  */
 export const Skeleton = ({
   width = '100%',

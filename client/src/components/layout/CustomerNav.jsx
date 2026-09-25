@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Authenticated Customer Navigation Bar
+ * SastoMarts Authenticated Customer Navigation Bar
  */
 export const CustomerNav = ({
   currentView = 'account',

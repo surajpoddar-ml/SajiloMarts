@@ -371,7 +371,7 @@ function AppContent() {
                 {currentView.replace('-', ' ')}
               </Typography>
               <Typography variant="body" style={{ marginBottom: 'var(--space-6)' }}>
-                This section is wired into the SajiloMarts layout and navigation system. Full functionality is scheduled for upcoming feature prompts.
+                This section is wired into the SastoMarts layout and navigation system. Full functionality is scheduled for upcoming feature prompts.
               </Typography>
               <Button variant="primary" onClick={() => handleNavigate('showcase')}>
                 Explore Design System Showcase

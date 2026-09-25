@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Reusable Card & Surface Component
+ * SastoMarts Reusable Card & Surface Component
  */
 export const Card = ({
   children,

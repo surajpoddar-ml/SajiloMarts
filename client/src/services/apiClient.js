@@ -3,7 +3,7 @@ import { APP_CONSTANTS } from '../constants/index.js';
 import { ApiClientError, normalizeApiError } from '../utils/apiError.js';
 
 /**
- * SajiloMarts Centralized API Client
+ * SastoMarts Centralized API Client
  * Supports cookies, auth tokens, and safe customer-facing error envelopes.
  */
 export const apiClient = async (endpoint, options = {}) => {

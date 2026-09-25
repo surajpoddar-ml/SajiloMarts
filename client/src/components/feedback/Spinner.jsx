@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Spinner Component
+ * SastoMarts Accessible Spinner Component
  */
 export const Spinner = ({
   size = 'md',
@@ -23,7 +23,7 @@ export const Spinner = ({
   );
 };
 
-export const PageLoader = ({ message = 'Loading SajiloMarts...' }) => (
+export const PageLoader = ({ message = 'Loading SastoMarts...' }) => (
   <div className="page-loader" role="status" aria-live="polite">
     <Spinner size="lg" label={message} />
     <span>{message}</span>

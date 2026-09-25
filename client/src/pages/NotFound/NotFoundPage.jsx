@@ -4,7 +4,7 @@ import { Card } from '../../components/common/Card.jsx';
 import { Container } from '../../components/layout/Container.jsx';
 
 /**
- * SajiloMarts Reusable Not Found (404) Page
+ * SastoMarts Reusable Not Found (404) Page
  */
 export const NotFoundPage = ({ onNavigateHome = () => {} }) => {
   return (

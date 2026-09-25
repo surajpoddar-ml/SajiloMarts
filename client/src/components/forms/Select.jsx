@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * SajiloMarts Accessible Select Component
+ * SastoMarts Accessible Select Component
  */
 export const Select = ({
   id,

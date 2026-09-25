@@ -11,7 +11,7 @@ import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } fro
 import { useToast } from '../../hooks/useToast.js';
 
 /**
- * SajiloMarts Design System Showcase
+ * SastoMarts Design System Showcase
  * Demonstrates live interactive tokens, typography, forms, cards, statuses, tables, and feedback.
  */
 export const DesignSystemShowcase = () => {
@@ -31,7 +31,7 @@ export const DesignSystemShowcase = () => {
             Design System Foundation &bull; Prompt 16
           </Typography>
           <Typography variant="display" style={{ marginTop: 'var(--space-1)' }}>
-            SajiloMarts Visual System
+            SastoMarts Visual System
           </Typography>
           <Typography variant="body" style={{ maxWidth: '640px', marginTop: 'var(--space-2)' }}>
             Calm, restrained, product-focused design system crafted for cross-border India-to-Nepal sourcing.
