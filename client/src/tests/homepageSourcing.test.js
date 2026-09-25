@@ -127,4 +127,17 @@ assert.ok(fs.existsSync(termsPath), 'TermsPage.jsx must exist');
 assert.ok(fs.existsSync(privacyPath), 'PrivacyPage.jsx must exist');
 console.log('✅ Footer and Legal navigation verified');
 
+// Test 15: SEO Metadata & Dynamic Document Title verification
+const titleHookPath = path.resolve('src/hooks/useDocumentTitle.js');
+assert.ok(fs.existsSync(titleHookPath), 'useDocumentTitle.js must exist');
+const titleHookContent = fs.readFileSync(titleHookPath, 'utf8');
+assert.ok(titleHookContent.includes('export const useDocumentTitle'), 'useDocumentTitle must be exported');
+assert.ok(titleHookContent.includes('Shop from India. We Deliver to Nepal.'), 'Must set default brand tagline');
+
+const indexHtmlPath = path.resolve('index.html');
+const indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8');
+assert.ok(indexHtmlContent.includes('SastoMarts — Shop from India. We Deliver to Nepal.'), 'index.html must contain SastoMarts title');
+assert.ok(!indexHtmlContent.includes('Vite'), 'index.html must not contain Vite title or default starter text');
+console.log('✅ SastoMarts SEO metadata and dynamic titles verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');

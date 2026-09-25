@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/feedback';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider, useToast } from './context/ToastContext.jsx';
 import { useAuth } from './hooks/useAuth.js';
+import { useDocumentTitle } from './hooks/useDocumentTitle.js';
 import { LoginPage } from './pages/Auth/LoginPage.jsx';
 import { RegisterPage } from './pages/Auth/RegisterPage.jsx';
 import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage.jsx';
@@ -64,6 +65,9 @@ function AppContent() {
     }
     return 'home';
   });
+
+  // Dynamic SEO Page Title
+  useDocumentTitle(null, currentView);
 
   const [backendStatus, setBackendStatus] = useState({
     loading: true,
