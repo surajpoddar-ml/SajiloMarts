@@ -51,6 +51,7 @@ function AppContent() {
   const { user, isAuthenticated, role, isAdmin, logout } = useAuth();
   const { showInfo } = useToast();
   const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [sourcingPrefillUrl, setSourcingPrefillUrl] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -100,7 +101,12 @@ function AppContent() {
     checkHealth();
   }, []);
 
-  const handleNavigate = (view) => {
+  const handleNavigate = (view, payload) => {
+    if (view === 'sourcing-new' && typeof payload === 'string') {
+      setSourcingPrefillUrl(payload);
+    } else if (view === 'sourcing-new' && payload?.url) {
+      setSourcingPrefillUrl(payload.url);
+    }
     setCurrentView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -226,11 +232,16 @@ function AppContent() {
             onRedirectToHome={() => handleNavigate('home')}
           >
             <SourcingRequestForm
+              initialProductUrl={sourcingPrefillUrl}
               onRequestCreated={(req) => {
                 setSelectedRequestId(req._id || req.id);
+                setSourcingPrefillUrl('');
                 handleNavigate('sourcing-detail');
               }}
-              onCancel={() => handleNavigate('sourcing-requests')}
+              onCancel={() => {
+                setSourcingPrefillUrl('');
+                handleNavigate('sourcing-requests');
+              }}
             />
           </ProtectedRoute>
         )}

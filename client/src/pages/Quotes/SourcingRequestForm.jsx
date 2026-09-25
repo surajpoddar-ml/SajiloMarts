@@ -11,9 +11,9 @@ const SUPPORTED_MARKETPLACES_LIST = [
   'Ajio (ajio.com)',
 ];
 
-export function SourcingRequestForm({ onRequestCreated, onCancel }) {
+export function SourcingRequestForm({ initialProductUrl = '', onRequestCreated, onCancel }) {
   const [formData, setFormData] = useState({
-    productUrl: '',
+    productUrl: initialProductUrl || '',
     productName: '',
     productPriceInr: '',
     quantity: 1,
@@ -21,6 +21,12 @@ export function SourcingRequestForm({ onRequestCreated, onCancel }) {
     notes: '',
     paymentMode: 'online_100',
   });
+
+  useEffect(() => {
+    if (initialProductUrl) {
+      setFormData((prev) => ({ ...prev, productUrl: initialProductUrl }));
+    }
+  }, [initialProductUrl]);
 
   const [detectedMarketplace, setDetectedMarketplace] = useState('');
   const [quotePreview, setQuotePreview] = useState(null);
