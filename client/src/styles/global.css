@@ -10,6 +10,7 @@
 @import './appShell.css';
 @import './navigation.css';
 @import './toast.css';
+@import './page.css';
 
 *, *::before, *::after {
   box-sizing: border-box;

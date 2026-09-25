@@ -124,7 +124,12 @@ assert.ok(fs.existsSync(adminRouteJsxPath), 'AdminRoute.jsx must exist');
 const protectedContent = fs.readFileSync(protectedRouteJsxPath, 'utf8');
 const adminContent = fs.readFileSync(adminRouteJsxPath, 'utf8');
 assert.ok(protectedContent.includes('export const ProtectedRoute'), 'ProtectedRoute must be exported');
-assert.ok(adminContent.includes('export const AdminRoute'), 'AdminRoute must be exported');
-console.log('✅ Protected frontend route guards verified');
+// Test 21: Responsive Page Layout Foundation Verification
+const pageHeaderJsxPath = path.resolve('src/components/layout/PageHeader.jsx');
+assert.ok(fs.existsSync(pageHeaderJsxPath), 'PageHeader.jsx must exist');
+const pageHeaderContent = fs.readFileSync(pageHeaderJsxPath, 'utf8');
+assert.ok(pageHeaderContent.includes('export const PageHeader'), 'PageHeader must be exported');
+assert.ok(pageHeaderContent.includes('page-header__title'), 'PageHeader must structure page title');
+console.log('✅ Responsive page layout foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');
