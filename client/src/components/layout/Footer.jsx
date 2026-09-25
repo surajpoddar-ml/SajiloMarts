@@ -46,7 +46,7 @@ export const Footer = ({
             <ul className="footer-column__list">
               <li>
                 <button type="button" className="footer-link" onClick={() => onNavigate('sourcing-requests')}>
-                  Sourcing Portal
+                  My Orders
                 </button>
               </li>
               <li>

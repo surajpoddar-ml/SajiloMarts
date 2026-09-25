@@ -65,15 +65,6 @@ export const Header = ({
               <li>
                 <button
                   type="button"
-                  className={`nav-link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail', 'checkout'].includes(currentView) ? 'nav-link--active' : ''}`}
-                  onClick={() => onNavigate('sourcing-requests')}
-                >
-                  Sourcing Portal
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
                   className="nav-link"
                   onClick={() => handleSectionClick('how-it-works', 'home')}
                 >
@@ -87,6 +78,15 @@ export const Header = ({
                   onClick={() => handleSectionClick('track-order-section', 'home')}
                 >
                   Track Order
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail', 'checkout'].includes(currentView) ? 'nav-link--active' : ''}`}
+                  onClick={() => onNavigate('sourcing-requests')}
+                >
+                  My Orders
                 </button>
               </li>
               <li>

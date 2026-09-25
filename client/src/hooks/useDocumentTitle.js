@@ -9,7 +9,7 @@ export const useDocumentTitle = (title, currentView) => {
   useEffect(() => {
     const viewTitles = {
       'home': `${PUBLIC_CONFIG.BRAND_NAME} — Shop from India. We Deliver to Nepal.`,
-      'sourcing-requests': `${PUBLIC_CONFIG.BRAND_NAME} — Sourcing Portal`,
+      'sourcing-requests': `${PUBLIC_CONFIG.BRAND_NAME} — My Orders`,
       'sourcing-new': `${PUBLIC_CONFIG.BRAND_NAME} — Source a Product`,
       'sourcing-detail': `${PUBLIC_CONFIG.BRAND_NAME} — Request Details & Quote`,
       'track-order': `${PUBLIC_CONFIG.BRAND_NAME} — Track Order`,

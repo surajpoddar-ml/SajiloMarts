@@ -89,15 +89,6 @@ export const MobileNav = ({
             <li>
               <button
                 type="button"
-                className={`mobile-nav-item ${['sourcing-requests', 'sourcing-new', 'sourcing-detail', 'checkout'].includes(currentView) ? 'mobile-nav-item--active' : ''}`}
-                onClick={() => handleNavClick('sourcing-requests')}
-              >
-                📦 Sourcing Portal
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
                 className="mobile-nav-item"
                 onClick={() => handleSectionClick('how-it-works')}
               >
@@ -111,6 +102,15 @@ export const MobileNav = ({
                 onClick={() => handleSectionClick('track-order-section')}
               >
                 Track Order
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                className={`mobile-nav-item ${['sourcing-requests', 'sourcing-new', 'sourcing-detail', 'checkout'].includes(currentView) ? 'mobile-nav-item--active' : ''}`}
+                onClick={() => handleNavClick('sourcing-requests')}
+              >
+                📦 My Orders
               </button>
             </li>
             <li>

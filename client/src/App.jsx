@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { healthService } from './services';
 import { ENV, PUBLIC_CONFIG } from './config';
 import { Header, Footer, Container, Section, CustomerNav, AdminNav, MobileNav, AppShell } from './components/layout';
-import { Card, CardHeader, CardBody, Button, Typography, StatusBadge } from './components/common';
-import { ErrorBoundary } from './components/feedback';
+import { Card, CardHeader, CardBody, Button, Typography, StatusBadge, Logo } from './components/common';
+import { ErrorBoundary, Spinner } from './components/feedback';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider, useToast } from './context/ToastContext.jsx';
 import { useAuth } from './hooks/useAuth.js';
@@ -24,31 +24,8 @@ import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
 import './App.css';
 
-const ARCHITECTURE_RULES = [
-  {
-    label: 'Authoritative Pricing Engine',
-    description: '1 INR = 1.65 NPR conversion rate, 18% online surcharge, and 22% COD fee calculated strictly server-side.',
-  },
-  {
-    label: 'Marketplace URL Security',
-    description: 'Automatic Indian marketplace domain validation, SSRF protection, and tracking parameter normalization.',
-  },
-  {
-    label: 'Ownership & IDOR Protection',
-    description: 'Customer sourcing requests, address assignments, and quote calculations are strictly bound to the authenticated user.',
-  },
-  {
-    label: 'Historical Quote Snapshots',
-    description: 'Quotes are immutably snapshotted with breakdown math preserving long-term auditability.',
-  },
-  {
-    label: 'Controlled Sourcing Lifecycle',
-    description: 'Deterministic state transitions (draft → submitted → quote_ready → customer_confirmed) without client tampering.',
-  },
-];
-
 function AppContent() {
-  const { user, isAuthenticated, role, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, role, isAdmin, isLoading: isAuthLoading, logout } = useAuth();
   const { showInfo } = useToast();
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,12 +39,25 @@ function AppContent() {
       if (path.includes('reset-password') || params.get('token')) {
         return 'reset-password';
       }
+      if (path.includes('register')) {
+        return 'register';
+      }
+      if (path.includes('forgot-password')) {
+        return 'forgot-password';
+      }
     }
-    return 'home';
+    return 'login';
   });
 
   // Dynamic SEO Page Title
   useDocumentTitle(null, currentView);
+
+  // When user is authenticated, if currentView is on auth gate, redirect to home
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated && ['login', 'register', 'forgot-password', 'reset-password'].includes(currentView)) {
+      setCurrentView(isAdmin ? 'admin-console' : 'home');
+    }
+  }, [isAuthenticated, isAuthLoading, isAdmin]);
 
   const [backendStatus, setBackendStatus] = useState({
     loading: true,
@@ -105,6 +95,99 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Initial Auth Loading State
+  if (isAuthLoading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  // Mandatory Auth Gate: Unauthenticated users must log in or sign up before accessing the main website
+  if (!isAuthenticated) {
+    const authViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];
+    const activeAuthView = authViews.includes(currentView) ? currentView : 'login';
+
+    return (
+      <div className="app-shell auth-gate-shell">
+        <header className="site-header" style={{ borderBottom: '1px solid var(--border-subtle)', padding: '16px 0' }}>
+          <Container size="wide">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Logo size="md" onClick={() => handleNavigate('login')} />
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Button
+                  variant={activeAuthView === 'login' ? 'primary' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleNavigate('login')}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant={activeAuthView === 'register' ? 'primary' : 'outline'}
+                  size="sm"
+                  onClick={() => handleNavigate('register')}
+                >
+                  Create Account
+                </Button>
+              </div>
+            </div>
+          </Container>
+        </header>
+
+        <main className="app-shell__main" style={{ padding: 'var(--space-8) 0' }}>
+          {activeAuthView === 'login' && (
+            <LoginPage
+              onNavigateToRegister={() => handleNavigate('register')}
+              onNavigateToForgot={() => handleNavigate('forgot-password')}
+              onNavigateToResend={() => handleNavigate('resend-verification')}
+              onLoginSuccess={() => handleNavigate('home')}
+            />
+          )}
+
+          {activeAuthView === 'register' && (
+            <RegisterPage
+              onNavigateToLogin={() => handleNavigate('login')}
+              onRegisterSuccess={() => handleNavigate('home')}
+            />
+          )}
+
+          {activeAuthView === 'forgot-password' && (
+            <ForgotPasswordPage
+              onNavigateToLogin={() => handleNavigate('login')}
+            />
+          )}
+
+          {activeAuthView === 'reset-password' && (
+            <ResetPasswordPage
+              onNavigateToLogin={() => handleNavigate('login')}
+              onNavigateToForgot={() => handleNavigate('forgot-password')}
+            />
+          )}
+
+          {activeAuthView === 'verify-email' && (
+            <VerifyEmailPage
+              onNavigateToLogin={() => handleNavigate('login')}
+              onNavigateToResend={() => handleNavigate('resend-verification')}
+            />
+          )}
+
+          {activeAuthView === 'resend-verification' && (
+            <ResendVerificationPage
+              onNavigateToLogin={() => handleNavigate('login')}
+            />
+          )}
+        </main>
+
+        <Footer
+          brandName={PUBLIC_CONFIG.BRAND_NAME}
+          onNavigate={handleNavigate}
+        />
+      </div>
+    );
+  }
+
+  // Authenticated Main Website
   return (
     <div className="app-shell">
       <Header
@@ -117,7 +200,7 @@ function AppContent() {
         onRegister={() => handleNavigate('register')}
         onLogout={async () => {
           await logout();
-          handleNavigate('home');
+          handleNavigate('login');
         }}
         onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         isMobileMenuOpen={isMobileMenuOpen}
@@ -134,25 +217,23 @@ function AppContent() {
         onRegister={() => handleNavigate('register')}
         onLogout={async () => {
           await logout();
-          handleNavigate('home');
+          handleNavigate('login');
         }}
       />
 
       {/* Role-Aware Sub-Navigation for Authenticated Users */}
-      {isAuthenticated && isAdmin && (
+      {isAdmin ? (
         <Container size="wide">
           <AdminNav currentView={currentView} onNavigate={handleNavigate} />
         </Container>
-      )}
-
-      {isAuthenticated && !isAdmin && (
+      ) : (
         <Container size="wide">
           <CustomerNav currentView={currentView} onNavigate={handleNavigate} />
         </Container>
       )}
 
       <main id="main-content" className="app-shell__main">
-        {/* Sourcing Portal Views */}
+        {/* My Orders / Sourcing Portal Views */}
         {currentView === 'sourcing-requests' && (
           <ProtectedRoute
             onRedirectToLogin={() => handleNavigate('login')}
@@ -215,49 +296,6 @@ function AppContent() {
               }}
             />
           </ProtectedRoute>
-        )}
-
-        {/* Authentication Pages */}
-        {currentView === 'login' && (
-          <LoginPage
-            onNavigateToRegister={() => handleNavigate('register')}
-            onNavigateToForgot={() => handleNavigate('forgot-password')}
-            onNavigateToResend={() => handleNavigate('resend-verification')}
-            onLoginSuccess={() => handleNavigate(isAdmin ? 'admin-console' : 'account')}
-          />
-        )}
-
-        {currentView === 'register' && (
-          <RegisterPage
-            onNavigateToLogin={() => handleNavigate('login')}
-            onRegisterSuccess={() => handleNavigate('account')}
-          />
-        )}
-
-        {currentView === 'forgot-password' && (
-          <ForgotPasswordPage
-            onNavigateToLogin={() => handleNavigate('login')}
-          />
-        )}
-
-        {currentView === 'reset-password' && (
-          <ResetPasswordPage
-            onNavigateToLogin={() => handleNavigate('login')}
-            onNavigateToForgot={() => handleNavigate('forgot-password')}
-          />
-        )}
-
-        {currentView === 'verify-email' && (
-          <VerifyEmailPage
-            onNavigateToLogin={() => handleNavigate('login')}
-            onNavigateToResend={() => handleNavigate('resend-verification')}
-          />
-        )}
-
-        {currentView === 'resend-verification' && (
-          <ResendVerificationPage
-            onNavigateToLogin={() => handleNavigate('login')}
-          />
         )}
 
         {/* Customer Account Page */}
@@ -349,7 +387,7 @@ function AppContent() {
                 {currentView.replace('-', ' ')}
               </Typography>
               <Typography variant="body" style={{ marginBottom: 'var(--space-6)' }}>
-                This section is wired into the SastoMarts layout and navigation system. Full functionality is scheduled for upcoming feature prompts.
+                This section is wired into the SajiloMarts layout and navigation system. Full functionality is scheduled for upcoming feature prompts.
               </Typography>
               <Button variant="primary" onClick={() => handleNavigate('home')}>
                 Back to Homepage
@@ -358,7 +396,7 @@ function AppContent() {
           </Container>
         )}
 
-        {/* Real SastoMarts Homepage */}
+        {/* Real SajiloMarts Homepage */}
         {currentView === 'home' && (
           <HomePage
             onNavigate={handleNavigate}

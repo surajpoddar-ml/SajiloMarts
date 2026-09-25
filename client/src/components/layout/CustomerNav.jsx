@@ -9,7 +9,7 @@ export const CustomerNav = ({
   className = '',
 }) => {
   const links = [
-    { id: 'sourcing-requests', label: 'Sourcing Requests' },
+    { id: 'sourcing-requests', label: 'My Orders' },
     { id: 'sourcing-new', label: 'New Request' },
     { id: 'current-orders', label: 'Current Orders' },
     { id: 'order-history', label: 'Order History' },
