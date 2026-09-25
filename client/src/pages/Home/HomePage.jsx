@@ -3,6 +3,7 @@ import { Container, Section } from '../../components/layout';
 import { Typography, Card, CardBody } from '../../components/common';
 import { PUBLIC_CONFIG } from '../../config/public.js';
 import { HeroSection } from './HeroSection.jsx';
+import { ProductUrlForm } from './ProductUrlForm.jsx';
 
 export function HomePage({
   onNavigate,
@@ -11,11 +12,24 @@ export function HomePage({
   onRequestCreated,
   onTrackOrder,
 }) {
+  const [productUrl, setProductUrl] = React.useState('');
+  const [isUrlValidating, setIsUrlValidating] = React.useState(false);
+  const [urlError, setUrlError] = React.useState(null);
+
+  const handleUrlSubmit = (url) => {
+    setProductUrl(url);
+  };
+
   return (
     <div className="homepage" id="sastomarts-homepage">
       {/* 1. Hero / Product URL Sourcing Section */}
       <HeroSection>
-        {/* URL Form slot */}
+        <ProductUrlForm
+          onSubmitUrl={handleUrlSubmit}
+          isLoading={isUrlValidating}
+          initialUrl={productUrl}
+          serverError={urlError}
+        />
       </HeroSection>
 
       {/* 2. Sourcing Portal / Request & Quote Flow Anchor */}
