@@ -11,6 +11,7 @@ import { RequestReviewCard } from './RequestReviewCard.jsx';
 import { ServerQuoteDisplay } from './ServerQuoteDisplay.jsx';
 import { HowItWorksSection } from './HowItWorksSection.jsx';
 import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx';
+import { ServiceBenefitsSection } from './ServiceBenefitsSection.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
@@ -141,10 +142,8 @@ export function HomePage({
       {/* 4. Supported Marketplaces Section */}
       <SupportedMarketplacesSection />
 
-      {/* 5. Service Benefits Section Anchor */}
-      <section id="service-benefits-section" aria-label="Service Benefits">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 5. Service Benefits Section */}
+      <ServiceBenefitsSection />
 
       {/* 6. Real Track Order Entry Section Anchor */}
       <section id="track-order-section" aria-label="Track Cross-Border Order">

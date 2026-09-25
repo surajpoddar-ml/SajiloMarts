@@ -79,4 +79,14 @@ assert.ok(howContent.includes('Find Product in India'), 'Must include step 1');
 assert.ok(howContent.includes('Procurement & Nepal Delivery'), 'Must include step 5');
 console.log('✅ How SastoMarts Works workflow explanation verified');
 
+// Test 10: Service Benefits section verification
+const benPath = path.resolve('src/pages/Home/ServiceBenefitsSection.jsx');
+assert.ok(fs.existsSync(benPath), 'ServiceBenefitsSection.jsx must exist');
+const benContent = fs.readFileSync(benPath, 'utf8');
+assert.ok(benContent.includes('export const ServiceBenefitsSection'), 'ServiceBenefitsSection must be exported');
+assert.ok(benContent.includes('India Product Sourcing'), 'Must describe India sourcing capability');
+assert.ok(benContent.includes('Transparent Server Pricing'), 'Must describe transparent server pricing');
+assert.ok(benContent.includes('Nepal Countrywide Delivery'), 'Must describe Nepal countrywide delivery');
+console.log('✅ Service Benefits section verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
