@@ -12,6 +12,7 @@ import { ServerQuoteDisplay } from './ServerQuoteDisplay.jsx';
 import { HowItWorksSection } from './HowItWorksSection.jsx';
 import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx';
 import { ServiceBenefitsSection } from './ServiceBenefitsSection.jsx';
+import { TrackOrderSection } from './TrackOrderSection.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
@@ -145,10 +146,8 @@ export function HomePage({
       {/* 5. Service Benefits Section */}
       <ServiceBenefitsSection />
 
-      {/* 6. Real Track Order Entry Section Anchor */}
-      <section id="track-order-section" aria-label="Track Cross-Border Order">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 6. Real Track Order Entry Section */}
+      <TrackOrderSection onTrackOrder={onTrackOrder} />
 
       {/* 7. Customer Account & Support Entry Section Anchor */}
       <section id="account-support-section" aria-label="Account and Support Access">

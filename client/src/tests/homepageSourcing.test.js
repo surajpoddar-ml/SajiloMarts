@@ -89,4 +89,12 @@ assert.ok(benContent.includes('Transparent Server Pricing'), 'Must describe tran
 assert.ok(benContent.includes('Nepal Countrywide Delivery'), 'Must describe Nepal countrywide delivery');
 console.log('✅ Service Benefits section verified');
 
+// Test 11: Track Order section verification
+const trackPath = path.resolve('src/pages/Home/TrackOrderSection.jsx');
+assert.ok(fs.existsSync(trackPath), 'TrackOrderSection.jsx must exist');
+const trackContent = fs.readFileSync(trackPath, 'utf8');
+assert.ok(trackContent.includes('export const TrackOrderSection'), 'TrackOrderSection must be exported');
+assert.ok(trackContent.includes('No order was found for that tracking code'), 'Must support real not found state');
+console.log('✅ Track Order entry experience verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
