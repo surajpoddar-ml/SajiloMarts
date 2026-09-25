@@ -5,6 +5,7 @@ import { PUBLIC_CONFIG } from '../../config/public.js';
 import { HeroSection } from './HeroSection.jsx';
 import { ProductUrlForm } from './ProductUrlForm.jsx';
 import { AuthContinuationPrompt } from './AuthContinuationPrompt.jsx';
+import { SourcingPortalSection } from './SourcingPortalSection.jsx';
 
 export function HomePage({
   onNavigate,
@@ -19,6 +20,10 @@ export function HomePage({
 
   const handleUrlSubmit = (url) => {
     setProductUrl(url);
+    const portalEl = document.getElementById('sourcing-portal');
+    if (portalEl) {
+      portalEl.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -33,10 +38,16 @@ export function HomePage({
         />
       </HeroSection>
 
-      {/* 2. Sourcing Portal / Request & Quote Flow Anchor */}
-      <section id="sourcing-flow-section" aria-label="Sourcing Request and Server Quote Flow">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 2. Sourcing Portal Layout Section */}
+      <SourcingPortalSection
+        initialProductUrl={productUrl}
+        user={user}
+        isAuthenticated={isAuthenticated}
+        onNavigate={onNavigate}
+        onRequestCreated={onRequestCreated}
+      >
+        {/* Step-by-step request flow */}
+      </SourcingPortalSection>
 
       {/* 3. How SastoMarts Works Section Anchor */}
       <section id="how-it-works-section" aria-label="How SastoMarts Works">
