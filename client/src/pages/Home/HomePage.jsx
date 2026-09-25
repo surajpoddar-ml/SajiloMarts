@@ -2,6 +2,7 @@ import React from 'react';
 import { Container, Section } from '../../components/layout';
 import { Typography, Card, CardBody } from '../../components/common';
 import { PUBLIC_CONFIG } from '../../config/public.js';
+import { HeroSection } from './HeroSection.jsx';
 
 export function HomePage({
   onNavigate,
@@ -12,10 +13,10 @@ export function HomePage({
 }) {
   return (
     <div className="homepage" id="sastomarts-homepage">
-      {/* 1. Hero / Product URL Sourcing Section Anchor */}
-      <section id="hero-sourcing-section" aria-label="Hero and Product Sourcing">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 1. Hero / Product URL Sourcing Section */}
+      <HeroSection>
+        {/* URL Form slot */}
+      </HeroSection>
 
       {/* 2. Sourcing Portal / Request & Quote Flow Anchor */}
       <section id="sourcing-flow-section" aria-label="Sourcing Request and Server Quote Flow">
