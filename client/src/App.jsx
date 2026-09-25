@@ -14,7 +14,7 @@ import { VerifyEmailPage } from './pages/Auth/VerifyEmailPage.jsx';
 import { ResendVerificationPage } from './pages/Auth/ResendVerificationPage.jsx';
 import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
-import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
+import { AccountPage, ChangePasswordSection } from './pages/Account';
 import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
 import { CheckoutPage } from './pages/Checkout';
 import { HomePage } from './pages/Home';
@@ -289,49 +289,16 @@ function AppContent() {
           </ProtectedRoute>
         )}
 
-        {/* Customer Account Page */}
-        {currentView === 'account' && (
+        {/* Customer Account Portal */}
+        {['account', 'account-security', 'account-profile'].includes(currentView) && (
           <ProtectedRoute
             onRedirectToLogin={() => handleNavigate('login')}
             onRedirectToHome={() => handleNavigate('home')}
           >
-            <Container size="narrow" style={{ marginTop: 'var(--space-8)' }}>
-              <Card>
-                <CardHeader
-                  title="Customer Account Profile"
-                  description="Verified cross-border identity and security controls"
-                />
-                <CardBody>
-                  <div style={{ display: 'grid', gap: 'var(--space-3)', background: 'var(--bg-surface-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)' }}>
-                    <div><strong>Name:</strong> {user?.name}</div>
-                    <div><strong>Email:</strong> {user?.email}</div>
-                    <div><strong>Phone:</strong> {user?.phone || 'Not provided'}</div>
-                    <div><strong>Role:</strong> <span className="badge" style={{ marginLeft: '4px' }}>{role}</span></div>
-                    <div>
-                      <strong>Email Verification:</strong>{' '}
-                      {user?.isEmailVerified ? (
-                        <StatusBadge status="customer_confirmed" label="Verified" />
-                      ) : (
-                        <span>
-                          <StatusBadge status="draft" label="Unverified" />
-                          <button
-                            type="button"
-                            onClick={() => handleNavigate('resend-verification')}
-                            style={{ background: 'none', border: 'none', marginLeft: '8px', color: 'var(--color-brand)', cursor: 'pointer', fontSize: '0.85rem' }}
-                          >
-                            Resend Email
-                          </button>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: 'var(--space-6)' }}>
-                    <ChangePasswordSection />
-                  </div>
-                </CardBody>
-              </Card>
-            </Container>
+            <AccountPage
+              initialTab={currentView === 'account-security' ? 'security' : currentView === 'account-profile' ? 'profile' : 'overview'}
+              onNavigate={handleNavigate}
+            />
           </ProtectedRoute>
         )}
 
