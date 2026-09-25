@@ -91,6 +91,23 @@ export const quoteRateLimiter = createRateLimiter(
   'Too many quote calculation requests. Please try again shortly.'
 );
 
+const paymentCounts = new Map();
+const paymentProofCounts = new Map();
+
+export const paymentRateLimiter = createRateLimiter(
+  paymentCounts,
+  15 * 60 * 1000,
+  30,
+  'Too many payment checkout requests. Please try again in 15 minutes.'
+);
+
+export const paymentProofRateLimiter = createRateLimiter(
+  paymentProofCounts,
+  15 * 60 * 1000,
+  20,
+  'Too many payment proof submission attempts. Please try again in 15 minutes.'
+);
+
 export default {
   apiRateLimiter,
   authRateLimiter,
@@ -99,5 +116,7 @@ export default {
   passwordChangeRateLimiter,
   sourcingRequestRateLimiter,
   quoteRateLimiter,
+  paymentRateLimiter,
+  paymentProofRateLimiter,
 };
 
