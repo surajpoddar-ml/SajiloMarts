@@ -67,6 +67,13 @@ export const passwordRecoveryRateLimiter = createRateLimiter(
   'Too many password recovery attempts. Please try again in 15 minutes.'
 );
 
+export const passwordChangeRateLimiter = createRateLimiter(
+  passwordChangeCounts,
+  15 * 60 * 1000,
+  10,
+  'Too many password change attempts. Please try again in 15 minutes.'
+);
+
 const sourcingCounts = new Map();
 const quoteCounts = new Map();
 
