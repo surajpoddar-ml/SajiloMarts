@@ -192,6 +192,13 @@ const productRequestSchema = new mongoose.Schema(
       maxlength: [2000, 'Internal notes cannot exceed 2000 characters'],
       select: false,
     },
+    statusHistory: [
+      {
+        status: { type: String, required: true },
+        changedAt: { type: Date, default: Date.now },
+        note: { type: String, default: null },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -166,6 +166,13 @@ export class ProductRequestService extends BaseService {
       currency: currency || 'INR',
       status: REQUEST_STATUSES.SUBMITTED,
       quote: initialQuote,
+      statusHistory: [
+        {
+          status: REQUEST_STATUSES.SUBMITTED,
+          changedAt: new Date(),
+          note: 'Sourcing request submitted by customer',
+        },
+      ],
     });
 
     return productRequest.save();
@@ -264,6 +271,12 @@ export class ProductRequestService extends BaseService {
     request.quantity = quantity;
     request.quote = quoteSnapshot;
     request.status = REQUEST_STATUSES.QUOTE_READY;
+    if (!request.statusHistory) request.statusHistory = [];
+    request.statusHistory.push({
+      status: REQUEST_STATUSES.QUOTE_READY,
+      changedAt: new Date(),
+      note: 'Authoritative quotation snapshot prepared',
+    });
 
     return request.save();
   }
@@ -323,6 +336,12 @@ export class ProductRequestService extends BaseService {
       request.quote.confirmedAt = new Date();
       request.quote.quoteStatus = 'accepted';
     }
+    if (!request.statusHistory) request.statusHistory = [];
+    request.statusHistory.push({
+      status: REQUEST_STATUSES.CUSTOMER_CONFIRMED,
+      changedAt: new Date(),
+      note: 'Quote confirmed by customer',
+    });
 
     return request.save();
   }
@@ -502,6 +521,12 @@ export class ProductRequestService extends BaseService {
 
     const oldStatus = request.status;
     request.status = targetStatus;
+    if (!request.statusHistory) request.statusHistory = [];
+    request.statusHistory.push({
+      status: targetStatus,
+      changedAt: new Date(),
+      note: options.note || `Status transition from ${oldStatus} to ${targetStatus}`,
+    });
 
     const saved = await request.save();
     return saved;
