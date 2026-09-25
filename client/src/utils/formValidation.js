@@ -28,15 +28,35 @@ export const validateProductUrl = (url) => {
       'nykaa.com',
       'tatacliq.com',
       'meesho.com',
+      '1mg.com',
     ].some((domain) => hostname === domain || hostname.endsWith(`.${domain}`));
 
     if (!isSupported) {
-      return 'Please enter a valid Indian marketplace URL (e.g., amazon.in, flipkart.com, myntra.com)';
+      return 'Please enter a valid Indian marketplace URL (e.g., amazon.in, flipkart.com, myntra.com, meesho.com, 1mg.com)';
     }
 
     return null;
   } catch {
     return 'Please enter a valid URL address';
+  }
+};
+
+export const detectMarketplace = (url) => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url.trim());
+    const host = parsed.hostname.toLowerCase();
+    if (host.includes('amazon')) return { id: 'amazon', name: 'Amazon India', domain: 'amazon.in' };
+    if (host.includes('flipkart')) return { id: 'flipkart', name: 'Flipkart', domain: 'flipkart.com' };
+    if (host.includes('myntra')) return { id: 'myntra', name: 'Myntra', domain: 'myntra.com' };
+    if (host.includes('meesho')) return { id: 'meesho', name: 'Meesho', domain: 'meesho.com' };
+    if (host.includes('1mg')) return { id: '1mg', name: 'Tata 1mg', domain: '1mg.com' };
+    if (host.includes('ajio')) return { id: 'ajio', name: 'AJIO', domain: 'ajio.com' };
+    if (host.includes('nykaa')) return { id: 'nykaa', name: 'Nykaa', domain: 'nykaa.com' };
+    if (host.includes('tatacliq')) return { id: 'tatacliq', name: 'Tata CLiQ', domain: 'tatacliq.com' };
+    return { id: 'other', name: host, domain: host };
+  } catch {
+    return null;
   }
 };
 
