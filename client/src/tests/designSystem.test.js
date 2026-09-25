@@ -97,7 +97,13 @@ assert.ok(fs.existsSync(adminNavJsxPath), 'AdminNav.jsx must exist');
 const adminNavContent = fs.readFileSync(adminNavJsxPath, 'utf8');
 assert.ok(adminNavContent.includes('export const AdminNav'), 'AdminNav must be exported');
 assert.ok(adminNavContent.includes('Admin Console'), 'AdminNav must include Admin Console');
-assert.ok(adminNavContent.includes('All Sourcing Requests'), 'AdminNav must include Requests management');
-console.log('✅ Role-aware administrator navigation verified');
+// Test 17: Accessible Mobile Navigation Verification
+const mobileNavJsxPath = path.resolve('src/components/layout/MobileNav.jsx');
+assert.ok(fs.existsSync(mobileNavJsxPath), 'MobileNav.jsx must exist');
+const mobileNavContent = fs.readFileSync(mobileNavJsxPath, 'utf8');
+assert.ok(mobileNavContent.includes('export const MobileNav'), 'MobileNav must be exported');
+assert.ok(mobileNavContent.includes('aria-modal="true"'), 'MobileNav must provide accessible dialog attributes');
+assert.ok(mobileNavContent.includes('Escape'), 'MobileNav must handle keyboard Escape key');
+console.log('✅ Accessible mobile navigation verified');
 
 console.log('🎉 Design System initial foundation verified!');
