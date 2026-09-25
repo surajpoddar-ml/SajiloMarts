@@ -77,6 +77,20 @@
   box-shadow: 0 0 0 3px var(--color-error-border) !important;
 }
 
+.form-input--success {
+  border-color: var(--color-success) !important;
+}
+
+.form-input--success:focus {
+  box-shadow: 0 0 0 3px var(--color-success-border) !important;
+}
+
+.form-input--url {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: 12px 16px;
+}
+
 .form-helper {
   font-size: 0.75rem;
   color: var(--text-muted);

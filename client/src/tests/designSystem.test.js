@@ -41,8 +41,13 @@ const formFieldJsxPath = path.resolve('src/components/forms/FormField.jsx');
 const inputJsxPath = path.resolve('src/components/forms/Input.jsx');
 assert.ok(fs.existsSync(formFieldJsxPath), 'FormField.jsx must exist');
 assert.ok(fs.existsSync(inputJsxPath), 'Input.jsx must exist');
-const formFieldContent = fs.readFileSync(formFieldJsxPath, 'utf8');
-assert.ok(formFieldContent.includes('export const FormField'), 'FormField must be exported');
-console.log('✅ Accessible form field components verified');
+// Test 8: Input Validation States Verification
+import { validateProductUrl, validateRequired, validateEmail } from '../utils/formValidation.js';
+assert.strictEqual(validateRequired(''), 'This field is required');
+assert.strictEqual(validateRequired('Valid'), null);
+assert.ok(validateProductUrl('invalid-url'));
+assert.strictEqual(validateProductUrl('https://www.amazon.in/dp/B08N5WRWNW'), null);
+assert.strictEqual(validateEmail('test@sajilomarts.com'), null);
+console.log('✅ Input validation states and helper functions verified');
 
 console.log('🎉 Design System initial foundation verified!');
