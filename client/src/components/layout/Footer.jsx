@@ -1,11 +1,12 @@
 import React from 'react';
+import { Logo } from '../common/Logo.jsx';
 import { Container } from './Container.jsx';
 
 /**
- * SajiloMarts Professional Application Footer & Legal Navigation
+ * SastoMarts Professional Application Footer & Legal Navigation
  */
 export const Footer = ({
-  brandName = 'SajiloMarts',
+  brandName = 'SastoMarts',
   onNavigate = () => {},
 }) => {
   return (
@@ -14,9 +15,11 @@ export const Footer = ({
         <div className="footer-grid">
           {/* Brand Col */}
           <div>
-            <div className="footer-brand__title">
-              <span className="brand-logo__dot" aria-hidden="true" />
-              <span>{brandName}</span>
+            <div className="footer-brand__title" style={{ marginBottom: '12px' }}>
+              <Logo
+                size="footer"
+                onClick={() => onNavigate('home')}
+              />
             </div>
             <div className="footer-brand__tagline">Shop from India. We Deliver to Nepal.</div>
             <p className="footer-brand__desc">

@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Button } from '../common/Button.jsx';
+import { Logo } from '../common/Logo.jsx';
 
 /**
- * SajiloMarts Accessible Mobile Drawer Navigation
+ * SastoMarts Accessible Mobile Drawer Navigation
  */
 export const MobileNav = ({
   isOpen = false,
@@ -45,8 +46,7 @@ export const MobileNav = ({
       <div className="mobile-nav-drawer" onClick={(e) => e.stopPropagation()}>
         <div className="mobile-nav-header">
           <div className="brand-logo">
-            <span className="brand-logo__dot" aria-hidden="true" />
-            <span>SajiloMarts</span>
+            <Logo size="sm" onClick={() => handleNavClick('home')} />
           </div>
           <button
             type="button"

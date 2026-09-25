@@ -1,12 +1,13 @@
 import React from 'react';
 import { Button } from '../common/Button.jsx';
+import { Logo } from '../common/Logo.jsx';
 import { Container } from './Container.jsx';
 
 /**
- * SajiloMarts Global Site Header with Responsive Public & Auth Navigation
+ * SastoMarts Global Site Header with Responsive Public & Auth Navigation
  */
 export const Header = ({
-  brandName = 'SajiloMarts',
+  brandName = 'SastoMarts',
   currentView = 'home',
   onNavigate = () => {},
   user,
@@ -21,16 +22,13 @@ export const Header = ({
     <header className="site-header">
       <Container size="wide">
         <div className="nav-container">
-          {/* Logo */}
-          <button
-            type="button"
-            className="brand-logo"
-            onClick={() => onNavigate('home')}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-          >
-            <span className="brand-logo__dot" aria-hidden="true" />
-            <span>{brandName}</span>
-          </button>
+          {/* SastoMarts Official Logo */}
+          <div className="header-brand">
+            <Logo
+              size="md"
+              onClick={() => onNavigate('home')}
+            />
+          </div>
 
           {/* Public Desktop Navigation Links */}
           <nav aria-label="Main Navigation">
