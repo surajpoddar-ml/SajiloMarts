@@ -21,6 +21,7 @@ export const useDocumentTitle = (title, currentView) => {
       'terms': `${PUBLIC_CONFIG.BRAND_NAME} — Terms of Service`,
       'privacy': `${PUBLIC_CONFIG.BRAND_NAME} — Privacy Policy`,
       'admin-console': `${PUBLIC_CONFIG.BRAND_NAME} — Admin Console`,
+      'checkout': `${PUBLIC_CONFIG.BRAND_NAME} — Secure Checkout & Payment Proof`,
     };
 
     if (currentView && viewTitles[currentView]) {

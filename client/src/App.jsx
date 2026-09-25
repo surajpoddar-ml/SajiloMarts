@@ -16,6 +16,7 @@ import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
 import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
 import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
+import { CheckoutPage } from './pages/Checkout';
 import { HomePage } from './pages/Home';
 import { TermsPage, PrivacyPage } from './pages/Legal';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
@@ -190,7 +191,28 @@ function AppContent() {
             <SourcingRequestDetail
               requestId={selectedRequestId}
               onBack={() => handleNavigate('sourcing-requests')}
+              onProceedToCheckout={(id) => {
+                setSelectedRequestId(id || selectedRequestId);
+                handleNavigate('checkout');
+              }}
               onStatusUpdated={() => { }}
+            />
+          </ProtectedRoute>
+        )}
+
+        {currentView === 'checkout' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <CheckoutPage
+              requestId={selectedRequestId}
+              user={user}
+              onNavigate={handleNavigate}
+              onBack={() => handleNavigate('sourcing-detail')}
+              onPaymentSubmitted={(result) => {
+                handleNavigate('sourcing-detail');
+              }}
             />
           </ProtectedRoute>
         )}
