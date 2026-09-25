@@ -14,12 +14,13 @@ console.log('✅ SajiloMarts brand identity and core messaging verified');
 assert.ok(PUBLIC_CONFIG.SUPPORT_EMAIL.includes('@sajilomarts.com'));
 console.log('✅ Frontend configuration baseline verified');
 
-// Test 3: Design Tokens structure
+// Test 3: Design Tokens structure & Warm Neutral Color System
 import { DESIGN_TOKENS } from '../styles/tokens.js';
-assert.ok(DESIGN_TOKENS.colors.background.page);
-assert.ok(DESIGN_TOKENS.colors.brand.primary);
-assert.ok(DESIGN_TOKENS.radius.md);
-assert.ok(DESIGN_TOKENS.spacing.md);
-console.log('✅ SajiloMarts visual design tokens verified');
+assert.strictEqual(DESIGN_TOKENS.colors.background.page, '#FAF8F5');
+assert.strictEqual(DESIGN_TOKENS.colors.text.primary, '#1C1917');
+assert.strictEqual(DESIGN_TOKENS.colors.brand.primary, '#B83A20');
+assert.ok(DESIGN_TOKENS.colors.background.surface);
+assert.ok(DESIGN_TOKENS.colors.border.subtle);
+console.log('✅ Warm neutral color system tokens verified');
 
 console.log('🎉 Design System initial foundation verified!');

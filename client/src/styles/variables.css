@@ -1,44 +1,66 @@
 :root {
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
+  /* Warm Neutral Background Palette */
+  --bg-page: #FAF8F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-secondary: #F4F1EA;
+  --bg-surface-tertiary: #ECE8DE;
+  --bg-surface-subtle: #F7F5F0;
 
-  --color-accent-500: #6366f1;
-  --color-accent-600: #4f46e5;
+  /* Typography / Text Palette */
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-muted: #78716C;
+  --text-subtle: #A8A29E;
+  --text-inverse: #FFFFFF;
 
-  --color-success-500: #10b981;
-  --color-warning-500: #f59e0b;
-  --color-danger-500: #ef4444;
+  /* Subtle Warm Borders */
+  --border-subtle: #E7E3DC;
+  --border-default: #DCD6CC;
+  --border-strong: #BCB4A6;
+  --border-focus: #B83A20;
 
-  --bg-primary: #0a0c10;
-  --bg-secondary: #12151c;
-  --bg-card: #181c26;
-  --bg-card-hover: #1f2430;
+  /* SajiloMarts Brand Accent (Himalayan Warm Brick / Carmine) */
+  --color-brand: #B83A20;
+  --color-brand-hover: #A03119;
+  --color-brand-active: #8B2A15;
+  --color-brand-subtle: #FDF4F2;
+  --color-brand-border: #F3D2CB;
 
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-color-hover: rgba(56, 189, 248, 0.35);
+  /* Functional Status Tokens */
+  --color-success: #15803D;
+  --color-success-bg: #F0FDF4;
+  --color-success-border: #BBF7D0;
 
-  --text-main: #f3f4f6;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  --color-warning: #B45309;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #FDE68A;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --color-error: #B91C1C;
+  --color-error-bg: #FEF2F2;
+  --color-error-border: #FECACA;
+
+  --color-info: #1D4ED8;
+  --color-info-bg: #EFF6FF;
+  --color-info-border: #BFDBFE;
+
+  /* Font System - System Sans (No Inter, Geist, or Space Grotesk) */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --radius-sm: 4px;
+  /* Restrained Radius */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-  --radius-full: 9999px;
+  --radius-xl: 16px;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  /* Restrained Elevation / Shadows */
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
 }
