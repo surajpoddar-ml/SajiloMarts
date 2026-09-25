@@ -4,7 +4,7 @@ import { ApiClientError, normalizeApiError } from '../utils/apiError.js';
 
 /**
  * SajiloMarts Centralized API Client
- * Supports cookies, auth tokens, automatic timeout aborts, and safe error envelopes.
+ * Supports cookies, auth tokens, automatic timeout aborts, and expired session handling.
  */
 export const apiClient = async (endpoint, options = {}) => {
   const defaultHeaders = {
@@ -46,6 +46,18 @@ export const apiClient = async (endpoint, options = {}) => {
     }
 
     if (!response.ok) {
+      if (response.status === 401 && !endpoint.includes('/auth/login')) {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER);
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('sajilomarts:session-expired', {
+            detail: { message: data?.message || 'Your session has expired. Please sign in again.' }
+          }));
+        }
+      }
+
       const errorMessage = data?.message || `Request failed with status ${response.status}`;
       throw new ApiClientError(errorMessage, response.status, data?.errors || null, data);
     }

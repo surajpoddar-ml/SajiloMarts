@@ -61,6 +61,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     refreshUser();
+
+    const handleSessionExpired = (event) => {
+      setUser(null);
+      setError(event.detail?.message || 'Session expired. Please log in again.');
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('sajilomarts:session-expired', handleSessionExpired);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('sajilomarts:session-expired', handleSessionExpired);
+      }
+    };
   }, [refreshUser]);
 
   const login = async (credentials) => {
