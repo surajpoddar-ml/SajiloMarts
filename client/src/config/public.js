@@ -5,4 +5,7 @@ export const PUBLIC_CONFIG = {
   SUPPORT_EMAIL: 'support@sastomarts.com',
   DEFAULT_LOCALE: 'en-NP',
   SUPPORTED_LOCALES: ['en-NP', 'ne-NP', 'hi-IN', 'en-IN'],
+  VERSION: '1.0.0',
+  HOMEPAGE_SOURCING_VERSION: '1.0.0',
 };
+
