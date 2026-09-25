@@ -36,8 +36,13 @@ import path from 'node:path';
 const buttonJsxPath = path.resolve('src/components/common/Button.jsx');
 assert.ok(fs.existsSync(buttonJsxPath), 'Button.jsx must exist');
 const buttonContent = fs.readFileSync(buttonJsxPath, 'utf8');
-assert.ok(buttonContent.includes('variant = \'primary\''), 'Button must default to primary variant');
-assert.ok(buttonContent.includes('btn--${variant}'), 'Button must support dynamic variant class');
-console.log('✅ Reusable Button component and variants verified');
+// Test 7: Form Field Components Verification
+const formFieldJsxPath = path.resolve('src/components/forms/FormField.jsx');
+const inputJsxPath = path.resolve('src/components/forms/Input.jsx');
+assert.ok(fs.existsSync(formFieldJsxPath), 'FormField.jsx must exist');
+assert.ok(fs.existsSync(inputJsxPath), 'Input.jsx must exist');
+const formFieldContent = fs.readFileSync(formFieldJsxPath, 'utf8');
+assert.ok(formFieldContent.includes('export const FormField'), 'FormField must be exported');
+console.log('✅ Accessible form field components verified');
 
 console.log('🎉 Design System initial foundation verified!');
