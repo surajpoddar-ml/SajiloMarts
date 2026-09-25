@@ -82,15 +82,8 @@ export function HomePage({
 
   return (
     <div className="homepage" id="sastomarts-homepage">
-      {/* 1. Hero / Product URL Sourcing Section */}
-      <HeroSection>
-        <ProductUrlForm
-          onSubmitUrl={handleUrlSubmit}
-          isLoading={isUrlValidating}
-          initialUrl={productUrl}
-          serverError={urlError}
-        />
-      </HeroSection>
+      {/* 1. Hero / Brand Value Section */}
+      <HeroSection />
 
       {/* 2. Sourcing Portal Layout Section */}
       <SourcingPortalSection

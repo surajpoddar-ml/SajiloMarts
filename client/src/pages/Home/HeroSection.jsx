@@ -52,14 +52,13 @@ export const HeroSection = ({ children }) => {
 
           <Typography variant="lead" style={{
             color: 'var(--text-secondary)',
-            marginBottom: 'var(--space-8)',
             maxWidth: '640px',
-            margin: '0 auto var(--space-8)',
+            margin: children ? '0 auto var(--space-8)' : '0 auto',
           }}>
-            Find any item on Amazon India, Flipkart, Myntra, Meesho, or Tata 1mg. Paste the product link below to verify and generate an authoritative server quote.
+            Find any item on Amazon India, Flipkart, Myntra, Meesho, or Tata 1mg. Enter your product details below to verify and generate an authoritative server quote.
           </Typography>
 
-          {/* Child Slot for Product URL Sourcing Form */}
+          {/* Child Slot */}
           {children}
         </div>
       </Container>
