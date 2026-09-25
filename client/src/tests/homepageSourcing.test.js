@@ -20,4 +20,14 @@ assert.strictEqual(detectMarketplace('https://www.1mg.com/otc/test').name, 'Tata
 assert.ok(validateProductUrl('https://www.fakestore.xyz/item'));
 console.log('✅ Marketplace validation & domain resolution verified');
 
+// Test 3: Accessible Quantity Controls verification
+import fs from 'node:fs';
+import path from 'node:path';
+const quantityInputPath = path.resolve('src/components/forms/QuantityInput.jsx');
+assert.ok(fs.existsSync(quantityInputPath), 'QuantityInput.jsx must exist');
+const quantityContent = fs.readFileSync(quantityInputPath, 'utf8');
+assert.ok(quantityContent.includes('export const QuantityInput'), 'QuantityInput must be exported');
+assert.ok(quantityContent.includes('aria-valuemin'), 'QuantityInput must contain accessible aria attributes');
+console.log('✅ Accessible Quantity Controls component verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');

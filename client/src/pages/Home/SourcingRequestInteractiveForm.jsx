@@ -5,6 +5,7 @@ import { Typography } from '../../components/common/Typography.jsx';
 import { Input } from '../../components/forms/Input.jsx';
 import { Textarea } from '../../components/forms/Textarea.jsx';
 import { FormField } from '../../components/forms/FormField.jsx';
+import { QuantityInput } from '../../components/forms/QuantityInput.jsx';
 import { validateProductUrl, detectMarketplace, validateRequired } from '../../utils/formValidation.js';
 
 /**
@@ -132,6 +133,21 @@ export const SourcingRequestInteractiveForm = ({
                 onBlur={() => handleBlur('productName')}
                 placeholder="e.g. Sony WH-1000XM5 Wireless Headphones"
                 hasError={Boolean(errors.productName)}
+                disabled={isLoading}
+              />
+            </FormField>
+
+            {/* Quantity */}
+            <FormField
+              label="Quantity"
+              required
+              hint="Minimum 1 unit. Quantity is strictly verified against India seller limits."
+            >
+              <QuantityInput
+                value={formData.quantity}
+                onChange={(newQty) => handleChange('quantity', newQty)}
+                min={1}
+                max={1000}
                 disabled={isLoading}
               />
             </FormField>
