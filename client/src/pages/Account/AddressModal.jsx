@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { addressService } from '../../services/address.service.js';
 import { Button } from '../../components/common/Button.jsx';
 import { Typography } from '../../components/common/Typography.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const NEPAL_PROVINCES = [
   'Bagmati Province',
@@ -16,15 +18,18 @@ const PHONE_REGEX = /^(?:\+?(?:977|91)[\s-]?)?[6789]\d{9}$/;
 
 /**
  * SajiloMarts Address Creation & Edit Modal Form
- * Full Nepal delivery destination form with strict client-side validation.
+ * Full Nepal delivery destination form with strict client-side validation, accessibility, and backend integration.
  */
 export const AddressModal = ({
-  isOpen = false,
-  onClose = () => {},
-  onSave = () => {},
+  isOpen = true,
+  address = null,
   initialData = null,
-  isSaving = false,
+  onClose = () => {},
+  onSave,
+  onSaved,
 }) => {
+  const activeAddress = address || initialData;
+  const { showSuccess, showError } = useToast();
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -39,20 +44,38 @@ export const AddressModal = ({
   });
 
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [serverError, setServerError] = useState(null);
 
   useEffect(() => {
-    if (initialData) {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('keydown', handleKeyDown);
+      }
+    };
+  }, [onClose]);
+
+  useEffect(() => {
+    if (activeAddress) {
       setFormData({
-        fullName: initialData.fullName || '',
-        phone: initialData.phone || '',
-        province: initialData.province || 'Bagmati Province',
-        district: initialData.district || '',
-        municipality: initialData.municipality || '',
-        wardNumber: initialData.wardNumber ? String(initialData.wardNumber) : '1',
-        tole: initialData.tole || '',
-        landmark: initialData.landmark || '',
-        label: initialData.label || 'home',
-        isDefaultShipping: Boolean(initialData.isDefaultShipping),
+        fullName: activeAddress.fullName || '',
+        phone: activeAddress.phone || '',
+        province: activeAddress.province || 'Bagmati Province',
+        district: activeAddress.district || '',
+        municipality: activeAddress.municipality || '',
+        wardNumber: activeAddress.wardNumber ? String(activeAddress.wardNumber) : '1',
+        tole: activeAddress.tole || '',
+        landmark: activeAddress.landmark || '',
+        label: activeAddress.label || 'home',
+        isDefaultShipping: Boolean(activeAddress.isDefaultShipping),
       });
     } else {
       setFormData({
@@ -69,7 +92,8 @@ export const AddressModal = ({
       });
     }
     setErrors({});
-  }, [initialData, isOpen]);
+    setServerError(null);
+  }, [activeAddress, isOpen]);
 
   if (!isOpen) return null;
 
@@ -127,11 +151,11 @@ export const AddressModal = ({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    onSave({
+    const payload = {
       ...formData,
       fullName: formData.fullName.trim(),
       phone: formData.phone.trim(),
@@ -141,7 +165,37 @@ export const AddressModal = ({
       tole: formData.tole.trim(),
       landmark: formData.landmark.trim() || null,
       country: 'Nepal',
-    });
+    };
+
+    if (onSave) {
+      onSave(payload);
+      return;
+    }
+
+    setIsSaving(true);
+    setServerError(null);
+
+    try {
+      if (activeAddress && (activeAddress._id || activeAddress.id)) {
+        await addressService.updateAddress(activeAddress._id || activeAddress.id, payload);
+        showSuccess('Delivery address updated successfully.');
+      } else {
+        await addressService.createAddress(payload);
+        showSuccess('New delivery address added.');
+      }
+
+      if (onSaved) {
+        onSaved();
+      } else {
+        onClose();
+      }
+    } catch (err) {
+      const msg = err.message || 'Failed to save address. Please check fields.';
+      setServerError(msg);
+      showError(msg);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -183,7 +237,7 @@ export const AddressModal = ({
           }}
         >
           <h2 id="address-modal-title" style={{ fontSize: '1.2rem', margin: 0, color: 'var(--text-primary)' }}>
-            {initialData ? 'Edit Delivery Address' : 'Add New Nepal Delivery Address'}
+            {activeAddress ? 'Edit Delivery Address' : 'Add New Nepal Delivery Address'}
           </h2>
           <button
             type="button"
@@ -197,11 +251,28 @@ export const AddressModal = ({
               color: 'var(--text-muted)',
               lineHeight: 1,
             }}
-            aria-label="Close modal"
+            aria-label="Close address dialog"
           >
             &times;
           </button>
         </div>
+
+        {serverError && (
+          <div
+            role="alert"
+            style={{
+              margin: 'var(--space-4) var(--space-6) 0',
+              padding: '0.75rem 1rem',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: 'var(--color-error)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.875rem',
+            }}
+          >
+            {serverError}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ padding: 'var(--space-6)' }} noValidate>
           <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
