@@ -1,15 +1,12 @@
+import React from 'react';
 import { useAuth } from '../hooks/useAuth.js';
+import { Button } from '../components/common/Button.jsx';
+import { Card } from '../components/common/Card.jsx';
+import { Spinner } from '../components/feedback/Spinner.jsx';
 
 /**
- * Admin Route Guard
+ * SajiloMarts Admin Route Guard
  * Enforces authenticated administrator access.
- * Displays safe unauthorized state for authenticated non-admin users and prompts unauthenticated users to sign in.
- *
- * @param {object} props
- * @param {React.ReactNode} props.children
- * @param {React.ReactNode} [props.fallback]
- * @param {() => void} [props.onRedirectToLogin]
- * @param {() => void} [props.onRedirectToHome]
  */
 export const AdminRoute = ({
   children,
@@ -21,9 +18,9 @@ export const AdminRoute = ({
 
   if (isLoading) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
-        <div className="status-indicator loading" style={{ margin: '0 auto 1rem' }}></div>
-        <p>Verifying administrative credentials...</p>
+      <div style={{ textAlign: 'center', padding: 'var(--space-12) var(--space-4)', color: 'var(--text-secondary)' }}>
+        <Spinner size="md" label="Verifying administrator credentials..." />
+        <p style={{ marginTop: 'var(--space-3)', fontSize: '0.875rem' }}>Verifying administrative credentials...</p>
       </div>
     );
   }
@@ -31,37 +28,23 @@ export const AdminRoute = ({
   if (!isAuthenticated) {
     if (fallback) return fallback;
     return (
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '3rem 1.5rem',
-          background: '#f8fafc',
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0',
-          maxWidth: '480px',
-          margin: '2rem auto',
-        }}
-      >
-        <span style={{ fontSize: '2.5rem' }}>🛡️</span>
-        <h3 style={{ margin: '1rem 0 0.5rem', color: '#0f172a' }}>Admin Authentication Required</h3>
-        <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-          This section requires administrative privileges. Please log in with an administrator account.
-        </p>
-        {onRedirectToLogin && (
-          <button
-            type="button"
-            className="refresh-btn"
-            onClick={onRedirectToLogin}
-            style={{
-              background: '#2563eb',
-              color: '#ffffff',
-              borderColor: '#2563eb',
-              padding: '0.65rem 1.25rem',
-            }}
-          >
-            Sign in as Administrator
-          </button>
-        )}
+      <div style={{ maxWidth: '480px', margin: 'var(--space-8) auto', padding: '0 var(--space-4)' }}>
+        <Card style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+          <h3 style={{ margin: '0 0 var(--space-2)', color: 'var(--text-primary)', fontSize: '1.25rem' }}>
+            Administrator Access Required
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 'var(--space-6)' }}>
+            This section requires administrative privileges. Please log in with an administrator account.
+          </p>
+          {onRedirectToLogin && (
+            <Button
+              variant="primary"
+              onClick={onRedirectToLogin}
+            >
+              Sign In as Administrator
+            </Button>
+          )}
+        </Card>
       </div>
     );
   }
@@ -69,37 +52,23 @@ export const AdminRoute = ({
   if (!isAdmin) {
     if (fallback) return fallback;
     return (
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '3rem 1.5rem',
-          background: '#fef2f2',
-          borderRadius: '12px',
-          border: '1px solid #fecaca',
-          maxWidth: '480px',
-          margin: '2rem auto',
-        }}
-      >
-        <span style={{ fontSize: '2.5rem' }}>🚫</span>
-        <h3 style={{ margin: '1rem 0 0.5rem', color: '#991b1b' }}>Access Denied (403 Forbidden)</h3>
-        <p style={{ color: '#7f1d1d', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-          Your account (<strong>{user?.email}</strong>) holds role <code>{user?.role}</code> which does not have permission to access administrative areas.
-        </p>
-        {onRedirectToHome && (
-          <button
-            type="button"
-            className="refresh-btn"
-            onClick={onRedirectToHome}
-            style={{
-              background: '#b91c1c',
-              color: '#ffffff',
-              borderColor: '#b91c1c',
-              padding: '0.65rem 1.25rem',
-            }}
-          >
-            Return to Customer Dashboard
-          </button>
-        )}
+      <div style={{ maxWidth: '480px', margin: 'var(--space-8) auto', padding: '0 var(--space-4)' }}>
+        <Card style={{ textAlign: 'center', padding: 'var(--space-8)', borderColor: 'var(--color-error-border)' }}>
+          <h3 style={{ margin: '0 0 var(--space-2)', color: 'var(--color-error)', fontSize: '1.25rem' }}>
+            Access Denied (403 Forbidden)
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: 'var(--space-6)' }}>
+            Your account (<strong>{user?.email}</strong>) does not hold administrator permissions.
+          </p>
+          {onRedirectToHome && (
+            <Button
+              variant="secondary"
+              onClick={onRedirectToHome}
+            >
+              Return to Customer Dashboard
+            </Button>
+          )}
+        </Card>
       </div>
     );
   }

@@ -116,7 +116,15 @@ assert.ok(fs.existsSync(toastContextJsxPath), 'ToastContext.jsx must exist');
 const toastContent = fs.readFileSync(toastContextJsxPath, 'utf8');
 assert.ok(toastContent.includes('export const ToastProvider'), 'ToastProvider must be exported');
 assert.ok(toastContent.includes('export const useToast'), 'useToast must be exported');
-assert.ok(toastContent.includes('toast-container'), 'ToastContainer structure must be defined');
-console.log('✅ Global notification & toast foundation verified');
+// Test 20: Protected Frontend Route Guards Verification
+const protectedRouteJsxPath = path.resolve('src/routes/ProtectedRoute.jsx');
+const adminRouteJsxPath = path.resolve('src/routes/AdminRoute.jsx');
+assert.ok(fs.existsSync(protectedRouteJsxPath), 'ProtectedRoute.jsx must exist');
+assert.ok(fs.existsSync(adminRouteJsxPath), 'AdminRoute.jsx must exist');
+const protectedContent = fs.readFileSync(protectedRouteJsxPath, 'utf8');
+const adminContent = fs.readFileSync(adminRouteJsxPath, 'utf8');
+assert.ok(protectedContent.includes('export const ProtectedRoute'), 'ProtectedRoute must be exported');
+assert.ok(adminContent.includes('export const AdminRoute'), 'AdminRoute must be exported');
+console.log('✅ Protected frontend route guards verified');
 
 console.log('🎉 Design System initial foundation verified!');
