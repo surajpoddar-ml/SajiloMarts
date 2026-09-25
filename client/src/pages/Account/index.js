@@ -1,4 +1,5 @@
 export { CustomerPortal } from './CustomerPortal.jsx';
 export { AccountOverview } from './AccountOverview.jsx';
+export { ProfileSection } from './ProfileSection.jsx';
 export { ChangePasswordSection } from './ChangePasswordSection.jsx';
 
