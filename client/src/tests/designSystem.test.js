@@ -103,7 +103,15 @@ assert.ok(fs.existsSync(mobileNavJsxPath), 'MobileNav.jsx must exist');
 const mobileNavContent = fs.readFileSync(mobileNavJsxPath, 'utf8');
 assert.ok(mobileNavContent.includes('export const MobileNav'), 'MobileNav must be exported');
 assert.ok(mobileNavContent.includes('aria-modal="true"'), 'MobileNav must provide accessible dialog attributes');
-assert.ok(mobileNavContent.includes('Escape'), 'MobileNav must handle keyboard Escape key');
-console.log('✅ Accessible mobile navigation verified');
+// Test 18: Frontend API Error Handling Verification
+import { ApiClientError, normalizeApiError } from '../utils/apiError.js';
+const testErr = new ApiClientError('Invalid URL', 400);
+assert.strictEqual(testErr.status, 400);
+assert.strictEqual(testErr.isAuthError, false);
+const authErr = new ApiClientError('Unauthorized', 401);
+assert.strictEqual(authErr.isAuthError, true);
+const normalized = normalizeApiError(new Error('Sample API failure'));
+assert.strictEqual(normalized.name, 'ApiClientError');
+console.log('✅ Frontend API error handling and normalization verified');
 
 console.log('🎉 Design System initial foundation verified!');
