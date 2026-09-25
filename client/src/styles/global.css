@@ -4,6 +4,7 @@
 @import './button.css';
 @import './forms.css';
 @import './card.css';
+@import './status.css';
 
 *, *::before, *::after {
   box-sizing: border-box;

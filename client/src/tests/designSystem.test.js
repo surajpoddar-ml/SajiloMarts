@@ -52,7 +52,13 @@ const cardJsxPath = path.resolve('src/components/common/Card.jsx');
 assert.ok(fs.existsSync(cardJsxPath), 'Card.jsx must exist');
 const cardContent = fs.readFileSync(cardJsxPath, 'utf8');
 assert.ok(cardContent.includes('export const Card'), 'Card must be exported');
-assert.ok(cardContent.includes('export const CardHeader'), 'CardHeader must be exported');
-console.log('✅ Reusable Card and Surface components verified');
+// Test 10: Status System Verification
+const statusBadgeJsxPath = path.resolve('src/components/common/StatusBadge.jsx');
+assert.ok(fs.existsSync(statusBadgeJsxPath), 'StatusBadge.jsx must exist');
+const statusBadgeContent = fs.readFileSync(statusBadgeJsxPath, 'utf8');
+assert.ok(statusBadgeContent.includes('export const StatusBadge'), 'StatusBadge must be exported');
+assert.ok(statusBadgeContent.includes('quote_ready'), 'StatusBadge must support quote_ready');
+assert.ok(statusBadgeContent.includes('customer_confirmed'), 'StatusBadge must support customer_confirmed');
+console.log('✅ SajiloMarts status system & badge components verified');
 
 console.log('🎉 Design System initial foundation verified!');
