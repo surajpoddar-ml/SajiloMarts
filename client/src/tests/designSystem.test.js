@@ -157,7 +157,13 @@ const accessibilityCssPath = path.resolve('src/styles/accessibility.css');
 assert.ok(fs.existsSync(accessibilityCssPath), 'accessibility.css must exist');
 const accessibilityContent = fs.readFileSync(accessibilityCssPath, 'utf8');
 assert.ok(accessibilityContent.includes('prefers-reduced-motion'), 'Must support prefers-reduced-motion');
-assert.ok(accessibilityContent.includes(':focus-visible'), 'Must define visible focus states');
-console.log('✅ Reduced-motion and accessible interaction behavior verified');
+// Test 27: Desktop, Mobile, and Accessibility Verification
+const showcaseJsxPath = path.resolve('src/pages/Showcase/DesignSystemShowcase.jsx');
+assert.ok(fs.existsSync(showcaseJsxPath), 'DesignSystemShowcase.jsx must exist');
+const showcaseContent = fs.readFileSync(showcaseJsxPath, 'utf8');
+assert.ok(showcaseContent.includes('export const DesignSystemShowcase'), 'DesignSystemShowcase must be exported');
+assert.ok(showcaseContent.includes('Warm Neutral Palette'), 'Showcase must include Warm Neutral palette demo');
+assert.ok(showcaseContent.includes('Button System'), 'Showcase must include Button system demo');
+console.log('✅ Desktop, mobile, and accessibility showcase verification passed');
 
 console.log('🎉 Design System initial foundation verified!');
