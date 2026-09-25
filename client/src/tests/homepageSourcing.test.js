@@ -169,4 +169,19 @@ for (const pattern of bannedPatterns) {
 }
 console.log('✅ Strict No-Dummy-Data Audit verified (0 fake records)');
 
-console.log('🎉 Homepage & Sourcing test baseline verified!');
+// Test 20: Complete homepage sourcing journey components integration
+assert.ok(homePageFileContent.includes('HeroSection'), 'HomePage must integrate HeroSection');
+assert.ok(homePageFileContent.includes('ProductUrlForm'), 'HomePage must integrate ProductUrlForm');
+assert.ok(homePageFileContent.includes('SourcingPortalSection'), 'HomePage must integrate SourcingPortalSection');
+assert.ok(homePageFileContent.includes('SourcingRequestInteractiveForm'), 'HomePage must integrate SourcingRequestInteractiveForm');
+assert.ok(homePageFileContent.includes('RequestReviewCard'), 'HomePage must integrate RequestReviewCard');
+assert.ok(homePageFileContent.includes('ServerQuoteDisplay'), 'HomePage must integrate ServerQuoteDisplay');
+assert.ok(homePageFileContent.includes('HowItWorksSection'), 'HomePage must integrate HowItWorksSection');
+assert.ok(homePageFileContent.includes('SupportedMarketplacesSection'), 'HomePage must integrate SupportedMarketplacesSection');
+assert.ok(homePageFileContent.includes('ServiceBenefitsSection'), 'HomePage must integrate ServiceBenefitsSection');
+assert.ok(homePageFileContent.includes('TrackOrderSection'), 'HomePage must integrate TrackOrderSection');
+assert.ok(homePageFileContent.includes('AccountEntrySection'), 'HomePage must integrate AccountEntrySection');
+assert.ok(homePageFileContent.includes('SupportEntrySection'), 'HomePage must integrate SupportEntrySection');
+console.log('✅ Complete homepage sourcing journey components verified');
+
+console.log('🎉 SastoMarts Homepage & Product Request Experience FULLY VERIFIED!');
