@@ -18,7 +18,6 @@ import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx
 import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
 import { HomePage } from './pages/Home';
 import { TermsPage, PrivacyPage } from './pages/Legal';
-import { DesignSystemShowcase } from './pages/Showcase/DesignSystemShowcase.jsx';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
@@ -151,59 +150,7 @@ function AppContent() {
         </Container>
       )}
 
-      {/* Global Quick-Nav Strip for Foundation Switching */}
-      <div style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', padding: '6px 0' }}>
-        <Container size="wide">
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto', padding: '2px 0' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', marginRight: '4px' }}>
-              Quick View:
-            </span>
-            <button
-              type="button"
-              className={`customer-nav__link ${currentView === 'home' ? 'customer-nav__link--active' : ''}`}
-              onClick={() => handleNavigate('home')}
-            >
-              System Health
-            </button>
-            <button
-              type="button"
-              className={`customer-nav__link ${currentView === 'showcase' ? 'customer-nav__link--active' : ''}`}
-              onClick={() => handleNavigate('showcase')}
-            >
-              🎨 Design System Showcase
-            </button>
-            <button
-              type="button"
-              className={`customer-nav__link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? 'customer-nav__link--active' : ''}`}
-              onClick={() => handleNavigate('sourcing-requests')}
-            >
-              📦 Sourcing Portal
-            </button>
-            <button
-              type="button"
-              className={`customer-nav__link ${currentView === 'account' ? 'customer-nav__link--active' : ''}`}
-              onClick={() => handleNavigate('account')}
-            >
-              👤 Customer Account
-            </button>
-            {isAdmin && (
-              <button
-                type="button"
-                className={`customer-nav__link ${currentView === 'admin-console' ? 'customer-nav__link--active' : ''}`}
-                onClick={() => handleNavigate('admin-console')}
-                style={{ color: '#B91C1C' }}
-              >
-                🛡️ Admin Console
-              </button>
-            )}
-          </div>
-        </Container>
-      </div>
-
       <main id="main-content" className="app-shell__main">
-        {/* Design System Showcase View */}
-        {currentView === 'showcase' && <DesignSystemShowcase />}
-
         {/* Sourcing Portal Views */}
         {currentView === 'sourcing-requests' && (
           <ProtectedRoute
@@ -382,8 +329,8 @@ function AppContent() {
               <Typography variant="body" style={{ marginBottom: 'var(--space-6)' }}>
                 This section is wired into the SastoMarts layout and navigation system. Full functionality is scheduled for upcoming feature prompts.
               </Typography>
-              <Button variant="primary" onClick={() => handleNavigate('showcase')}>
-                Explore Design System Showcase
+              <Button variant="primary" onClick={() => handleNavigate('home')}>
+                Back to Homepage
               </Button>
             </Card>
           </Container>

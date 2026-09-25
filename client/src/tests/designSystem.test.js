@@ -157,19 +157,20 @@ const accessibilityCssPath = path.resolve('src/styles/accessibility.css');
 assert.ok(fs.existsSync(accessibilityCssPath), 'accessibility.css must exist');
 const accessibilityContent = fs.readFileSync(accessibilityCssPath, 'utf8');
 assert.ok(accessibilityContent.includes('prefers-reduced-motion'), 'Must support prefers-reduced-motion');
-// Test 27: Desktop, Mobile, and Accessibility Verification
-const showcaseJsxPath = path.resolve('src/pages/Showcase/DesignSystemShowcase.jsx');
-assert.ok(fs.existsSync(showcaseJsxPath), 'DesignSystemShowcase.jsx must exist');
-const showcaseContent = fs.readFileSync(showcaseJsxPath, 'utf8');
-assert.ok(showcaseContent.includes('export const DesignSystemShowcase'), 'DesignSystemShowcase must be exported');
-assert.ok(showcaseContent.includes('Warm Neutral Palette'), 'Showcase must include Warm Neutral palette demo');
+// Test 27: Brand Logo Component Verification
+const logoJsxPath = path.resolve('src/components/common/Logo.jsx');
+assert.ok(fs.existsSync(logoJsxPath), 'Logo.jsx must exist');
+const logoContent = fs.readFileSync(logoJsxPath, 'utf8');
+assert.ok(logoContent.includes('export const Logo'), 'Logo must be exported');
+assert.ok(logoContent.includes('SastoMarts'), 'Logo must have SastoMarts brand text');
+
 // Test 28: Complete Design System Foundation Verification
 const appJsxPath = path.resolve('src/App.jsx');
 assert.ok(fs.existsSync(appJsxPath), 'App.jsx must exist');
 const appContent = fs.readFileSync(appJsxPath, 'utf8');
 assert.ok(appContent.includes('ErrorBoundary'), 'App must be wrapped in ErrorBoundary');
 assert.ok(appContent.includes('ToastProvider'), 'App must provide Toast notifications');
-assert.ok(appContent.includes('DesignSystemShowcase'), 'App must support showcase navigation');
+assert.ok(appContent.includes('AppShell') || appContent.includes('app-shell'), 'App must render standard app shell');
 console.log('✅ Complete SastoMarts frontend design system foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');
