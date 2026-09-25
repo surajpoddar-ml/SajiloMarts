@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { healthService } from './services';
-import { ENV, FEATURE_FLAGS, PUBLIC_CONFIG } from './config';
-import { Header, Footer } from './components/layout';
-import { StatusCard, FoundationHighlights } from './components/common';
+import { ENV, PUBLIC_CONFIG } from './config';
+import { Header, Footer, Container, Section, CustomerNav, AdminNav, MobileNav, AppShell } from './components/layout';
+import { Card, CardHeader, CardBody, Button, Typography, StatusBadge } from './components/common';
+import { ErrorBoundary } from './components/feedback';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ToastProvider, useToast } from './context/ToastContext.jsx';
 import { useAuth } from './hooks/useAuth.js';
 import { LoginPage } from './pages/Auth/LoginPage.jsx';
 import { RegisterPage } from './pages/Auth/RegisterPage.jsx';
@@ -13,6 +15,8 @@ import { ForgotPasswordPage } from './pages/Auth/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
 import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
 import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
+import { DesignSystemShowcase } from './pages/Showcase/DesignSystemShowcase.jsx';
+import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
 import './App.css';
@@ -41,8 +45,10 @@ const ARCHITECTURE_RULES = [
 ];
 
 function AppContent() {
-  const { user, isAuthenticated, role, isAdmin, isCustomer, logout } = useAuth();
+  const { user, isAuthenticated, role, isAdmin, logout } = useAuth();
+  const { showInfo } = useToast();
   const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -88,296 +94,399 @@ function AppContent() {
     checkHealth();
   }, []);
 
-  const backendIndicator = backendStatus.connected
-    ? 'active'
-    : backendStatus.loading
-    ? 'loading'
-    : 'offline';
+  const handleNavigate = (view) => {
+    setCurrentView(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <div className="container">
+    <div className="app-shell">
       <Header
         brandName={PUBLIC_CONFIG.BRAND_NAME}
-        stepLabel="Prompt 15 &bull; Sourcing &amp; Quote APIs"
+        currentView={currentView}
+        onNavigate={handleNavigate}
         user={user}
-        onLogin={() => setCurrentView('login')}
-        onRegister={() => setCurrentView('register')}
+        isAdmin={isAdmin}
+        onLogin={() => handleNavigate('login')}
+        onRegister={() => handleNavigate('register')}
         onLogout={async () => {
           await logout();
-          setCurrentView('home');
+          handleNavigate('home');
+        }}
+        onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        isMobileMenuOpen={isMobileMenuOpen}
+      />
+
+      <MobileNav
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        currentView={currentView}
+        onNavigate={handleNavigate}
+        user={user}
+        isAdmin={isAdmin}
+        onLogin={() => handleNavigate('login')}
+        onRegister={() => handleNavigate('register')}
+        onLogout={async () => {
+          await logout();
+          handleNavigate('home');
         }}
       />
 
-      <nav style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', margin: '1rem 0', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={() => setCurrentView('home')}
-          className="refresh-btn"
-          style={{
-            background: currentView === 'home' ? '#2563eb' : '#ffffff',
-            color: currentView === 'home' ? '#ffffff' : '#334155',
-            borderColor: currentView === 'home' ? '#2563eb' : '#cbd5e1',
-          }}
-        >
-          Home &amp; System Health
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setCurrentView('sourcing-requests')}
-          className="refresh-btn"
-          style={{
-            background: ['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? '#2563eb' : '#ffffff',
-            color: ['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? '#ffffff' : '#334155',
-            borderColor: ['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? '#2563eb' : '#cbd5e1',
-          }}
-        >
-          📦 Sourcing Portal (Quotes &amp; Requests)
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setCurrentView('account')}
-          className="refresh-btn"
-          style={{
-            background: currentView === 'account' ? '#2563eb' : '#ffffff',
-            color: currentView === 'account' ? '#ffffff' : '#334155',
-            borderColor: currentView === 'account' ? '#2563eb' : '#cbd5e1',
-          }}
-        >
-          Customer Profile
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setCurrentView('admin-console')}
-          className="refresh-btn"
-          style={{
-            background: currentView === 'admin-console' ? '#b91c1c' : '#ffffff',
-            color: currentView === 'admin-console' ? '#ffffff' : '#991b1b',
-            borderColor: currentView === 'admin-console' ? '#b91c1c' : '#fca5a5',
-          }}
-        >
-          🛡️ Admin Console
-        </button>
-      </nav>
-
-      {/* Sourcing Portal Views */}
-      {currentView === 'sourcing-requests' && (
-        <ProtectedRoute
-          onRedirectToLogin={() => setCurrentView('login')}
-          onRedirectToHome={() => setCurrentView('home')}
-        >
-          <SourcingRequestList
-            onCreateNew={() => setCurrentView('sourcing-new')}
-            onSelectRequest={(id) => {
-              setSelectedRequestId(id);
-              setCurrentView('sourcing-detail');
-            }}
-          />
-        </ProtectedRoute>
+      {/* Role-Aware Sub-Navigation for Authenticated Users */}
+      {isAuthenticated && isAdmin && (
+        <Container size="wide">
+          <AdminNav currentView={currentView} onNavigate={handleNavigate} />
+        </Container>
       )}
 
-      {currentView === 'sourcing-new' && (
-        <ProtectedRoute
-          onRedirectToLogin={() => setCurrentView('login')}
-          onRedirectToHome={() => setCurrentView('home')}
-        >
-          <SourcingRequestForm
-            onRequestCreated={(req) => {
-              setSelectedRequestId(req._id || req.id);
-              setCurrentView('sourcing-detail');
-            }}
-            onCancel={() => setCurrentView('sourcing-requests')}
-          />
-        </ProtectedRoute>
+      {isAuthenticated && !isAdmin && (
+        <Container size="wide">
+          <CustomerNav currentView={currentView} onNavigate={handleNavigate} />
+        </Container>
       )}
 
-      {currentView === 'sourcing-detail' && (
-        <ProtectedRoute
-          onRedirectToLogin={() => setCurrentView('login')}
-          onRedirectToHome={() => setCurrentView('home')}
-        >
-          <SourcingRequestDetail
-            requestId={selectedRequestId}
-            onBack={() => setCurrentView('sourcing-requests')}
-            onStatusUpdated={() => {}}
-          />
-        </ProtectedRoute>
-      )}
-
-      {currentView === 'login' && (
-        <LoginPage
-          onNavigateToRegister={() => setCurrentView('register')}
-          onNavigateToForgot={() => setCurrentView('forgot-password')}
-          onNavigateToResend={() => setCurrentView('resend-verification')}
-          onLoginSuccess={() => setCurrentView(isAdmin ? 'admin-console' : 'account')}
-        />
-      )}
-
-      {currentView === 'register' && (
-        <RegisterPage
-          onNavigateToLogin={() => setCurrentView('login')}
-          onRegisterSuccess={() => setCurrentView('account')}
-        />
-      )}
-
-      {currentView === 'forgot-password' && (
-        <ForgotPasswordPage
-          onNavigateToLogin={() => setCurrentView('login')}
-        />
-      )}
-
-      {currentView === 'reset-password' && (
-        <ResetPasswordPage
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToForgot={() => setCurrentView('forgot-password')}
-        />
-      )}
-
-      {currentView === 'verify-email' && (
-        <VerifyEmailPage
-          onNavigateToLogin={() => setCurrentView('login')}
-          onNavigateToResend={() => setCurrentView('resend-verification')}
-        />
-      )}
-
-      {currentView === 'resend-verification' && (
-        <ResendVerificationPage
-          onNavigateToLogin={() => setCurrentView('login')}
-        />
-      )}
-
-      {currentView === 'account' && (
-        <ProtectedRoute
-          onRedirectToLogin={() => setCurrentView('login')}
-          onRedirectToHome={() => setCurrentView('home')}
-        >
-          <div style={{ maxWidth: '640px', margin: '2rem auto', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ margin: '0 0 1rem', color: '#0f172a' }}>Customer Profile &amp; Access Controls</h2>
-            <div style={{ display: 'grid', gap: '0.75rem', textAlign: 'left', background: '#f8fafc', padding: '1.25rem', borderRadius: '8px' }}>
-              <div><strong>Name:</strong> {user?.name}</div>
-              <div><strong>Email:</strong> {user?.email}</div>
-              <div><strong>Phone:</strong> {user?.phone || 'Not provided'}</div>
-              <div><strong>Authoritative Role:</strong> <span className="badge" style={{ marginLeft: '0.25rem' }}>{role}</span></div>
-              <div>
-                <strong>Email Verification:</strong>{' '}
-                {user?.isEmailVerified ? (
-                  <span style={{ color: '#16a34a', fontWeight: 600 }}>&check; Verified</span>
-                ) : (
-                  <span>
-                    <span style={{ color: '#d97706', fontWeight: 600 }}>&bull; Unverified</span>
-                    <button
-                      type="button"
-                      onClick={() => setCurrentView('resend-verification')}
-                      className="auth-link"
-                      style={{ background: 'none', border: 'none', marginLeft: '0.75rem', fontSize: '0.85rem' }}
-                    >
-                      Resend Verification Email
-                    </button>
-                  </span>
-                )}
-              </div>
-              <div><strong>Account Status:</strong> <span style={{ color: '#16a34a', fontWeight: 600 }}>Active</span></div>
-            </div>
-
-            <ChangePasswordSection />
-          </div>
-        </ProtectedRoute>
-      )}
-
-      {currentView === 'admin-console' && (
-        <AdminRoute
-          onRedirectToLogin={() => setCurrentView('login')}
-          onRedirectToHome={() => setCurrentView('account')}
-        >
-          <div style={{ maxWidth: '640px', margin: '2rem auto', background: '#ffffff', border: '1px solid #fecaca', borderRadius: '16px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-            <h2 style={{ margin: '0 0 1rem', color: '#991b1b' }}>🛡️ Administrative Access Boundary</h2>
-            <div style={{ background: '#fef2f2', padding: '1.25rem', borderRadius: '8px', textAlign: 'left', marginBottom: '1.5rem' }}>
-              <p style={{ margin: '0 0 0.5rem', color: '#7f1d1d', fontWeight: 600 }}>
-                &check; Administrator Privilege Verified Server-Side
-              </p>
-              <div style={{ color: '#475569', fontSize: '0.9rem' }}>
-                <div><strong>Admin Identity:</strong> {user?.name} ({user?.email})</div>
-                <div><strong>Role Guard:</strong> <code>{role}</code></div>
-                <div><strong>Authorization Status:</strong> <span style={{ color: '#16a34a', fontWeight: 600 }}>Authorized for Administrative Endpoints</span></div>
-              </div>
-            </div>
-            <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
-              Note: Full administrative control panel views will be implemented in Prompt 21.
-            </p>
-          </div>
-        </AdminRoute>
-      )}
-
-      {currentView === 'home' && (
-        <main className="hero-section">
-          <h1 className="title">{PUBLIC_CONFIG.TAGLINE}</h1>
-          <p className="subtitle">
-            Role-Based Access Control &amp; Authorization foundation with customer/admin isolation, ownership validation, and deny-by-default policy.
-          </p>
-
-          <div className="status-card-grid">
-            <StatusCard
-              statusIndicator="active"
-              tag={`React Frontend (${ENV.NODE_ENV})`}
-              title="Auth Context &amp; Role Guards"
-              detail={`Session State: ${isAuthenticated ? `Authenticated (${user?.name} - ${role})` : 'Guest / Unauthenticated'}`}
+      {/* Global Quick-Nav Strip for Foundation Switching */}
+      <div style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', padding: '6px 0' }}>
+        <Container size="wide">
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto', padding: '2px 0' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', marginRight: '4px' }}>
+              Quick View:
+            </span>
+            <button
+              type="button"
+              className={`customer-nav__link ${currentView === 'home' ? 'customer-nav__link--active' : ''}`}
+              onClick={() => handleNavigate('home')}
             >
-              <div className="badge-list">
-                <span className="badge">Pure JavaScript / JSX</span>
-                <span className="badge">Active Role: {role || 'none'}</span>
-              </div>
-            </StatusCard>
-
-            <StatusCard
-              statusIndicator={backendIndicator}
-              tag="Express Backend"
-              title="RBAC &amp; Authorization API"
-              detail="Target: /api/v1/admin &amp; /api/v1/auth"
+              System Health
+            </button>
+            <button
+              type="button"
+              className={`customer-nav__link ${currentView === 'showcase' ? 'customer-nav__link--active' : ''}`}
+              onClick={() => handleNavigate('showcase')}
             >
-              <div className="connection-info">
-                {backendStatus.loading ? (
-                  <span className="status-text loading-text">Connecting &amp; checking health...</span>
-                ) : backendStatus.connected ? (
-                  <div className="backend-meta">
-                    <span className="status-text success-text">&check; Server Online &amp; Healthy</span>
-                    {backendStatus.data?.uptime && (
-                      <small className="uptime-info">
-                        Uptime: {backendStatus.data.uptime} | Env: {backendStatus.data.environment}
-                      </small>
-                    )}
-                  </div>
-                ) : (
-                  <div className="backend-meta">
-                    <span className="status-text error-text">&cross; Backend Offline</span>
-                    <small className="uptime-info">Run <code>npm run dev</code> in <code>server/</code></small>
-                  </div>
-                )}
-              </div>
-              <button className="refresh-btn" onClick={checkHealth} type="button">
-                Recheck Health
+              🎨 Design System Showcase
+            </button>
+            <button
+              type="button"
+              className={`customer-nav__link ${['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? 'customer-nav__link--active' : ''}`}
+              onClick={() => handleNavigate('sourcing-requests')}
+            >
+              📦 Sourcing Portal
+            </button>
+            <button
+              type="button"
+              className={`customer-nav__link ${currentView === 'account' ? 'customer-nav__link--active' : ''}`}
+              onClick={() => handleNavigate('account')}
+            >
+              👤 Customer Account
+            </button>
+            {isAdmin && (
+              <button
+                type="button"
+                className={`customer-nav__link ${currentView === 'admin-console' ? 'customer-nav__link--active' : ''}`}
+                onClick={() => handleNavigate('admin-console')}
+                style={{ color: '#B91C1C' }}
+              >
+                🛡️ Admin Console
               </button>
-            </StatusCard>
+            )}
           </div>
+        </Container>
+      </div>
 
-          <FoundationHighlights
-            title="RBAC &amp; Security Principles"
-            items={ARCHITECTURE_RULES}
+      <main id="main-content" className="app-shell__main">
+        {/* Design System Showcase View */}
+        {currentView === 'showcase' && <DesignSystemShowcase />}
+
+        {/* Sourcing Portal Views */}
+        {currentView === 'sourcing-requests' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <SourcingRequestList
+              onCreateNew={() => handleNavigate('sourcing-new')}
+              onSelectRequest={(id) => {
+                setSelectedRequestId(id);
+                handleNavigate('sourcing-detail');
+              }}
+            />
+          </ProtectedRoute>
+        )}
+
+        {currentView === 'sourcing-new' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <SourcingRequestForm
+              onRequestCreated={(req) => {
+                setSelectedRequestId(req._id || req.id);
+                handleNavigate('sourcing-detail');
+              }}
+              onCancel={() => handleNavigate('sourcing-requests')}
+            />
+          </ProtectedRoute>
+        )}
+
+        {currentView === 'sourcing-detail' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <SourcingRequestDetail
+              requestId={selectedRequestId}
+              onBack={() => handleNavigate('sourcing-requests')}
+              onStatusUpdated={() => {}}
+            />
+          </ProtectedRoute>
+        )}
+
+        {/* Authentication Pages */}
+        {currentView === 'login' && (
+          <LoginPage
+            onNavigateToRegister={() => handleNavigate('register')}
+            onNavigateToForgot={() => handleNavigate('forgot-password')}
+            onNavigateToResend={() => handleNavigate('resend-verification')}
+            onLoginSuccess={() => handleNavigate(isAdmin ? 'admin-console' : 'account')}
           />
-        </main>
-      )}
+        )}
 
-      <Footer brandName={PUBLIC_CONFIG.BRAND_NAME} />
+        {currentView === 'register' && (
+          <RegisterPage
+            onNavigateToLogin={() => handleNavigate('login')}
+            onRegisterSuccess={() => handleNavigate('account')}
+          />
+        )}
+
+        {currentView === 'forgot-password' && (
+          <ForgotPasswordPage
+            onNavigateToLogin={() => handleNavigate('login')}
+          />
+        )}
+
+        {currentView === 'reset-password' && (
+          <ResetPasswordPage
+            onNavigateToLogin={() => handleNavigate('login')}
+            onNavigateToForgot={() => handleNavigate('forgot-password')}
+          />
+        )}
+
+        {currentView === 'verify-email' && (
+          <VerifyEmailPage
+            onNavigateToLogin={() => handleNavigate('login')}
+            onNavigateToResend={() => handleNavigate('resend-verification')}
+          />
+        )}
+
+        {currentView === 'resend-verification' && (
+          <ResendVerificationPage
+            onNavigateToLogin={() => handleNavigate('login')}
+          />
+        )}
+
+        {/* Customer Account Page */}
+        {currentView === 'account' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <Container size="narrow" style={{ marginTop: 'var(--space-8)' }}>
+              <Card>
+                <CardHeader
+                  title="Customer Account Profile"
+                  description="Verified cross-border identity and security controls"
+                />
+                <CardBody>
+                  <div style={{ display: 'grid', gap: 'var(--space-3)', background: 'var(--bg-surface-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)' }}>
+                    <div><strong>Name:</strong> {user?.name}</div>
+                    <div><strong>Email:</strong> {user?.email}</div>
+                    <div><strong>Phone:</strong> {user?.phone || 'Not provided'}</div>
+                    <div><strong>Role:</strong> <span className="badge" style={{ marginLeft: '4px' }}>{role}</span></div>
+                    <div>
+                      <strong>Email Verification:</strong>{' '}
+                      {user?.isEmailVerified ? (
+                        <StatusBadge status="customer_confirmed" label="Verified" />
+                      ) : (
+                        <span>
+                          <StatusBadge status="draft" label="Unverified" />
+                          <button
+                            type="button"
+                            onClick={() => handleNavigate('resend-verification')}
+                            style={{ background: 'none', border: 'none', marginLeft: '8px', color: 'var(--color-brand)', cursor: 'pointer', fontSize: '0.85rem' }}
+                          >
+                            Resend Email
+                          </button>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: 'var(--space-6)' }}>
+                    <ChangePasswordSection />
+                  </div>
+                </CardBody>
+              </Card>
+            </Container>
+          </ProtectedRoute>
+        )}
+
+        {/* Admin Console Boundary */}
+        {currentView === 'admin-console' && (
+          <AdminRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('account')}
+          >
+            <Container size="narrow" style={{ marginTop: 'var(--space-8)' }}>
+              <Card style={{ borderColor: '#FECACA' }}>
+                <CardHeader
+                  title="🛡️ Administrative Access Boundary"
+                  description="Privilege verified server-side with RBAC guards"
+                />
+                <CardBody>
+                  <div style={{ background: '#FEF2F2', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)' }}>
+                    <div style={{ color: '#7F1D1D', fontWeight: 600, marginBottom: '6px' }}>
+                      &check; Administrator Privilege Verified
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#475569' }}>
+                      <div><strong>Admin:</strong> {user?.name} ({user?.email})</div>
+                      <div><strong>Role:</strong> <code>{role}</code></div>
+                    </div>
+                  </div>
+                  <Typography variant="caption">
+                    Note: Complete administrative dashboard operations will be established in Prompt 21.
+                  </Typography>
+                </CardBody>
+              </Card>
+            </Container>
+          </AdminRoute>
+        )}
+
+        {/* Placeholder Nav views for real routing */}
+        {['how-it-works', 'track-order', 'support', 'terms', 'privacy', 'current-orders', 'order-history', 'admin-requests', 'admin-users', 'admin-audit'].includes(currentView) && (
+          <Container size="narrow" style={{ marginTop: 'var(--space-8)' }}>
+            <Card style={{ textAlign: 'center', padding: 'var(--space-10) var(--space-6)' }}>
+              <Typography variant="h2" style={{ textTransform: 'capitalize', marginBottom: 'var(--space-2)' }}>
+                {currentView.replace('-', ' ')}
+              </Typography>
+              <Typography variant="body" style={{ marginBottom: 'var(--space-6)' }}>
+                This section is wired into the SajiloMarts layout and navigation system. Full functionality is scheduled for upcoming feature prompts.
+              </Typography>
+              <Button variant="primary" onClick={() => handleNavigate('showcase')}>
+                Explore Design System Showcase
+              </Button>
+            </Card>
+          </Container>
+        )}
+
+        {/* Home & System Health View */}
+        {currentView === 'home' && (
+          <div>
+            <Section size="sm" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
+              <Container size="wide" style={{ textAlign: 'center', padding: 'var(--space-8) var(--space-4)' }}>
+                <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)' }}>
+                  {PUBLIC_CONFIG.BRAND_NAME} &bull; Cross-Border Logistics
+                </Typography>
+                <Typography variant="display" style={{ marginTop: 'var(--space-2)' }}>
+                  {PUBLIC_CONFIG.TAGLINE}
+                </Typography>
+                <Typography variant="body" style={{ maxWidth: '640px', margin: 'var(--space-3) auto 0' }}>
+                  Professional frontend design system and global layout foundation connecting Indian marketplaces to verified delivery across Nepal.
+                </Typography>
+                <div style={{ marginTop: 'var(--space-6)', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <Button variant="primary" onClick={() => handleNavigate('showcase')}>
+                    Explore Design System Showcase
+                  </Button>
+                  <Button variant="secondary" onClick={() => handleNavigate('sourcing-requests')}>
+                    Sourcing Portal
+                  </Button>
+                </div>
+              </Container>
+            </Section>
+
+            <Container size="wide" style={{ marginTop: 'var(--space-8)' }}>
+              <div className="layout-grid-2">
+                <Card>
+                  <CardHeader title="Frontend System State" description={`React 19 &bull; ${ENV.NODE_ENV}`} />
+                  <CardBody>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
+                      <div><strong>Session State:</strong> {isAuthenticated ? `Authenticated (${user?.name} - ${role})` : 'Guest / Unauthenticated'}</div>
+                      <div><strong>Design Tokens:</strong> Warm Neutral Theme, Restrained Himalayan Crimson</div>
+                      <div><strong>Font System:</strong> High-Legibility System Stack (No Inter/Geist)</div>
+                    </div>
+                  </CardBody>
+                </Card>
+
+                <Card>
+                  <CardHeader title="Backend API &amp; Database Health" description="Express API &bull; MongoDB Atlas" />
+                  <CardBody>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.875rem' }}>
+                      <div>
+                        <strong>Connection:</strong>{' '}
+                        {backendStatus.connected ? (
+                          <StatusBadge status="customer_confirmed" label="Online & Connected" />
+                        ) : backendStatus.loading ? (
+                          <StatusBadge status="under_review" label="Checking Health..." />
+                        ) : (
+                          <StatusBadge status="cancelled" label="Offline" />
+                        )}
+                      </div>
+                      {backendStatus.data?.uptime && (
+                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+                          Uptime: {backendStatus.data.uptime} | Env: {backendStatus.data.environment}
+                        </div>
+                      )}
+                      <div>
+                        <Button variant="outline" size="sm" onClick={checkHealth}>
+                          Recheck Backend Health
+                        </Button>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </div>
+
+              <Section size="sm" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-12)' }}>
+                <Card>
+                  <CardHeader title="SajiloMarts Sourcing &amp; Security Principles" description="Authoritative pricing and verified cross-border fulfillment" />
+                  <CardBody>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+                      {ARCHITECTURE_RULES.map((rule) => (
+                        <div key={rule.label} style={{ background: 'var(--bg-surface-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)' }}>
+                          <Typography variant="label" style={{ display: 'block', marginBottom: '4px' }}>
+                            {rule.label}
+                          </Typography>
+                          <Typography variant="small">
+                            {rule.description}
+                          </Typography>
+                        </div>
+                      ))}
+                    </div>
+                  </CardBody>
+                </Card>
+              </Section>
+            </Container>
+          </div>
+        )}
+      </main>
+
+      <Footer
+        brandName={PUBLIC_CONFIG.BRAND_NAME}
+        onNavigate={handleNavigate}
+      />
     </div>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

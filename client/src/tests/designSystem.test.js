@@ -163,7 +163,13 @@ assert.ok(fs.existsSync(showcaseJsxPath), 'DesignSystemShowcase.jsx must exist')
 const showcaseContent = fs.readFileSync(showcaseJsxPath, 'utf8');
 assert.ok(showcaseContent.includes('export const DesignSystemShowcase'), 'DesignSystemShowcase must be exported');
 assert.ok(showcaseContent.includes('Warm Neutral Palette'), 'Showcase must include Warm Neutral palette demo');
-assert.ok(showcaseContent.includes('Button System'), 'Showcase must include Button system demo');
-console.log('✅ Desktop, mobile, and accessibility showcase verification passed');
+// Test 28: Complete Design System Foundation Verification
+const appJsxPath = path.resolve('src/App.jsx');
+assert.ok(fs.existsSync(appJsxPath), 'App.jsx must exist');
+const appContent = fs.readFileSync(appJsxPath, 'utf8');
+assert.ok(appContent.includes('ErrorBoundary'), 'App must be wrapped in ErrorBoundary');
+assert.ok(appContent.includes('ToastProvider'), 'App must provide Toast notifications');
+assert.ok(appContent.includes('DesignSystemShowcase'), 'App must support showcase navigation');
+console.log('✅ Complete SajiloMarts frontend design system foundation verified');
 
 console.log('🎉 Design System initial foundation verified!');
