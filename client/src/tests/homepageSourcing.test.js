@@ -113,4 +113,18 @@ assert.ok(suppContent.includes('export const SupportEntrySection'), 'SupportEntr
 assert.ok(suppContent.includes('Direct Email Helpdesk'), 'Must render direct email helpdesk channel');
 console.log('✅ Customer support entry experience verified');
 
+// Test 14: SastoMarts Footer & Legal navigation verification
+const footerPath = path.resolve('src/components/layout/Footer.jsx');
+assert.ok(fs.existsSync(footerPath), 'Footer.jsx must exist');
+const footerContent = fs.readFileSync(footerPath, 'utf8');
+assert.ok(footerContent.includes('Terms of Service'), 'Footer must contain Terms of Service link');
+assert.ok(footerContent.includes('Privacy Policy'), 'Footer must contain Privacy Policy link');
+assert.ok(footerContent.includes('Logo'), 'Footer must include SastoMarts Logo component');
+
+const termsPath = path.resolve('src/pages/Legal/TermsPage.jsx');
+const privacyPath = path.resolve('src/pages/Legal/PrivacyPage.jsx');
+assert.ok(fs.existsSync(termsPath), 'TermsPage.jsx must exist');
+assert.ok(fs.existsSync(privacyPath), 'PrivacyPage.jsx must exist');
+console.log('✅ Footer and Legal navigation verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');

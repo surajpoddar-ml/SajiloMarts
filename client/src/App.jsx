@@ -16,6 +16,7 @@ import { ResetPasswordPage } from './pages/Auth/ResetPasswordPage.jsx';
 import { ChangePasswordSection } from './pages/Account/ChangePasswordSection.jsx';
 import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from './pages/Quotes';
 import { HomePage } from './pages/Home';
+import { TermsPage, PrivacyPage } from './pages/Legal';
 import { DesignSystemShowcase } from './pages/Showcase/DesignSystemShowcase.jsx';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
@@ -363,8 +364,12 @@ function AppContent() {
           </AdminRoute>
         )}
 
-        {/* Placeholder Nav views for real routing */}
-        {['how-it-works', 'track-order', 'support', 'terms', 'privacy', 'current-orders', 'order-history', 'admin-requests', 'admin-users', 'admin-audit'].includes(currentView) && (
+        {/* Legal Pages */}
+        {currentView === 'terms' && <TermsPage onNavigate={handleNavigate} />}
+        {currentView === 'privacy' && <PrivacyPage onNavigate={handleNavigate} />}
+
+        {/* Placeholder Nav views for remaining future routes */}
+        {['current-orders', 'order-history', 'admin-requests', 'admin-users', 'admin-audit'].includes(currentView) && (
           <Container size="narrow" style={{ marginTop: 'var(--space-8)' }}>
             <Card style={{ textAlign: 'center', padding: 'var(--space-10) var(--space-6)' }}>
               <Typography variant="h2" style={{ textTransform: 'capitalize', marginBottom: 'var(--space-2)' }}>
