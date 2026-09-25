@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Section } from '../../components/layout';
 import { Card, CardHeader, CardBody, Button, Typography, StatusBadge } from '../../components/common';
 import { Spinner } from '../../components/feedback/Spinner.jsx';
+import { AuthoritativeQuoteReview } from './AuthoritativeQuoteReview.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
 /**
@@ -104,19 +105,7 @@ export const CheckoutPage = ({
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 'var(--space-6)' }}>
-            <Card>
-              <CardHeader
-                title="Sourcing Request &amp; Quote Summary"
-                description={`Reference: ${request._id || request.id}`}
-              />
-              <CardBody>
-                <div style={{ display: 'grid', gap: '12px', fontSize: '0.9rem' }}>
-                  <div><strong>Product:</strong> {request.productName}</div>
-                  <div><strong>Quantity:</strong> {request.quantity || 1} unit(s)</div>
-                  <div><strong>Status:</strong> <StatusBadge status={request.status || 'draft'} /></div>
-                </div>
-              </CardBody>
-            </Card>
+            <AuthoritativeQuoteReview request={request} />
           </div>
         </Container>
       </Section>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { productRequestService } from '../../services';
 
-export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated }) {
+export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onProceedToCheckout }) {
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -36,6 +36,9 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated }) {
       setFeedback('Quote confirmed successfully! Sourcing order is queued for payment.');
       setRequest((prev) => ({ ...prev, ...(res.data || res) }));
       if (onStatusUpdated) onStatusUpdated();
+      if (onProceedToCheckout) {
+        onProceedToCheckout(requestId);
+      }
     } catch (err) {
       setError(err.message || 'Failed to confirm quote');
     } finally {
@@ -180,7 +183,17 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated }) {
             onClick={handleConfirmQuote}
             style={{ padding: '0.75rem 1.5rem', background: '#16a34a', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
-            {actionLoading ? 'Processing...' : 'Confirm Quote &amp; Proceed'}
+            {actionLoading ? 'Processing...' : 'Confirm Quote &amp; Proceed to Checkout'}
+          </button>
+        )}
+
+        {request.status === 'customer_confirmed' && onProceedToCheckout && (
+          <button
+            type="button"
+            onClick={() => onProceedToCheckout(requestId)}
+            style={{ padding: '0.75rem 1.5rem', background: '#2563eb', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+          >
+            Proceed to Payment &amp; Checkout &rarr;
           </button>
         )}
 
