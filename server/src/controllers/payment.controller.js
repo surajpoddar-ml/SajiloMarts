@@ -4,6 +4,8 @@ import { ApiResponse, asyncHandler } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import { USER_ROLES } from '../models/user.model.js';
 
+import { validateInitializePaymentInput, validateSubmitProofInput } from '../validations/payment.validation.js';
+
 /**
  * Controller handling payment workflows, proof submission, and protected proof access.
  */
@@ -14,11 +16,11 @@ export class PaymentController extends BaseController {
    */
   createPaymentSubmission = asyncHandler(async (req, res) => {
     const userId = req.user.id || req.user._id;
-    const { requestId, paymentMode, paymentMethod } = req.body;
+    const validatedData = validateInitializePaymentInput(req.body);
 
-    const submission = await paymentService.createPaymentSubmission(userId, requestId, {
-      paymentMode,
-      paymentMethod,
+    const submission = await paymentService.createPaymentSubmission(userId, validatedData.requestId, {
+      paymentMode: validatedData.paymentMode,
+      paymentMethod: validatedData.paymentMethod,
     });
 
     return res.status(HTTP_STATUS.CREATED).json(
@@ -33,7 +35,7 @@ export class PaymentController extends BaseController {
   submitPaymentProof = asyncHandler(async (req, res) => {
     const userId = req.user.id || req.user._id;
     const { paymentId } = req.params;
-    const { transactionCode } = req.body;
+    const validatedData = validateSubmitProofInput(req.body, Boolean(req.file));
 
     let paymentProofPath = req.body.paymentProof;
     if (req.file) {
@@ -41,7 +43,7 @@ export class PaymentController extends BaseController {
     }
 
     const updatedPayment = await paymentService.submitPaymentProof(userId, paymentId, {
-      transactionCode,
+      transactionCode: validatedData.transactionCode,
       paymentProof: paymentProofPath,
     });
 
