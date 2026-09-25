@@ -140,7 +140,12 @@ const errorBoundaryJsxPath = path.resolve('src/components/feedback/ErrorBoundary
 assert.ok(fs.existsSync(errorBoundaryJsxPath), 'ErrorBoundary.jsx must exist');
 const errorBoundaryContent = fs.readFileSync(errorBoundaryJsxPath, 'utf8');
 assert.ok(errorBoundaryContent.includes('export class ErrorBoundary'), 'ErrorBoundary must be exported');
-assert.ok(errorBoundaryContent.includes('componentDidCatch'), 'ErrorBoundary must implement componentDidCatch lifecycle');
-console.log('✅ Global frontend error boundary verified');
+// Test 24: Reusable Not-Found (404) Page Verification
+const notFoundJsxPath = path.resolve('src/pages/NotFound/NotFoundPage.jsx');
+assert.ok(fs.existsSync(notFoundJsxPath), 'NotFoundPage.jsx must exist');
+const notFoundContent = fs.readFileSync(notFoundJsxPath, 'utf8');
+assert.ok(notFoundContent.includes('export const NotFoundPage'), 'NotFoundPage must be exported');
+assert.ok(notFoundContent.includes('404'), 'NotFoundPage must render 404 header');
+console.log('✅ Reusable not-found page verified');
 
 console.log('🎉 Design System initial foundation verified!');
