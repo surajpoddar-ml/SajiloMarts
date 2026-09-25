@@ -9,6 +9,7 @@ import { SourcingPortalSection } from './SourcingPortalSection.jsx';
 import { SourcingRequestInteractiveForm } from './SourcingRequestInteractiveForm.jsx';
 import { RequestReviewCard } from './RequestReviewCard.jsx';
 import { ServerQuoteDisplay } from './ServerQuoteDisplay.jsx';
+import { HowItWorksSection } from './HowItWorksSection.jsx';
 import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
 
@@ -134,10 +135,8 @@ export function HomePage({
         )}
       </SourcingPortalSection>
 
-      {/* 3. How SastoMarts Works Section Anchor */}
-      <section id="how-it-works-section" aria-label="How SastoMarts Works">
-        {/* Established in upcoming commits */}
-      </section>
+      {/* 3. How SastoMarts Works Section */}
+      <HowItWorksSection />
 
       {/* 4. Supported Marketplaces Section */}
       <SupportedMarketplacesSection />

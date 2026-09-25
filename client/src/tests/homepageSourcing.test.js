@@ -70,4 +70,13 @@ assert.ok(mpContent.includes('Flipkart'), 'Must include Flipkart');
 assert.ok(mpContent.includes('Tata 1mg'), 'Must include Tata 1mg');
 console.log('✅ Supported Marketplaces section verified');
 
+// Test 9: How It Works workflow verification
+const howPath = path.resolve('src/pages/Home/HowItWorksSection.jsx');
+assert.ok(fs.existsSync(howPath), 'HowItWorksSection.jsx must exist');
+const howContent = fs.readFileSync(howPath, 'utf8');
+assert.ok(howContent.includes('export const HowItWorksSection'), 'HowItWorksSection must be exported');
+assert.ok(howContent.includes('Find Product in India'), 'Must include step 1');
+assert.ok(howContent.includes('Procurement & Nepal Delivery'), 'Must include step 5');
+console.log('✅ How SastoMarts Works workflow explanation verified');
+
 console.log('🎉 Homepage & Sourcing test baseline verified!');
