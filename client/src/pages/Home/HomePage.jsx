@@ -7,6 +7,8 @@ import { ProductUrlForm } from './ProductUrlForm.jsx';
 import { AuthContinuationPrompt } from './AuthContinuationPrompt.jsx';
 import { SourcingPortalSection } from './SourcingPortalSection.jsx';
 import { SourcingRequestInteractiveForm } from './SourcingRequestInteractiveForm.jsx';
+import { RequestReviewCard } from './RequestReviewCard.jsx';
+import { productRequestService } from '../../services/productRequest.service.js';
 
 export function HomePage({
   onNavigate,
@@ -20,6 +22,9 @@ export function HomePage({
   const [urlError, setUrlError] = React.useState(null);
   const [activeStep, setActiveStep] = React.useState('form'); // 'form' | 'review' | 'quote'
   const [requestDraft, setRequestDraft] = React.useState(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submissionError, setSubmissionError] = React.useState(null);
+  const [createdRequest, setCreatedRequest] = React.useState(null);
 
   const handleUrlSubmit = (url) => {
     setProductUrl(url);
@@ -32,6 +37,40 @@ export function HomePage({
   const handleReviewStep = (draft) => {
     setRequestDraft(draft);
     setActiveStep('review');
+    setSubmissionError(null);
+  };
+
+  const handleSubmitRequest = async () => {
+    if (!requestDraft) return;
+    setIsSubmitting(true);
+    setSubmissionError(null);
+
+    try {
+      const payload = {
+        productUrl: requestDraft.productUrl,
+        productName: requestDraft.productName,
+        quantity: requestDraft.quantity || 1,
+      };
+
+      if (requestDraft.variant) payload.variant = requestDraft.variant;
+      if (requestDraft.notes) payload.notes = requestDraft.notes;
+      if (requestDraft.productPriceInr) {
+        payload.productPriceInr = Number(requestDraft.productPriceInr);
+      }
+
+      const response = await productRequestService.createRequest(payload);
+      const reqData = response.data || response;
+      setCreatedRequest(reqData);
+      setActiveStep('quote');
+
+      if (onRequestCreated) {
+        onRequestCreated(reqData);
+      }
+    } catch (err) {
+      setSubmissionError(err.message || 'Failed to create sourcing request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -58,6 +97,19 @@ export function HomePage({
           <SourcingRequestInteractiveForm
             initialProductUrl={productUrl}
             onSubmitReview={handleReviewStep}
+          />
+        )}
+
+        {activeStep === 'review' && (
+          <RequestReviewCard
+            requestData={requestDraft}
+            onEdit={() => setActiveStep('form')}
+            onSubmit={handleSubmitRequest}
+            isSubmitting={isSubmitting}
+            error={submissionError}
+            isAuthenticated={isAuthenticated}
+            onLogin={() => onNavigate('login')}
+            onRegister={() => onNavigate('register')}
           />
         )}
       </SourcingPortalSection>
