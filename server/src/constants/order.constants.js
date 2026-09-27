@@ -38,6 +38,25 @@ export const ACTIVE_FULFILLMENT_STATUSES = Object.freeze([
   ORDER_STATUSES.OUT_FOR_DELIVERY,
 ]);
 
+export const HISTORICAL_FULFILLMENT_STATUSES = Object.freeze([
+  ORDER_STATUSES.DELIVERED,
+  ORDER_STATUSES.CANCELLED,
+  ORDER_STATUSES.REFUNDED,
+]);
+
+export function isValidOrderStatus(status) {
+  return typeof status === 'string' && Object.values(ORDER_STATUSES).includes(status);
+}
+
+export function isHistoricalOrderStatus(status) {
+  return HISTORICAL_FULFILLMENT_STATUSES.includes(status);
+}
+
+export function isActiveOrderStatus(status) {
+  return ACTIVE_FULFILLMENT_STATUSES.includes(status);
+}
+
+
 /**
  * Explicit Valid Order Status Transitions
  * Normal progression: Order Received -> Sourcing -> Purchased -> In Transit -> Arrived in Nepal -> Out for Delivery -> Delivered
