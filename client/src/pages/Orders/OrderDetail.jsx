@@ -5,6 +5,8 @@ import { Button } from '../../components/common/Button.jsx';
 import { Typography } from '../../components/common/Typography.jsx';
 import { StatusBadge } from '../../components/common/StatusBadge.jsx';
 import { Spinner } from '../../components/feedback/Spinner.jsx';
+import { OrderStatusTimeline } from '../../components/orders/OrderStatusTimeline.jsx';
+
 
 /**
  * SajiloMarts Customer Order Detail View
@@ -287,7 +289,23 @@ export const OrderDetail = ({
           )}
 
 
-          {/* Chronological Order Status History */}
+          {/* 7-Stage Fulfillment Visual Timeline */}
+          <div
+            style={{
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-4)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <OrderStatusTimeline
+              currentStatus={order.currentStatus || order.status}
+              statusHistory={order.statusHistory}
+              createdAt={order.createdAt}
+            />
+          </div>
+
+          {/* Chronological Order Status History Audit */}
           <div
             style={{
               border: '1px solid var(--border-subtle)',
@@ -296,8 +314,9 @@ export const OrderDetail = ({
             }}
           >
             <Typography variant="h3" style={{ fontSize: '1rem', marginBottom: 'var(--space-3)' }}>
-              Order Status History &amp; Tracking Timeline
+              Detailed Status Log
             </Typography>
+
 
             {order.statusHistory && order.statusHistory.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
