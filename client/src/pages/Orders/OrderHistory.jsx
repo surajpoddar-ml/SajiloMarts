@@ -112,8 +112,9 @@ export const OrderHistory = ({
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {orders.map((order) => {
-                const quote = order.quote || {};
-                const finalAmount = quote.finalAmountNpr || quote.finalNprTotal || order.productPriceInr;
+                const quote = order.quoteSnapshot || order.quote || {};
+                const finalAmount = order.finalAmountNpr ?? quote.finalAmountNpr ?? quote.finalNprTotal ?? order.productPriceInr;
+                const displayId = order.orderNumber || `#${String(order._id || order.id).slice(-8).toUpperCase()}`;
 
                 return (
                   <div
@@ -142,20 +143,21 @@ export const OrderHistory = ({
                         if (onSelectOrder) onSelectOrder(order._id || order.id);
                       }
                     }}
-                    aria-label={`View completed order ${order._id || order.id}`}
+                    aria-label={`View completed order ${displayId}`}
                   >
                     <div style={{ flex: '1 1 320px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                          #{String(order._id || order.id).slice(-8).toUpperCase()}
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'monospace', fontWeight: 600 }}>
+                          {displayId}
                         </span>
-                        <StatusBadge status={order.status} />
+                        <StatusBadge status={order.status || order.currentStatus} label={order.statusLabel} />
                       </div>
                       <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>
                         {order.productName}
                       </strong>
                       <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)' }}>
                         Marketplace: <span style={{ textTransform: 'capitalize' }}>{order.marketplace}</span> &bull; Qty: {order.quantity}
+                        {order.variant && ` • ${order.variant}`}
                         {order.createdAt && ` • Completed: ${new Date(order.updatedAt || order.createdAt).toLocaleDateString()}`}
                       </div>
                     </div>
@@ -171,6 +173,7 @@ export const OrderHistory = ({
                   </div>
                 );
               })}
+
 
               {/* Server-side Pagination */}
               {pagination.totalPages > 1 && (
