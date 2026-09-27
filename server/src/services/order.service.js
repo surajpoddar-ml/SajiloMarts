@@ -53,6 +53,21 @@ export class OrderService extends BaseService {
   }
 
   /**
+   * Sanitizes and enforces safe server-side bounds for pagination queries.
+   * Max limit: 50, Default: 10
+   */
+  sanitizePaginationOptions(query = {}) {
+    const rawPage = parseInt(query.page, 10);
+    const rawLimit = parseInt(query.limit, 10);
+
+    const page = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+    const limit = Number.isInteger(rawLimit) && rawLimit > 0 ? Math.min(50, rawLimit) : 10;
+
+    return { page, limit };
+  }
+
+
+  /**
    * Safe, server-authoritative Order Creation from a validated Sourcing Request.
    * Enforces customer ownership, quote snapshot integrity, delivery address snapshot, and payment readiness.
    * @param {string} userId - Authenticated customer ID
@@ -228,8 +243,7 @@ export class OrderService extends BaseService {
   async getCurrentOrders(userId, options = {}) {
     this.validateObjectId(userId, 'User ID');
 
-    const page = Math.max(1, parseInt(options.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(options.limit, 10) || 10));
+    const { page, limit } = this.sanitizePaginationOptions(options);
     const sortBy = options.sortBy || 'createdAt';
     const sortOrder = options.sortOrder === 1 || options.sortOrder === 'asc' ? 1 : -1;
 
@@ -314,10 +328,10 @@ export class OrderService extends BaseService {
   async getOrderHistory(userId, options = {}) {
     this.validateObjectId(userId, 'User ID');
 
-    const page = Math.max(1, parseInt(options.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(options.limit, 10) || 10));
+    const { page, limit } = this.sanitizePaginationOptions(options);
     const sortBy = options.sortBy || 'createdAt';
     const sortOrder = options.sortOrder === 1 || options.sortOrder === 'asc' ? 1 : -1;
+
 
     const skip = (page - 1) * limit;
     const orderFilter = {
