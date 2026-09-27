@@ -445,11 +445,72 @@ export class OrderService extends BaseService {
       }
     }
 
-    throw new NotFoundError('Order not found');
+  /**
+   * Asserts that a user has administrator privileges.
+   */
+  async assertAdmin(adminUserId) {
+    this.validateObjectId(adminUserId, 'Admin User ID');
+    const { User, USER_ROLES } = await import('../models/user.model.js');
+    const adminUser = await User.findById(adminUserId);
+    if (!adminUser || adminUser.role !== USER_ROLES.ADMIN) {
+      throw new ForbiddenError('Administrative privileges required');
+    }
+    return adminUser;
   }
 
+  /**
+   * Privileged Order Status Update
+   * Enforces transition policies and logs changedBy in status history.
+   * @param {string} adminUserId - Authenticated Admin User ID
+   * @param {string} orderId - Order ID or orderNumber
+   * @param {object} updateData - { status, note, deliveryInfo }
+   * @returns {Promise<object>}
+   */
+  async updateOrderStatus(adminUserId, orderId, updateData = {}) {
+    await this.assertAdmin(adminUserId);
+
+    const { status: targetStatus, note, deliveryInfo } = updateData;
+
+    if (!targetStatus) {
+      throw new BadRequestError('Target order status is required');
+    }
+
+    const isObjectId = mongoose.Types.ObjectId.isValid(orderId);
+    const orderQuery = isObjectId
+      ? { _id: orderId }
+      : { orderNumber: String(orderId).trim().toUpperCase() };
+
+    const order = await Order.findOne(orderQuery);
+    if (!order) {
+      throw new NotFoundError('Order not found');
+    }
+
+    const currentStatus = order.currentStatus;
+
+    if (!canTransitionOrderStatus(currentStatus, targetStatus)) {
+      throw new BadRequestError(`Invalid order status transition from "${ORDER_STATUS_LABELS[currentStatus] || currentStatus}" to "${ORDER_STATUS_LABELS[targetStatus] || targetStatus}"`);
+    }
+
+    // Append to status history
+    order.addStatusHistory(targetStatus, adminUserId, note);
+
+    if (deliveryInfo && typeof deliveryInfo === 'object') {
+      if (deliveryInfo.carrier) order.deliveryInfo.carrier = String(deliveryInfo.carrier).trim();
+      if (deliveryInfo.trackingNumber) order.deliveryInfo.trackingNumber = String(deliveryInfo.trackingNumber).trim();
+      if (deliveryInfo.estimatedDeliveryDate) order.deliveryInfo.estimatedDeliveryDate = new Date(deliveryInfo.estimatedDeliveryDate);
+      if (deliveryInfo.actualDeliveryDate) order.deliveryInfo.actualDeliveryDate = new Date(deliveryInfo.actualDeliveryDate);
+    }
+
+    if (targetStatus === ORDER_STATUSES.DELIVERED && !order.deliveryInfo.actualDeliveryDate) {
+      order.deliveryInfo.actualDeliveryDate = new Date();
+    }
+
+    const saved = await order.save();
+    return serializeCustomerOrder(saved);
+  }
 }
 
 export const orderService = new OrderService();
 export default orderService;
+
 

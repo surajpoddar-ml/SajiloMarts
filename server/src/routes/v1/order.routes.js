@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { orderController } from '../../controllers/order.controller.js';
 import { requireAuth } from '../../middlewares/auth.middleware.js';
-import { requireActiveAccount } from '../../middlewares/rbac.middleware.js';
+import { requireActiveAccount, requireAdmin } from '../../middlewares/rbac.middleware.js';
 
 const router = Router();
 
@@ -14,5 +14,9 @@ router.get('/my/history', orderController.getOrderHistory);
 router.post('/create', orderController.createOrder);
 router.get('/:orderId', orderController.getOrderDetail);
 
+// Privileged Order Status Update (Admin only)
+router.patch('/:orderId/status', requireAdmin, orderController.updateOrderStatus);
+
 export default router;
+
 

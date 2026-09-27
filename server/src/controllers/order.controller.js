@@ -66,9 +66,27 @@ export class OrderController extends BaseController {
     return res.status(HTTP_STATUS.CREATED).json(
       ApiResponse.created(order, 'Order created successfully')
     );
+  /**
+   * PATCH /api/v1/orders/:orderId/status
+   * Updates order fulfillment status (Admin only).
+   */
+  updateOrderStatus = asyncHandler(async (req, res) => {
+    const adminUserId = req.user.id || req.user._id;
+    const orderId = req.params.orderId || req.params.id;
+    const { status, note, deliveryInfo } = req.body;
+
+    const order = await orderService.updateOrderStatus(adminUserId, orderId, {
+      status,
+      note,
+      deliveryInfo,
+    });
+
+    return res.status(HTTP_STATUS.OK).json(
+      ApiResponse.success(order, 'Order status updated successfully')
+    );
   });
 }
 
-
 export const orderController = new OrderController();
 export default orderController;
+
