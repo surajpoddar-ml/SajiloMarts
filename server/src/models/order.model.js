@@ -155,12 +155,26 @@ const orderSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
-    currency: {
-      type: String,
-      default: 'NPR',
-      trim: true,
-      uppercase: true,
+    // Complete Authoritative Quote Snapshot
+    quoteSnapshot: {
+      sourceCurrency: { type: String, default: 'INR' },
+      destinationCurrency: { type: String, default: 'NPR' },
+      productPriceInr: { type: Number },
+      quantity: { type: Number },
+      subtotalInr: { type: Number },
+      conversionMultiplier: { type: Number, default: 1.65 },
+      exchangeRate: { type: Number },
+      convertedAmountNpr: { type: Number },
+      paymentMode: { type: String },
+      feeRate: { type: Number },
+      appliedRate: { type: Number },
+      rateAmountNpr: { type: Number },
+      finalAmountNpr: { type: Number },
+      payNowAmountNpr: { type: Number },
+      remainingCodAmountNpr: { type: Number, default: 0 },
+      calculatedAt: { type: Date, default: Date.now },
     },
+
 
     // Delivery Address Immutable Snapshot
     deliveryAddressSnapshot: {
