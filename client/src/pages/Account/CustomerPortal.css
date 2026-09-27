@@ -145,3 +145,38 @@
     gap: 6px;
   }
 }
+
+/* Responsive Order Views & Card Grids */
+.order-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.order-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .order-detail-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+  }
+  
+  .current-orders-view,
+  .order-history-view,
+  .order-detail-view {
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 420px) {
+  .order-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
