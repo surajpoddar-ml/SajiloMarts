@@ -31,13 +31,16 @@ export function serializeCustomerOrder(order) {
 
   // Format status history safely (strip internal operational notes if not customer safe)
   const safeStatusHistory = Array.isArray(raw.statusHistory)
-    ? raw.statusHistory.map((entry) => ({
-        status: entry.status,
-        statusLabel: ORDER_STATUS_LABELS[entry.status] || entry.status,
-        changedAt: entry.changedAt,
-        note: entry.note || null,
-      }))
+    ? raw.statusHistory
+        .map((entry) => ({
+          status: entry.status,
+          statusLabel: ORDER_STATUS_LABELS[entry.status] || entry.status,
+          changedAt: entry.changedAt,
+          note: entry.note || null,
+        }))
+        .sort((a, b) => new Date(a.changedAt).getTime() - new Date(b.changedAt).getTime())
     : [];
+
 
   return {
     _id: raw._id,
