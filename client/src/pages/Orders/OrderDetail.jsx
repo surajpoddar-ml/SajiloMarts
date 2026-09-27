@@ -369,16 +369,14 @@ export const OrderDetail = ({
             ) : (
               <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <StatusBadge status={order.status} />
+                  <StatusBadge status={order.status || order.currentStatus} label={order.statusLabel} />
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     {new Date(order.createdAt).toLocaleString()}
                   </span>
                 </div>
-                <div style={{ marginTop: '4px', fontSize: '0.825rem' }}>
-                  Order record initialized.
-                </div>
               </div>
             )}
+
           </div>
         </CardBody>
       </Card>
