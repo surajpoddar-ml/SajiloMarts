@@ -225,6 +225,7 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
     strict: true,
     strictQuery: true,
+    bufferCommands: false,
     collection: 'orders',
     toJSON: {
       virtuals: true,

@@ -2,7 +2,8 @@ export const PUBLIC_CONFIG = {
   BRAND_NAME: 'SajiloMarts',
   TAGLINE: 'Shop from India. We Deliver to Nepal.',
   SUBTITLE: 'Cross-Border Sourcing & Delivery Platform for Nepal',
-  SUPPORT_EMAIL: 'sajilomarts@gmail.com',
+  SUPPORT_EMAIL: 'support@sajilomarts.com',
+
   INSTAGRAM_URL: 'https://www.instagram.com/sajilomarts',
   DEFAULT_LOCALE: 'en-NP',
   SUPPORTED_LOCALES: ['en-NP', 'ne-NP', 'hi-IN', 'en-IN'],

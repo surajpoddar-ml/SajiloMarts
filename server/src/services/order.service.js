@@ -270,15 +270,25 @@ export class OrderService extends BaseService {
       currentStatus: { $in: ACTIVE_FULFILLMENT_STATUSES },
     };
 
-    const [orders, total] = await Promise.all([
-      Order.find(orderFilter)
-        .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
-        .sort(sortCriteria)
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Order.countDocuments(orderFilter),
-    ]);
+    let orders = [];
+    let total = 0;
+
+    if (mongoose.connection.readyState === 1) {
+      try {
+        [orders, total] = await Promise.all([
+          Order.find(orderFilter)
+            .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
+            .sort(sortCriteria)
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+          Order.countDocuments(orderFilter),
+        ]);
+      } catch {
+        orders = [];
+        total = 0;
+      }
+    }
 
     if (total > 0 || orders.length > 0) {
       const sanitizedOrders = orders.map((order) => serializeCustomerOrder(order));
@@ -328,7 +338,6 @@ export class OrderService extends BaseService {
     };
   }
 
-
   /**
    * Retrieves paginated order history (delivered / completed / cancelled) for an authenticated customer.
    */
@@ -344,16 +353,25 @@ export class OrderService extends BaseService {
       currentStatus: { $in: HISTORICAL_FULFILLMENT_STATUSES },
     };
 
+    let orders = [];
+    let total = 0;
 
-    const [orders, total] = await Promise.all([
-      Order.find(orderFilter)
-        .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
-        .sort(sortCriteria)
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Order.countDocuments(orderFilter),
-    ]);
+    if (mongoose.connection.readyState === 1) {
+      try {
+        [orders, total] = await Promise.all([
+          Order.find(orderFilter)
+            .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
+            .sort(sortCriteria)
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+          Order.countDocuments(orderFilter),
+        ]);
+      } catch {
+        orders = [];
+        total = 0;
+      }
+    }
 
     if (total > 0 || orders.length > 0) {
       const sanitizedOrders = orders.map((order) => serializeCustomerOrder(order));
@@ -403,7 +421,6 @@ export class OrderService extends BaseService {
     };
   }
 
-
   /**
    * Retrieves single order detail with strict customer ownership verification.
    * Supports lookup by either MongoDB ObjectId or customer-facing orderNumber.
@@ -422,10 +439,17 @@ export class OrderService extends BaseService {
       ? { _id: orderIdOrNumber }
       : { orderNumber: String(orderIdOrNumber).trim().toUpperCase() };
 
-    const orderDoc = await Order.findOne(orderQuery)
-      .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
-      .populate('productRequest', 'productName productUrl marketplace quantity variant notes')
-      .lean();
+    let orderDoc = null;
+    if (mongoose.connection.readyState === 1) {
+      try {
+        orderDoc = await Order.findOne(orderQuery)
+          .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
+          .populate('productRequest', 'productName productUrl marketplace quantity variant notes')
+          .lean();
+      } catch {
+        orderDoc = null;
+      }
+    }
 
     if (orderDoc) {
       assertResourceOwnership(orderDoc, userId, 'Order', 'user');

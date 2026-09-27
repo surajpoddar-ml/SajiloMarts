@@ -67,6 +67,7 @@ export function serializeCustomerOrder(order) {
 
     // Snapshots
     quoteSnapshot: raw.quoteSnapshot || raw.quote || null,
+    quote: raw.quote || raw.quoteSnapshot || null,
     deliveryAddressSnapshot: raw.deliveryAddressSnapshot || raw.deliveryAddress || null,
 
     // Status & Tracking
