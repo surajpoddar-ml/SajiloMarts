@@ -44,9 +44,40 @@ export const HISTORICAL_FULFILLMENT_STATUSES = Object.freeze([
   ORDER_STATUSES.REFUNDED,
 ]);
 
+/**
+ * Checks if the given status is a valid defined order status.
+ * @param {string} status
+ * @returns {boolean}
+ */
+export function isValidOrderStatus(status) {
+  return typeof status === 'string' && Object.values(ORDER_STATUSES).includes(status);
+}
+
+/**
+ * Checks if the given status represents a completed/historical state.
+ * @param {string} status
+ * @returns {boolean}
+ */
+export function isHistoricalOrderStatus(status) {
+  return HISTORICAL_FULFILLMENT_STATUSES.includes(status);
+}
+
+/**
+ * Checks if the given status represents an active in-flight fulfillment state.
+ * @param {string} status
+ * @returns {boolean}
+ */
+export function isActiveOrderStatus(status) {
+  return ACTIVE_FULFILLMENT_STATUSES.includes(status);
+}
+
 export default {
   ORDER_STATUSES,
   ORDER_STATUS_LABELS,
   ACTIVE_FULFILLMENT_STATUSES,
   HISTORICAL_FULFILLMENT_STATUSES,
+  isValidOrderStatus,
+  isHistoricalOrderStatus,
+  isActiveOrderStatus,
 };
+
