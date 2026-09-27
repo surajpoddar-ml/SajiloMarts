@@ -419,27 +419,55 @@ export class OrderService extends BaseService {
 
 
   /**
-   * Retrieves single order detail with customer ownership verification.
+   * Retrieves single order detail with strict customer ownership verification.
+   * Supports lookup by either MongoDB ObjectId or customer-facing orderNumber.
    */
-  async getOrderDetailForCustomer(userId, orderId) {
+  async getOrderDetailForCustomer(userId, orderIdOrNumber) {
     this.validateObjectId(userId, 'User ID');
-    this.validateObjectId(orderId, 'Order ID');
 
-    const order = await ProductRequest.findById(orderId)
-      .populate('deliveryAddress')
-      .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountDueNpr amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
-      .lean();
-
-    if (!order) {
-      throw new NotFoundError('Order not found');
+    if (!orderIdOrNumber || typeof orderIdOrNumber !== 'string') {
+      throw new BadRequestError('Invalid Order ID format');
     }
 
-    assertResourceOwnership(order, userId, 'Order', 'user');
+    const isObjectId = mongoose.Types.ObjectId.isValid(orderIdOrNumber);
 
-    const { internalNotes, __v, ...safeOrder } = order;
-    return safeOrder;
+    // 1. Try finding in authoritative Order model first
+    const orderQuery = isObjectId
+      ? { _id: orderIdOrNumber }
+      : { orderNumber: String(orderIdOrNumber).trim().toUpperCase() };
+
+    const orderDoc = await Order.findOne(orderQuery)
+      .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
+      .populate('productRequest', 'productName productUrl marketplace quantity variant notes')
+      .lean();
+
+    if (orderDoc) {
+      assertResourceOwnership(orderDoc, userId, 'Order', 'user');
+
+      const { internalNotes, __v, ...safeOrder } = orderDoc;
+      safeOrder.status = safeOrder.currentStatus;
+      safeOrder.statusLabel = ORDER_STATUS_LABELS[safeOrder.currentStatus] || safeOrder.currentStatus;
+      return safeOrder;
+    }
+
+    // 2. Fallback to legacy ProductRequest for backward compatibility
+    if (isObjectId) {
+      const legacyDoc = await ProductRequest.findById(orderIdOrNumber)
+        .populate('deliveryAddress')
+        .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountDueNpr amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
+        .lean();
+
+      if (legacyDoc) {
+        assertResourceOwnership(legacyDoc, userId, 'Order', 'user');
+        const { internalNotes, __v, ...safeLegacy } = legacyDoc;
+        return safeLegacy;
+      }
+    }
+
+    throw new NotFoundError('Order not found');
   }
 }
 
 export const orderService = new OrderService();
 export default orderService;
+
