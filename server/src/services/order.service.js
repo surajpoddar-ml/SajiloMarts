@@ -66,6 +66,22 @@ export class OrderService extends BaseService {
     return { page, limit };
   }
 
+  /**
+   * Sanitizes sort criteria against a strict allowlist.
+   * Prevents arbitrary query injection or execution of malicious MongoDB expressions.
+   * Default: { createdAt: -1, _id: -1 }
+   */
+  sanitizeSortCriteria(options = {}) {
+    const ALLOWED_SORT_FIELDS = ['createdAt', 'updatedAt', 'finalAmountNpr', 'currentStatus', 'orderNumber', 'productName'];
+    const sortBy = typeof options.sortBy === 'string' && ALLOWED_SORT_FIELDS.includes(options.sortBy)
+      ? options.sortBy
+      : 'createdAt';
+
+    const sortOrder = options.sortOrder === 1 || options.sortOrder === '1' || options.sortOrder === 'asc' ? 1 : -1;
+    return { [sortBy]: sortOrder, _id: -1 };
+  }
+
+
 
   /**
    * Safe, server-authoritative Order Creation from a validated Sourcing Request.
@@ -244,16 +260,13 @@ export class OrderService extends BaseService {
     this.validateObjectId(userId, 'User ID');
 
     const { page, limit } = this.sanitizePaginationOptions(options);
-    const sortBy = options.sortBy || 'createdAt';
-    const sortOrder = options.sortOrder === 1 || options.sortOrder === 'asc' ? 1 : -1;
+    const sortCriteria = this.sanitizeSortCriteria(options);
 
     const skip = (page - 1) * limit;
     const orderFilter = {
       user: userId,
       currentStatus: { $in: ACTIVE_FULFILLMENT_STATUSES },
     };
-
-    const sortCriteria = { [sortBy]: sortOrder, _id: -1 };
 
     const [orders, total] = await Promise.all([
       Order.find(orderFilter)
@@ -329,9 +342,7 @@ export class OrderService extends BaseService {
     this.validateObjectId(userId, 'User ID');
 
     const { page, limit } = this.sanitizePaginationOptions(options);
-    const sortBy = options.sortBy || 'createdAt';
-    const sortOrder = options.sortOrder === 1 || options.sortOrder === 'asc' ? 1 : -1;
-
+    const sortCriteria = this.sanitizeSortCriteria(options);
 
     const skip = (page - 1) * limit;
     const orderFilter = {
@@ -339,7 +350,6 @@ export class OrderService extends BaseService {
       currentStatus: { $in: HISTORICAL_FULFILLMENT_STATUSES },
     };
 
-    const sortCriteria = { [sortBy]: sortOrder, _id: -1 };
 
     const [orders, total] = await Promise.all([
       Order.find(orderFilter)
