@@ -38,37 +38,51 @@ export const ACTIVE_FULFILLMENT_STATUSES = Object.freeze([
   ORDER_STATUSES.OUT_FOR_DELIVERY,
 ]);
 
-export const HISTORICAL_FULFILLMENT_STATUSES = Object.freeze([
-  ORDER_STATUSES.DELIVERED,
-  ORDER_STATUSES.CANCELLED,
-  ORDER_STATUSES.REFUNDED,
-]);
+/**
+ * Explicit Valid Order Status Transitions
+ * Normal progression: Order Received -> Sourcing -> Purchased -> In Transit -> Arrived in Nepal -> Out for Delivery -> Delivered
+ */
+export const VALID_ORDER_TRANSITIONS = Object.freeze({
+  [ORDER_STATUSES.ORDER_RECEIVED]: [
+    ORDER_STATUSES.SOURCING,
+    ORDER_STATUSES.CANCELLED,
+  ],
+  [ORDER_STATUSES.SOURCING]: [
+    ORDER_STATUSES.PURCHASED,
+    ORDER_STATUSES.CANCELLED,
+  ],
+  [ORDER_STATUSES.PURCHASED]: [
+    ORDER_STATUSES.IN_TRANSIT,
+    ORDER_STATUSES.CANCELLED,
+  ],
+  [ORDER_STATUSES.IN_TRANSIT]: [
+    ORDER_STATUSES.ARRIVED_IN_NEPAL,
+  ],
+  [ORDER_STATUSES.ARRIVED_IN_NEPAL]: [
+    ORDER_STATUSES.OUT_FOR_DELIVERY,
+  ],
+  [ORDER_STATUSES.OUT_FOR_DELIVERY]: [
+    ORDER_STATUSES.DELIVERED,
+  ],
+  [ORDER_STATUSES.DELIVERED]: [], // Terminal state
+  [ORDER_STATUSES.CANCELLED]: [
+    ORDER_STATUSES.REFUNDED,
+  ],
+  [ORDER_STATUSES.REFUNDED]: [], // Terminal state
+});
 
 /**
- * Checks if the given status is a valid defined order status.
- * @param {string} status
+ * Validates whether a transition from one status to another is permitted.
+ * @param {string} currentStatus
+ * @param {string} targetStatus
  * @returns {boolean}
  */
-export function isValidOrderStatus(status) {
-  return typeof status === 'string' && Object.values(ORDER_STATUSES).includes(status);
-}
-
-/**
- * Checks if the given status represents a completed/historical state.
- * @param {string} status
- * @returns {boolean}
- */
-export function isHistoricalOrderStatus(status) {
-  return HISTORICAL_FULFILLMENT_STATUSES.includes(status);
-}
-
-/**
- * Checks if the given status represents an active in-flight fulfillment state.
- * @param {string} status
- * @returns {boolean}
- */
-export function isActiveOrderStatus(status) {
-  return ACTIVE_FULFILLMENT_STATUSES.includes(status);
+export function canTransitionOrderStatus(currentStatus, targetStatus) {
+  if (!currentStatus || !targetStatus) return false;
+  if (currentStatus === targetStatus) return false;
+  const allowed = VALID_ORDER_TRANSITIONS[currentStatus];
+  if (!Array.isArray(allowed)) return false;
+  return allowed.includes(targetStatus);
 }
 
 export default {
@@ -76,8 +90,11 @@ export default {
   ORDER_STATUS_LABELS,
   ACTIVE_FULFILLMENT_STATUSES,
   HISTORICAL_FULFILLMENT_STATUSES,
+  VALID_ORDER_TRANSITIONS,
   isValidOrderStatus,
   isHistoricalOrderStatus,
   isActiveOrderStatus,
+  canTransitionOrderStatus,
 };
+
 
