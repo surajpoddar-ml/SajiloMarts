@@ -150,7 +150,20 @@ export class OrderService extends BaseService {
       ],
     });
 
-    const savedOrder = await order.save();
+    let savedOrder;
+    try {
+      savedOrder = await order.save();
+    } catch (err) {
+      if (err.code === 11000) {
+        // Concurrent order creation collision: retrieve existing order for idempotency
+        const concurrentExisting = await Order.findOne({ productRequest: request._id });
+        if (concurrentExisting) {
+          return concurrentExisting;
+        }
+        throw new ConflictError('An order for this sourcing request already exists');
+      }
+      throw err;
+    }
 
     // 9. Update references on ProductRequest and PaymentSubmission
     request.order = savedOrder._id;
@@ -161,6 +174,7 @@ export class OrderService extends BaseService {
     await payment.save();
 
     return savedOrder;
+
   }
 
 
