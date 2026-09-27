@@ -1,4 +1,4 @@
-export { CheckoutPage } from './CheckoutPage.jsx';
+export { CheckoutPage, default } from './CheckoutPage.jsx';
 export { AuthoritativeQuoteReview } from './AuthoritativeQuoteReview.jsx';
 export { PaymentMethodSelector } from './PaymentMethodSelector.jsx';
 export { PaymentQrPresenter } from './PaymentQrPresenter.jsx';
@@ -11,4 +11,3 @@ export { PaymentSummaryCard } from './PaymentSummaryCard.jsx';
 export { PaymentConfirmationCard } from './PaymentConfirmationCard.jsx';
 export { CodModeInfoCard } from './CodModeInfoCard.jsx';
 
-export default CheckoutPage;
