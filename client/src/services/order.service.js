@@ -23,6 +23,14 @@ export const orderService = {
   getOrderDetail: async (orderId) => {
     return http.get(`/orders/${orderId}`);
   },
+
+  /**
+   * Creates an order from a confirmed sourcing request.
+   */
+  createOrder: async (data) => {
+    return http.post('/orders/create', data);
+  },
 };
 
 export default orderService;
+

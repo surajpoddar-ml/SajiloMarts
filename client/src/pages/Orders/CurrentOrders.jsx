@@ -119,11 +119,12 @@ export const CurrentOrders = ({
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               {orders.map((order) => {
-                const quote = order.quote || {};
+                const quote = order.quoteSnapshot || order.quote || {};
                 const payment = order.paymentSubmission;
-                const finalAmount = quote.finalAmountNpr || quote.finalNprTotal || order.productPriceInr;
-                const amountPaid = payment?.amountPaidNpr || quote.amountPayableNow || quote.payNowAmountNpr || 0;
-                const remainingCod = payment?.remainingAmountNpr || quote.remainingCodAmount || quote.remainingCodAmountNpr || 0;
+                const finalAmount = order.finalAmountNpr ?? quote.finalAmountNpr ?? quote.finalNprTotal ?? order.productPriceInr;
+                const amountPaid = order.amountPayableNow ?? payment?.amountPaidNpr ?? quote.amountPayableNow ?? quote.payNowAmountNpr ?? 0;
+                const remainingCod = order.remainingCodAmount ?? payment?.remainingAmountNpr ?? quote.remainingCodAmount ?? quote.remainingCodAmountNpr ?? 0;
+                const displayId = order.orderNumber || `#${String(order._id || order.id).slice(-8).toUpperCase()}`;
 
                 return (
                   <div
@@ -152,14 +153,14 @@ export const CurrentOrders = ({
                         if (onSelectOrder) onSelectOrder(order._id || order.id);
                       }
                     }}
-                    aria-label={`View order ${order._id || order.id}`}
+                    aria-label={`View order ${displayId}`}
                   >
                     <div style={{ flex: '1 1 320px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                          #{String(order._id || order.id).slice(-8).toUpperCase()}
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'monospace', fontWeight: 600 }}>
+                          {displayId}
                         </span>
-                        <StatusBadge status={order.status} />
+                        <StatusBadge status={order.status || order.currentStatus} label={order.statusLabel} />
                       </div>
                       <strong style={{ fontSize: '1rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>
                         {order.productName}
@@ -187,6 +188,7 @@ export const CurrentOrders = ({
                   </div>
                 );
               })}
+
 
               {/* Server-side Pagination */}
               {pagination.totalPages > 1 && (
