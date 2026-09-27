@@ -150,32 +150,75 @@ export class OrderService extends BaseService {
       ],
     });
 
+    // Multi-document transaction handling (Atlas replica sets support sessions; standalone instances fallback cleanly)
+    const session = await mongoose.startSession().catch(() => null);
+    const useTransaction = session && typeof session.withTransaction === 'function';
+
+    if (useTransaction) {
+      try {
+        let resultOrder;
+        await session.withTransaction(async () => {
+          const [created] = await Order.create([order], { session });
+          resultOrder = created;
+
+          await ProductRequest.findByIdAndUpdate(
+            request._id,
+            { order: created._id, status: REQUEST_STATUSES.PROCESSING },
+            { session }
+          );
+
+          await PaymentSubmission.findByIdAndUpdate(
+            payment._id,
+            { order: created._id },
+            { session }
+          );
+        });
+        await session.endSession();
+        return resultOrder;
+      } catch (txnError) {
+        await session.endSession().catch(() => {});
+        if (txnError.code === 11000) {
+          const concurrentExisting = await Order.findOne({ productRequest: request._id });
+          if (concurrentExisting) return concurrentExisting;
+          throw new ConflictError('An order for this sourcing request already exists');
+        }
+        // If transactions aren't supported on current Mongo deployment, proceed to atomic fallback
+        if (!txnError.message?.includes('Transaction numbers are only allowed on a replica set member or mongos')) {
+          throw txnError;
+        }
+      }
+    }
+
+    // Atomic sequential fallback for non-replica set deployments
     let savedOrder;
     try {
       savedOrder = await order.save();
     } catch (err) {
       if (err.code === 11000) {
-        // Concurrent order creation collision: retrieve existing order for idempotency
         const concurrentExisting = await Order.findOne({ productRequest: request._id });
-        if (concurrentExisting) {
-          return concurrentExisting;
-        }
+        if (concurrentExisting) return concurrentExisting;
         throw new ConflictError('An order for this sourcing request already exists');
       }
       throw err;
     }
 
-    // 9. Update references on ProductRequest and PaymentSubmission
-    request.order = savedOrder._id;
-    request.status = REQUEST_STATUSES.PROCESSING;
-    await request.save();
+    // Update references on ProductRequest and PaymentSubmission
+    try {
+      request.order = savedOrder._id;
+      request.status = REQUEST_STATUSES.PROCESSING;
+      await request.save();
 
-    payment.order = savedOrder._id;
-    await payment.save();
+      payment.order = savedOrder._id;
+      await payment.save();
+    } catch (cleanupErr) {
+      // Avoid orphan order in partial failure
+      await Order.findByIdAndDelete(savedOrder._id).catch(() => {});
+      throw cleanupErr;
+    }
 
     return savedOrder;
-
   }
+
 
 
   /**
