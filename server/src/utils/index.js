@@ -23,6 +23,8 @@ export * from './requestLifecycle.js';
 export * from './orderIdGenerator.js';
 export * from './orderAddressSnapshot.js';
 export * from './orderQuoteSnapshot.js';
+export * from './orderSerializer.js';
+
 
 
 

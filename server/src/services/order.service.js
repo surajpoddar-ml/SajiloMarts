@@ -22,7 +22,9 @@ import {
   generateUniqueOrderNumber,
   createDeliveryAddressSnapshot,
   extractAuthoritativeQuoteSnapshot,
+  serializeCustomerOrder,
 } from '../utils/index.js';
+
 
 // Established SajiloMarts fulfillment & active order statuses
 export const ACTIVE_ORDER_STATUSES = [
@@ -279,12 +281,7 @@ export class OrderService extends BaseService {
     ]);
 
     if (total > 0 || orders.length > 0) {
-      const sanitizedOrders = orders.map((order) => {
-        const { internalNotes, __v, ...safeOrder } = order;
-        safeOrder.status = safeOrder.currentStatus;
-        safeOrder.statusLabel = ORDER_STATUS_LABELS[safeOrder.currentStatus] || safeOrder.currentStatus;
-        return safeOrder;
-      });
+      const sanitizedOrders = orders.map((order) => serializeCustomerOrder(order));
 
       return {
         orders: sanitizedOrders,
@@ -316,10 +313,7 @@ export class OrderService extends BaseService {
       ProductRequest.countDocuments(requestFilter),
     ]);
 
-    const sanitizedLegacy = legacyRequests.map((req) => {
-      const { internalNotes, __v, ...safeReq } = req;
-      return safeReq;
-    });
+    const sanitizedLegacy = legacyRequests.map((req) => serializeCustomerOrder(req));
 
     return {
       orders: sanitizedLegacy,
@@ -362,12 +356,7 @@ export class OrderService extends BaseService {
     ]);
 
     if (total > 0 || orders.length > 0) {
-      const sanitizedOrders = orders.map((order) => {
-        const { internalNotes, __v, ...safeOrder } = order;
-        safeOrder.status = safeOrder.currentStatus;
-        safeOrder.statusLabel = ORDER_STATUS_LABELS[safeOrder.currentStatus] || safeOrder.currentStatus;
-        return safeOrder;
-      });
+      const sanitizedOrders = orders.map((order) => serializeCustomerOrder(order));
 
       return {
         orders: sanitizedOrders,
@@ -399,10 +388,7 @@ export class OrderService extends BaseService {
       ProductRequest.countDocuments(requestFilter),
     ]);
 
-    const sanitizedLegacy = legacyRequests.map((req) => {
-      const { internalNotes, __v, ...safeReq } = req;
-      return safeReq;
-    });
+    const sanitizedLegacy = legacyRequests.map((req) => serializeCustomerOrder(req));
 
     return {
       orders: sanitizedLegacy,
@@ -443,11 +429,7 @@ export class OrderService extends BaseService {
 
     if (orderDoc) {
       assertResourceOwnership(orderDoc, userId, 'Order', 'user');
-
-      const { internalNotes, __v, ...safeOrder } = orderDoc;
-      safeOrder.status = safeOrder.currentStatus;
-      safeOrder.statusLabel = ORDER_STATUS_LABELS[safeOrder.currentStatus] || safeOrder.currentStatus;
-      return safeOrder;
+      return serializeCustomerOrder(orderDoc);
     }
 
     // 2. Fallback to legacy ProductRequest for backward compatibility
@@ -459,13 +441,13 @@ export class OrderService extends BaseService {
 
       if (legacyDoc) {
         assertResourceOwnership(legacyDoc, userId, 'Order', 'user');
-        const { internalNotes, __v, ...safeLegacy } = legacyDoc;
-        return safeLegacy;
+        return serializeCustomerOrder(legacyDoc);
       }
     }
 
     throw new NotFoundError('Order not found');
   }
+
 }
 
 export const orderService = new OrderService();
