@@ -241,5 +241,16 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ user: 1, currentStatus: 1, createdAt: -1 });
 orderSchema.index({ user: 1, createdAt: -1 });
 
+/**
+ * Checks whether the given user ID matches the order owner
+ * @param {string|mongoose.Types.ObjectId} userId
+ * @returns {boolean}
+ */
+orderSchema.methods.isOwnedBy = function (userId) {
+  if (!userId || !this.user) return false;
+  return this.user.toString() === userId.toString();
+};
+
 export const Order = mongoose.model('Order', orderSchema);
 export default Order;
+
