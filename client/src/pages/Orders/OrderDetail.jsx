@@ -70,12 +70,14 @@ export const OrderDetail = ({
     );
   }
 
-  const quote = order.quote || {};
+  const quote = order.quoteSnapshot || order.quote || {};
   const payment = order.paymentSubmission;
-  const address = order.deliveryAddress;
-  const finalAmount = quote.finalAmountNpr || quote.finalNprTotal || order.productPriceInr;
-  const amountPaid = payment?.amountPaidNpr || quote.amountPayableNow || quote.payNowAmountNpr || 0;
-  const remainingCod = payment?.remainingAmountNpr || quote.remainingCodAmount || quote.remainingCodAmountNpr || 0;
+  const address = order.deliveryAddressSnapshot || order.deliveryAddress;
+  const finalAmount = order.finalAmountNpr ?? quote.finalAmountNpr ?? quote.finalNprTotal ?? order.productPriceInr;
+  const amountPaid = order.amountPayableNow ?? payment?.amountPaidNpr ?? quote.amountPayableNow ?? quote.payNowAmountNpr ?? 0;
+  const remainingCod = order.remainingCodAmount ?? payment?.remainingAmountNpr ?? quote.remainingCodAmount ?? quote.remainingCodAmountNpr ?? 0;
+  const displayId = order.orderNumber || `#${String(order._id || order.id).slice(-8).toUpperCase()}`;
+  const deliveryInfo = order.deliveryInfo;
 
   return (
     <div className="order-detail-view" style={{ maxWidth: '860px', margin: '0 auto' }}>
@@ -87,9 +89,9 @@ export const OrderDetail = ({
 
       <Card>
         <CardHeader
-          title={`Order #${String(order._id || order.id).slice(-8).toUpperCase()}`}
+          title={`Order ${displayId}`}
           description={`Placed on ${new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
-          action={<StatusBadge status={order.status} />}
+          action={<StatusBadge status={order.status || order.currentStatus} label={order.statusLabel} />}
         />
         <CardBody>
           {/* Product & Store Details */}
@@ -109,7 +111,7 @@ export const OrderDetail = ({
           >
             <div style={{ flex: '1 1 360px' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-brand)', textTransform: 'uppercase' }}>
-                {order.marketplace || 'Indian Store Item'}
+                {order.marketplace || 'Indian Marketplace Item'}
               </span>
               <Typography variant="h3" style={{ fontSize: '1.1rem', margin: '4px 0 8px', color: 'var(--text-primary)' }}>
                 {order.productName}
@@ -179,11 +181,20 @@ export const OrderDetail = ({
               </div>
 
               <div>
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Payment Method</span>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Payment Mode</span>
                 <div style={{ fontWeight: 600, textTransform: 'uppercase' }}>
-                  {payment?.paymentMethod || 'Manual Proof / Verification'}
+                  {order.paymentMode === 'cod_50_50' ? '50% COD / 50% Pay' : '100% Online Payment'}
                 </div>
               </div>
+
+              {payment?.paymentMethod && (
+                <div>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Payment Method</span>
+                  <div style={{ fontWeight: 600, textTransform: 'uppercase' }}>
+                    {payment.paymentMethod}
+                  </div>
+                </div>
+              )}
 
               {payment?.transactionCode && (
                 <div>
@@ -197,13 +208,57 @@ export const OrderDetail = ({
               <div>
                 <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Payment Status</span>
                 <div style={{ marginTop: '2px' }}>
-                  <StatusBadge status={payment?.paymentStatus || 'pending'} />
+                  <StatusBadge status={payment?.paymentStatus || 'verified'} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Delivery Destination Address */}
+          {/* Carrier / Courier Tracking info (only displayed if actually assigned by ops) */}
+          {deliveryInfo && (deliveryInfo.carrier || deliveryInfo.trackingNumber) && (
+            <div
+              style={{
+                backgroundColor: 'var(--bg-surface-secondary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-6)',
+              }}
+            >
+              <Typography variant="h3" style={{ fontSize: '1rem', marginBottom: 'var(--space-2)' }}>
+                Courier &amp; Delivery Tracking
+              </Typography>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: 'var(--space-3)',
+                  fontSize: '0.875rem',
+                }}
+              >
+                {deliveryInfo.carrier && (
+                  <div>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Courier Carrier</span>
+                    <div style={{ fontWeight: 600 }}>{deliveryInfo.carrier}</div>
+                  </div>
+                )}
+                {deliveryInfo.trackingNumber && (
+                  <div>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Tracking Number</span>
+                    <div style={{ fontWeight: 600, fontFamily: 'monospace' }}>{deliveryInfo.trackingNumber}</div>
+                  </div>
+                )}
+                {deliveryInfo.estimatedDeliveryDate && (
+                  <div>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Estimated Delivery</span>
+                    <div style={{ fontWeight: 500 }}>{new Date(deliveryInfo.estimatedDeliveryDate).toLocaleDateString()}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Delivery Destination Address Snapshot */}
           {address && (
             <div
               style={{
@@ -230,6 +285,7 @@ export const OrderDetail = ({
               </div>
             </div>
           )}
+
 
           {/* Chronological Order Status History */}
           <div
