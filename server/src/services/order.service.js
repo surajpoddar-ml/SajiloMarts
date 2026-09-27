@@ -445,10 +445,14 @@ export class OrderService extends BaseService {
       }
     }
 
+    throw new NotFoundError('Order not found');
+  }
+
   /**
    * Asserts that a user has administrator privileges.
    */
   async assertAdmin(adminUserId) {
+
     this.validateObjectId(adminUserId, 'Admin User ID');
     const { User, USER_ROLES } = await import('../models/user.model.js');
     const adminUser = await User.findById(adminUserId);
