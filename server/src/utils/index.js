@@ -22,6 +22,8 @@ export * from './urlSecurity.js';
 export * from './requestLifecycle.js';
 export * from './orderIdGenerator.js';
 export * from './orderAddressSnapshot.js';
+export * from './orderQuoteSnapshot.js';
+
 
 
 
