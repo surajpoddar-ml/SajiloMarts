@@ -62,12 +62,21 @@ export const OrderStatusTimeline = ({
   }
 
   return (
-    <div className="order-status-timeline" style={{ margin: 'var(--space-4) 0' }}>
+    <div
+      className="order-status-timeline"
+      style={{ margin: 'var(--space-4) 0' }}
+      role="region"
+      aria-label="Order fulfillment progress timeline"
+    >
       <Typography variant="h3" style={{ fontSize: '1.05rem', marginBottom: 'var(--space-4)' }}>
         Fulfillment Progress
       </Typography>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+      <div
+        role="list"
+        aria-label="Fulfillment steps"
+        style={{ display: 'flex', flexDirection: 'column', gap: '0' }}
+      >
         {FULFILLMENT_STAGES.map((stage, idx) => {
           const isPassed = currentStageIndex > idx;
           const isCurrent = currentStageIndex === idx || (currentStageIndex === -1 && idx === 0);
@@ -87,9 +96,13 @@ export const OrderStatusTimeline = ({
           const circleColor = isPassed || isCurrent ? '#ffffff' : 'var(--text-muted)';
           const lineColor = isPassed ? 'var(--color-success)' : 'var(--border-subtle)';
 
+          const stepStatusText = isPassed ? 'Completed' : isCurrent ? 'Current step' : 'Upcoming';
+
           return (
             <div
               key={stage.key}
+              role="listitem"
+              aria-current={isCurrent ? 'step' : undefined}
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -100,6 +113,7 @@ export const OrderStatusTimeline = ({
               {/* Vertical connecting line */}
               {idx < FULFILLMENT_STAGES.length - 1 && (
                 <div
+                  aria-hidden="true"
                   style={{
                     position: 'absolute',
                     left: '15px',
@@ -145,6 +159,9 @@ export const OrderStatusTimeline = ({
                       fontSize: '0.95rem',
                     }}
                   >
+                    <span className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', border: 0 }}>
+                      {stepStatusText}:{' '}
+                    </span>
                     {stage.label}
                     {isCurrent && (
                       <span
@@ -163,6 +180,7 @@ export const OrderStatusTimeline = ({
                       </span>
                     )}
                   </span>
+
 
                   {timestamp && (
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>

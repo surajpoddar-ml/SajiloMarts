@@ -180,3 +180,16 @@
   }
 }
 
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .customer-portal__nav-btn,
+  .current-orders-view *,
+  .order-history-view *,
+  .order-detail-view *,
+  .order-status-timeline * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
