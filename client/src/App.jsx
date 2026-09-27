@@ -39,6 +39,9 @@ function AppContent() {
       if (path.includes('reset-password') || params.get('token')) {
         return 'reset-password';
       }
+      if (path.includes('login')) {
+        return 'login';
+      }
       if (path.includes('register')) {
         return 'register';
       }
@@ -46,7 +49,7 @@ function AppContent() {
         return 'forgot-password';
       }
     }
-    return 'login';
+    return 'register';
   });
 
   // Dynamic SEO Page Title
@@ -98,14 +101,14 @@ function AppContent() {
   // Mandatory Auth Gate: Unauthenticated users must log in or sign up before accessing the main website
   if (!isAuthenticated) {
     const authViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];
-    const activeAuthView = authViews.includes(currentView) ? currentView : 'login';
+    const activeAuthView = authViews.includes(currentView) ? currentView : 'register';
 
     return (
       <div className="app-shell auth-gate-shell">
         <header className="site-header" style={{ borderBottom: '1px solid var(--border-subtle)', padding: '16px 0' }}>
           <Container size="wide">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Logo size="md" onClick={() => handleNavigate('login')} />
+              <Logo size="md" onClick={() => handleNavigate('register')} />
               <div style={{ display: 'flex', gap: '8px' }}>
                 <Button
                   variant={activeAuthView === 'login' ? 'primary' : 'ghost'}

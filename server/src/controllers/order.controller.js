@@ -66,6 +66,8 @@ export class OrderController extends BaseController {
     return res.status(HTTP_STATUS.CREATED).json(
       ApiResponse.created(order, 'Order created successfully')
     );
+  });
+
   /**
    * PATCH /api/v1/orders/:orderId/status
    * Updates order fulfillment status (Admin only).
