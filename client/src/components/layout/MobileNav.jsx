@@ -126,7 +126,7 @@ export const MobileNav = ({
 
           {user && (
             <div className="mobile-nav-section">
-              <div className="mobile-nav-section-title">Account &amp; Orders</div>
+              <div className="mobile-nav-section-title">Customer Portal</div>
               <ul className="mobile-nav-list">
                 <li>
                   <button
@@ -134,16 +134,52 @@ export const MobileNav = ({
                     className={`mobile-nav-item ${currentView === 'account' ? 'mobile-nav-item--active' : ''}`}
                     onClick={() => handleNavClick('account')}
                   >
-                    👤 Account Profile ({user.name})
+                    🏠 Overview
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
-                    className={`mobile-nav-item ${currentView === 'sourcing-new' ? 'mobile-nav-item--active' : ''}`}
-                    onClick={() => handleNavClick('sourcing-new')}
+                    className={`mobile-nav-item ${['sourcing-requests', 'sourcing-new', 'sourcing-detail'].includes(currentView) ? 'mobile-nav-item--active' : ''}`}
+                    onClick={() => handleNavClick('sourcing-requests')}
                   >
-                    + Create Sourcing Request
+                    📋 Sourcing Requests
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={`mobile-nav-item ${currentView === 'current-orders' ? 'mobile-nav-item--active' : ''}`}
+                    onClick={() => handleNavClick('current-orders')}
+                  >
+                    🚚 Current Orders
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={`mobile-nav-item ${currentView === 'order-history' ? 'mobile-nav-item--active' : ''}`}
+                    onClick={() => handleNavClick('order-history')}
+                  >
+                    📜 Order History
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={`mobile-nav-item ${currentView === 'addresses' ? 'mobile-nav-item--active' : ''}`}
+                    onClick={() => handleNavClick('addresses')}
+                  >
+                    📍 Saved Addresses
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className={`mobile-nav-item ${currentView === 'account-security' ? 'mobile-nav-item--active' : ''}`}
+                    onClick={() => handleNavClick('account-security')}
+                  >
+                    🛡️ Account Security
                   </button>
                 </li>
                 {isAdmin && (
@@ -154,7 +190,7 @@ export const MobileNav = ({
                       onClick={() => handleNavClick('admin-console')}
                       style={{ color: '#B91C1C' }}
                     >
-                      🛡️ Administrator Console
+                      🔒 Administrator Console
                     </button>
                   </li>
                 )}
