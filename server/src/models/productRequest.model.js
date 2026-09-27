@@ -184,7 +184,14 @@ const productRequestSchema = new mongoose.Schema(
       required: false,
       default: null,
     },
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order',
+      required: false,
+      default: null,
+    },
     internalNotes: {
+
       type: String,
       required: false,
       default: null,
