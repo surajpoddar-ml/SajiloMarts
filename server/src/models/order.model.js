@@ -242,6 +242,24 @@ orderSchema.index({ user: 1, currentStatus: 1, createdAt: -1 });
 orderSchema.index({ user: 1, createdAt: -1 });
 
 /**
+ * Appends an authoritative status transition record to the order's history.
+ * @param {string} newStatus
+ * @param {string|mongoose.Types.ObjectId} [changedBy]
+ * @param {string} [note]
+ */
+orderSchema.methods.addStatusHistory = function (newStatus, changedBy = null, note = null) {
+  const previousStatus = this.currentStatus;
+  this.currentStatus = newStatus;
+  this.statusHistory.push({
+    previousStatus,
+    status: newStatus,
+    changedAt: new Date(),
+    changedBy,
+    note: note ? String(note).trim() : null,
+  });
+};
+
+/**
  * Checks whether the given user ID matches the order owner
  * @param {string|mongoose.Types.ObjectId} userId
  * @returns {boolean}
@@ -250,6 +268,7 @@ orderSchema.methods.isOwnedBy = function (userId) {
   if (!userId || !this.user) return false;
   return this.user.toString() === userId.toString();
 };
+
 
 export const Order = mongoose.model('Order', orderSchema);
 export default Order;
