@@ -16,7 +16,14 @@ const paymentSubmissionSchema = new mongoose.Schema(
       immutable: [true, 'Payment ownership cannot be reassigned'],
       index: true,
     },
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order',
+      required: false,
+      default: null,
+    },
     paymentMode: {
+
       type: String,
       enum: {
         values: Object.values(PAYMENT_MODES),
