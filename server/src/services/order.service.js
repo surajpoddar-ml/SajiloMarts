@@ -223,6 +223,7 @@ export class OrderService extends BaseService {
 
   /**
    * Retrieves paginated active current orders for an authenticated customer.
+   * Filters out delivered and completed orders authoritatively on the server.
    */
   async getCurrentOrders(userId, options = {}) {
     this.validateObjectId(userId, 'User ID');
@@ -233,41 +234,79 @@ export class OrderService extends BaseService {
     const sortOrder = options.sortOrder === 1 || options.sortOrder === 'asc' ? 1 : -1;
 
     const skip = (page - 1) * limit;
-    const filter = {
+    const orderFilter = {
       user: userId,
-      status: { $in: ACTIVE_ORDER_STATUSES },
+      currentStatus: { $in: ACTIVE_FULFILLMENT_STATUSES },
     };
 
     const sortCriteria = { [sortBy]: sortOrder, _id: -1 };
 
     const [orders, total] = await Promise.all([
-      ProductRequest.find(filter)
+      Order.find(orderFilter)
+        .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
+        .sort(sortCriteria)
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Order.countDocuments(orderFilter),
+    ]);
+
+    if (total > 0 || orders.length > 0) {
+      const sanitizedOrders = orders.map((order) => {
+        const { internalNotes, __v, ...safeOrder } = order;
+        safeOrder.status = safeOrder.currentStatus;
+        safeOrder.statusLabel = ORDER_STATUS_LABELS[safeOrder.currentStatus] || safeOrder.currentStatus;
+        return safeOrder;
+      });
+
+      return {
+        orders: sanitizedOrders,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit) || 1,
+          hasNextPage: page * limit < total,
+          hasPrevPage: page > 1,
+        },
+      };
+    }
+
+    // Fallback query for legacy ProductRequests in active state
+    const requestFilter = {
+      user: userId,
+      status: { $in: ACTIVE_ORDER_STATUSES },
+    };
+
+    const [legacyRequests, legacyTotal] = await Promise.all([
+      ProductRequest.find(requestFilter)
         .populate('deliveryAddress', 'fullName phone label tole municipality district province')
         .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt')
         .sort(sortCriteria)
         .skip(skip)
         .limit(limit)
         .lean(),
-      ProductRequest.countDocuments(filter),
+      ProductRequest.countDocuments(requestFilter),
     ]);
 
-    const sanitizedOrders = orders.map((order) => {
-      const { internalNotes, __v, ...safeOrder } = order;
-      return safeOrder;
+    const sanitizedLegacy = legacyRequests.map((req) => {
+      const { internalNotes, __v, ...safeReq } = req;
+      return safeReq;
     });
 
     return {
-      orders: sanitizedOrders,
+      orders: sanitizedLegacy,
       pagination: {
-        total,
+        total: legacyTotal,
         page,
         limit,
-        totalPages: Math.ceil(total / limit) || 1,
-        hasNextPage: page * limit < total,
+        totalPages: Math.ceil(legacyTotal / limit) || 1,
+        hasNextPage: page * limit < legacyTotal,
         hasPrevPage: page > 1,
       },
     };
   }
+
 
   /**
    * Retrieves paginated order history (completed / delivered / cancelled) for an authenticated customer.
