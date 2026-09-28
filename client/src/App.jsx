@@ -287,9 +287,11 @@ function AppContent() {
             <SourcingRequestDetail
               requestId={selectedRequestId}
               onBack={() => handleNavigate('sourcing-requests')}
-              onProceedToCheckout={(id) => {
-                setSelectedRequestId(id || selectedRequestId);
-                handleNavigate('checkout');
+              onProceedToCheckout={(id, payload) => {
+                const targetOrderId = payload?.orderId || (id !== selectedRequestId ? id : null);
+                if (targetOrderId) setSelectedOrderId(targetOrderId);
+                if (payload?.requestId) setSelectedRequestId(payload.requestId);
+                handleNavigate('checkout', { orderId: targetOrderId, requestId: payload?.requestId || selectedRequestId });
               }}
               onStatusUpdated={() => { }}
             />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { productRequestService } from '../../services';
+import { productRequestService, orderService } from '../../services';
 import { Card, CardHeader, CardBody } from '../../components/common/Card.jsx';
 import { Button } from '../../components/common/Button.jsx';
 import { Typography } from '../../components/common/Typography.jsx';
@@ -40,17 +40,35 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onPr
   const handleConfirmQuote = async () => {
     setActionLoading(true);
     setError(null);
-    setFeedback('');
+    setFeedback('Submitting order and preparing payment parameters...');
     try {
-      const res = await productRequestService.confirmQuote(requestId);
-      setFeedback('Quote confirmed successfully! Proceeding to payment and checkout.');
-      setRequest((prev) => ({ ...prev, ...(res.data || res) }));
+      // 1. Confirm quote if needed
+      let confirmedReq = request;
+      if (request.status !== 'customer_confirmed') {
+        const confirmRes = await productRequestService.confirmQuote(requestId);
+        confirmedReq = confirmRes.data || confirmRes;
+        setRequest((prev) => ({ ...prev, ...confirmedReq }));
+      }
+
+      // 2. Create or resolve order
+      const orderRes = await orderService.createOrder({
+        requestId,
+        deliveryAddressId: request.deliveryAddress?._id || request.deliveryAddress?.id || request.deliveryAddress,
+      });
+
+      const orderData = orderRes?.data || orderRes;
+      const realOrderId = orderData?.order?._id || orderData?._id || orderData?.orderId || orderData?.id;
+
+      setFeedback('Order submitted successfully! Continuing to payment...');
       if (onStatusUpdated) onStatusUpdated();
       if (onProceedToCheckout) {
-        onProceedToCheckout(requestId);
+        onProceedToCheckout(realOrderId || requestId, { orderId: realOrderId, requestId });
       }
     } catch (err) {
-      setError(err.message || 'Failed to confirm quote');
+      setError(err.message || 'Failed to submit order');
+      if (err.message?.toLowerCase().includes('already exists') && onProceedToCheckout) {
+        onProceedToCheckout(requestId);
+      }
     } finally {
       setActionLoading(false);
     }
