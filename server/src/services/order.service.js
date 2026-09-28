@@ -505,7 +505,17 @@ export class OrderService extends BaseService {
 
     if (orderDoc) {
       assertResourceOwnership(orderDoc, userId, 'Order', 'user');
-      return serializeCustomerOrder(orderDoc);
+      const serialized = serializeCustomerOrder(orderDoc);
+      const isPaymentRequired = (serialized.amountPayableNow > 0) && (!serialized.payment || serialized.payment.paymentStatus === 'pending');
+      const nextStep = {
+        type: isPaymentRequired ? 'payment' : (['proof_submitted', 'under_review'].includes(serialized.payment?.paymentStatus) ? 'verification' : 'order'),
+        orderId: serialized._id,
+        orderNumber: serialized.orderNumber,
+      };
+      return {
+        ...serialized,
+        nextStep,
+      };
     }
 
     // 2. Fallback to legacy ProductRequest for backward compatibility
@@ -517,7 +527,17 @@ export class OrderService extends BaseService {
 
       if (legacyDoc) {
         assertResourceOwnership(legacyDoc, userId, 'Order', 'user');
-        return serializeCustomerOrder(legacyDoc);
+        const serialized = serializeCustomerOrder(legacyDoc);
+        const isPaymentRequired = (serialized.amountPayableNow > 0) && (!serialized.payment || serialized.payment.paymentStatus === 'pending');
+        const nextStep = {
+          type: isPaymentRequired ? 'payment' : (['proof_submitted', 'under_review'].includes(serialized.payment?.paymentStatus) ? 'verification' : 'order'),
+          orderId: serialized._id,
+          orderNumber: serialized.orderNumber,
+        };
+        return {
+          ...serialized,
+          nextStep,
+        };
       }
     }
 

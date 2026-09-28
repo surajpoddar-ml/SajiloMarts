@@ -70,6 +70,10 @@ export function serializeCustomerOrder(order) {
     quote: raw.quote || raw.quoteSnapshot || null,
     deliveryAddressSnapshot: raw.deliveryAddressSnapshot || raw.deliveryAddress || null,
 
+    // Payment Info
+    payment: safePayment,
+    paymentSubmission: safePayment,
+
     // Status & Tracking
     currentStatus,
     status: currentStatus,
