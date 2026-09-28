@@ -323,6 +323,42 @@ export const CheckoutPage = ({
     );
   }
 
+  // If already verified / completed, show completed state
+  const currentPaymentStatus = order?.payment?.paymentStatus || request?.payment?.paymentStatus || request?.paymentSubmission?.paymentStatus;
+  if (currentPaymentStatus === 'verified' || currentPaymentStatus === 'paid') {
+    return (
+      <div className="checkout-page" id="sajilomarts-checkout-completed">
+        <Section size="md">
+          <Container size="narrow">
+            <Card style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-3)' }}>🎉</div>
+              <Typography variant="h2" style={{ color: 'var(--color-success)', marginBottom: 'var(--space-2)' }}>
+                Payment Already Verified
+              </Typography>
+              <Typography variant="body" style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+                Payment for this order has already been completed and confirmed. Your order is actively being processed by the Kathmandu fulfillment team.
+              </Typography>
+              {order?.orderNumber && (
+                <div style={{ background: 'var(--bg-surface-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-6)', display: 'inline-block' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Order Reference</div>
+                  <div style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--color-brand)' }}>{order.orderNumber}</div>
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Button variant="primary" onClick={() => onNavigate('current-orders')}>
+                  View Active Orders
+                </Button>
+                <Button variant="outline" onClick={() => onNavigate('home')}>
+                  Return to Homepage
+                </Button>
+              </div>
+            </Card>
+          </Container>
+        </Section>
+      </div>
+    );
+  }
+
   // If already successfully submitted, show clean confirmation card
   if (submissionResult) {
     return (
