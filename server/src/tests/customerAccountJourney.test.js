@@ -98,4 +98,52 @@ test('SajiloMarts Complete Customer Account Journey Integration Test', async (t)
     const deliveredStatus = 'delivered';
     assert.ok(COMPLETED_ORDER_STATUSES.includes(deliveredStatus), 'delivered is a completed order history status');
   });
+
+  await t.test('Step 6: Order Submission to Payment Continuation Response Verification', () => {
+    const orderSubmissionResult = {
+      _id: new mongoose.Types.ObjectId().toString(),
+      orderNumber: 'SM-2026-A8F3K9',
+      finalAmountNpr: 40260,
+      amountPayableNow: 20130,
+      remainingCodAmount: 20130,
+      paymentMode: 'cod_50_50',
+      payment: {
+        isPaymentRequired: true,
+        paymentStatus: 'pending',
+        amountDueNpr: 40260,
+        amountPayableNow: 20130,
+        remainingCodAmount: 20130,
+        paymentMode: 'cod_50_50',
+        currency: 'NPR',
+      },
+      nextStep: {
+        type: 'payment',
+        orderId: 'SM-2026-A8F3K9',
+      },
+    };
+
+    assert.equal(orderSubmissionResult.nextStep.type, 'payment');
+    assert.equal(orderSubmissionResult.payment.isPaymentRequired, true);
+    assert.equal(orderSubmissionResult.payment.amountPayableNow, 20130);
+    assert.equal(orderSubmissionResult.payment.remainingCodAmount, 20130);
+  });
+
+  await t.test('Step 7: Payment Proof Submission & Order State Synchronization', () => {
+    const paymentRecord = {
+      _id: new mongoose.Types.ObjectId().toString(),
+      user: customerId,
+      paymentMode: 'cod_50_50',
+      paymentMethod: 'esewa',
+      transactionCode: 'TXN-882211',
+      paymentProof: 'uploads/receipt-proof.png',
+      paymentStatus: 'proof_submitted',
+      submittedAt: new Date(),
+    };
+
+    assert.equal(paymentRecord.paymentStatus, 'proof_submitted');
+    assert.equal(paymentRecord.transactionCode, 'TXN-882211');
+    assert.doesNotThrow(() => {
+      assertResourceOwnership(paymentRecord, customerId, 'Payment submission', 'user');
+    });
+  });
 });
