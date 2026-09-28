@@ -56,9 +56,14 @@ export const AuthoritativeQuoteReview = ({ request }) => {
             flexWrap: 'wrap',
           }}>
             <div style={{ flex: '1 1 320px' }}>
-              <Typography variant="caption" style={{ textTransform: 'uppercase', color: 'var(--color-brand)', fontWeight: 600 }}>
-                {request.marketplace || 'Indian Marketplace Item'}
-              </Typography>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <Typography variant="caption" style={{ textTransform: 'uppercase', color: 'var(--color-brand)', fontWeight: 600 }}>
+                  {request.marketplace || 'Indian Marketplace Item'}
+                </Typography>
+                {request.orderNumber && (
+                  <StatusBadge status="info" label={`Order: ${request.orderNumber}`} />
+                )}
+              </div>
               <Typography variant="h3" style={{ fontSize: '1.05rem', margin: '4px 0', color: 'var(--text-primary)' }}>
                 {request.productName}
               </Typography>
