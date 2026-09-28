@@ -70,4 +70,32 @@ test('SajiloMarts Customer Order Privacy & IDOR Protection Test Suite', async (t
     assert.strictEqual(JSON.stringify(serialized).includes('SECRET SUPPLIER DISCOUNT'), false);
     assert.strictEqual(JSON.stringify(serialized).includes('VEND-9921'), false);
   });
+
+  await t.test('4. Payment ownership protection strictly prevents Customer B access to Customer A payment proof', () => {
+    const mockPayment = {
+      _id: new mongoose.Types.ObjectId().toString(),
+      user: customerA,
+      paymentStatus: 'proof_submitted',
+      transactionCode: 'TXN-998822',
+      paymentProof: 'uploads/proof-123.jpg',
+    };
+
+    assert.throws(
+      () => {
+        assertResourceOwnership(mockPayment, customerB, 'Payment submission', 'user');
+      },
+      (err) => {
+        assert.strictEqual(err instanceof ForbiddenError, true);
+        return true;
+      }
+    );
+  });
+
+  await t.test('5. Serializer computes authoritative payment continuation state without client overrides', () => {
+    const serialized = serializeCustomerOrder(mockOrder);
+    assert.strictEqual(serialized.amountPayableNow, 24938.76);
+    assert.strictEqual(serialized.remainingCodAmount, 24938.76);
+    assert.strictEqual(serialized.paymentMode, 'cod_50_50');
+    assert.strictEqual(serialized.currency, 'NPR');
+  });
 });
