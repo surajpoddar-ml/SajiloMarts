@@ -359,6 +359,47 @@ export const CheckoutPage = ({
     );
   }
 
+  // If payment proof is currently under review / pending verification
+  if (currentPaymentStatus === 'proof_submitted' || currentPaymentStatus === 'under_review') {
+    const paymentData = order?.payment || request?.payment || request?.paymentSubmission;
+    return (
+      <div className="checkout-page" id="sajilomarts-checkout-verification">
+        <Section size="md">
+          <Container size="narrow">
+            <Card style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-3)' }}>⏳</div>
+              <Typography variant="h2" style={{ color: 'var(--color-warning)', marginBottom: 'var(--space-2)' }}>
+                Payment Proof Under Verification
+              </Typography>
+              <Typography variant="body" style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+                Your payment reference has been submitted and is currently being verified by our Kathmandu finance desk. Verification typically completes within 15-30 minutes during business hours.
+              </Typography>
+              <div style={{ background: 'var(--bg-surface-secondary)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-6)', textAlign: 'left', display: 'grid', gap: '8px' }}>
+                {order?.orderNumber && (
+                  <div><span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Order Reference: </span><strong>{order.orderNumber}</strong></div>
+                )}
+                {paymentData?.transactionCode && (
+                  <div><span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Transaction Code: </span><code>{paymentData.transactionCode}</code></div>
+                )}
+                {paymentData?.paymentMethod && (
+                  <div><span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Method: </span><strong style={{ textTransform: 'capitalize' }}>{paymentData.paymentMethod}</strong></div>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Button variant="primary" onClick={() => onNavigate('current-orders')}>
+                  Go to Current Orders
+                </Button>
+                <Button variant="outline" onClick={() => onNavigate('sourcing-requests')}>
+                  Return to Sourcing Requests
+                </Button>
+              </div>
+            </Card>
+          </Container>
+        </Section>
+      </div>
+    );
+  }
+
   // If already successfully submitted, show clean confirmation card
   if (submissionResult) {
     return (
