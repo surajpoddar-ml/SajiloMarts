@@ -67,6 +67,10 @@
   .checkout-transaction-code input {
     font-size: 0.95rem;
   }
+
+  .checkout-page button {
+    min-height: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
