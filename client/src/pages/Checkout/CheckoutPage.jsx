@@ -168,12 +168,27 @@ export const CheckoutPage = ({
 
   const breakdown = useMemo(() => {
     if (!request) return null;
+    if (order && order.quoteSnapshot) {
+      const q = order.quoteSnapshot;
+      return {
+        productPriceInr: order.productPriceInr || q.productPriceInr,
+        quantity: order.quantity || q.quantity,
+        subtotalInr: order.subtotalInr ?? q.subtotalInr,
+        conversionMultiplier: order.conversionMultiplier || q.conversionMultiplier || 1.65,
+        feeRate: order.feeRate || q.feeRate || 0.12,
+        convertedAmountNpr: order.convertedAmountNpr ?? q.convertedAmountNpr,
+        finalAmountNpr: order.finalAmountNpr ?? q.finalAmountNpr,
+        payNowAmountNpr: selectedMethod === 'cod_50_50' ? (order.amountPayableNow ?? q.payNowAmountNpr ?? Math.ceil((order.finalAmountNpr ?? q.finalAmountNpr) / 2)) : (order.finalAmountNpr ?? q.finalAmountNpr),
+        remainingCodAmountNpr: selectedMethod === 'cod_50_50' ? (order.remainingCodAmount ?? q.remainingCodAmountNpr ?? Math.floor((order.finalAmountNpr ?? q.finalAmountNpr) / 2)) : 0,
+        paymentMode,
+      };
+    }
     return calculateAuthoritativePaymentBreakdown(
       request.productPriceInr,
       request.quantity,
       paymentMode
     );
-  }, [request, paymentMode]);
+  }, [request, order, paymentMode, selectedMethod]);
 
   // Handle Payment Method switch (clears method-specific stale error state)
   const handleMethodChange = (newMethod) => {
