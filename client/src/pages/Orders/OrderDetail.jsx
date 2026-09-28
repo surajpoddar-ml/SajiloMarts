@@ -16,6 +16,7 @@ import { OrderStatusTimeline } from '../../components/orders/OrderStatusTimeline
 export const OrderDetail = ({
   orderId,
   onBack,
+  onProceedToPayment,
 }) => {
   const [order, setOrder] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,6 +97,37 @@ export const OrderDetail = ({
           action={<StatusBadge status={order.status || order.currentStatus} label={order.statusLabel} />}
         />
         <CardBody>
+          {(!payment || payment.paymentStatus === 'pending') && onProceedToPayment && (
+            <div
+              style={{
+                backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                border: '1.5px solid var(--color-brand)',
+                borderRadius: 'var(--radius-md)',
+                padding: 'var(--space-4)',
+                marginBottom: 'var(--space-6)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <strong style={{ color: 'var(--color-brand)', display: 'block' }}>Payment Required</strong>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Submit digital wallet advance payment to initiate Indian procurement.
+                </span>
+              </div>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => onProceedToPayment(order._id || order.id)}
+              >
+                Complete Payment &amp; Proof &rarr;
+              </Button>
+            </div>
+          )}
+
           {/* Product & Store Details */}
           <div
             style={{

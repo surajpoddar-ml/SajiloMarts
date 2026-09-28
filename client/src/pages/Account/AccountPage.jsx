@@ -131,8 +131,8 @@ export const AccountPage = ({
           <SourcingRequestDetail
             requestId={selectedRequestId}
             onBack={() => setSelectedRequestId(null)}
-            onProceedToCheckout={(id) => {
-              onNavigate('checkout');
+            onProceedToCheckout={(id, payload) => {
+              onNavigate('checkout', payload || { orderId: id, requestId: selectedRequestId });
             }}
             onStatusUpdated={() => {}}
           />
@@ -149,6 +149,9 @@ export const AccountPage = ({
           <OrderDetail
             orderId={selectedOrderId}
             onBack={() => setSelectedOrderId(null)}
+            onProceedToPayment={(orderId) => {
+              onNavigate('checkout', { orderId });
+            }}
           />
         ) : (
           <CurrentOrders
@@ -163,6 +166,9 @@ export const AccountPage = ({
           <OrderDetail
             orderId={selectedOrderId}
             onBack={() => setSelectedOrderId(null)}
+            onProceedToPayment={(orderId) => {
+              onNavigate('checkout', { orderId });
+            }}
           />
         ) : (
           <OrderHistory
