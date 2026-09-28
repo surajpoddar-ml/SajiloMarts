@@ -56,15 +56,16 @@ export class OrderController extends BaseController {
   /**
    * POST /api/v1/orders/create
    * Creates an order from a verified sourcing request for the authenticated user.
+   * Returns authoritative order reference, payment continuation details, and nextStep.
    */
   createOrder = asyncHandler(async (req, res) => {
     const userId = req.user.id || req.user._id;
     const { requestId, deliveryAddressId } = req.body;
 
-    const order = await orderService.createOrderFromSourcingRequest(userId, requestId, { deliveryAddressId });
+    const result = await orderService.createOrderFromSourcingRequest(userId, requestId, { deliveryAddressId });
 
     return res.status(HTTP_STATUS.CREATED).json(
-      ApiResponse.created(order, 'Order created successfully')
+      ApiResponse.created(result, 'Order created successfully')
     );
   });
 
