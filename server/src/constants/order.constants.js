@@ -104,12 +104,20 @@ export function canTransitionOrderStatus(currentStatus, targetStatus) {
   return allowed.includes(targetStatus);
 }
 
+export const PAYMENT_CONTINUATION_STATES = Object.freeze({
+  PAYMENT_REQUIRED: 'payment_required',
+  PAYMENT_COMPLETED: 'payment_completed',
+  PAYMENT_UNDER_REVIEW: 'payment_under_review',
+  PAYMENT_NOT_REQUIRED: 'payment_not_required',
+});
+
 export default {
   ORDER_STATUSES,
   ORDER_STATUS_LABELS,
   ACTIVE_FULFILLMENT_STATUSES,
   HISTORICAL_FULFILLMENT_STATUSES,
   VALID_ORDER_TRANSITIONS,
+  PAYMENT_CONTINUATION_STATES,
   isValidOrderStatus,
   isHistoricalOrderStatus,
   isActiveOrderStatus,
