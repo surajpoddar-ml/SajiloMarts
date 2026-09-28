@@ -36,9 +36,19 @@ export class PaymentService extends BaseService {
     this.validateObjectId(userId, 'User ID');
     this.validateObjectId(requestId, 'ProductRequest ID');
 
-    const request = await ProductRequest.findById(requestId);
+    let request = await ProductRequest.findById(requestId);
+    let orderDoc = null;
     if (!request) {
-      throw new NotFoundError('Product request not found');
+      const { Order } = await import('../models/order.model.js');
+      orderDoc = await Order.findById(requestId);
+      if (orderDoc) {
+        assertResourceOwnership(orderDoc, userId, 'Order', 'user');
+        request = await ProductRequest.findById(orderDoc.productRequest);
+      }
+    }
+
+    if (!request) {
+      throw new NotFoundError('Product request or order not found');
     }
 
     assertResourceOwnership(request, userId, 'Product request', 'user');
