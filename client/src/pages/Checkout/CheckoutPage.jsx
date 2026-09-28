@@ -567,9 +567,18 @@ export const CheckoutPage = ({
                 size="lg"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                style={{ width: '100%', padding: '16px', fontSize: '1.1rem', fontWeight: 600 }}
+                aria-busy={isSubmitting}
+                aria-disabled={isSubmitting}
+                style={{ width: '100%', padding: '16px', fontSize: '1.1rem', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                {isSubmitting ? 'Submitting Payment Proof...' : 'Submit Payment for Verification'}
+                {isSubmitting ? (
+                  <>
+                    <Spinner size="sm" />
+                    <span>Submitting Payment Proof...</span>
+                  </>
+                ) : (
+                  <span>Submit Payment for Verification</span>
+                )}
               </Button>
               <Typography variant="caption" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
                 🔒 Your transaction reference and proof are securely submitted to the SajiloMarts fulfillment team for verification.
