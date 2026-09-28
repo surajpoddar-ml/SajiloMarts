@@ -466,11 +466,16 @@ export const CheckoutPage = ({
         <Container size="standard">
           <div style={{ marginBottom: 'var(--space-6)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)', fontWeight: 600 }}>
-                Step 2 of 2: Checkout &amp; Payment Proof
-              </Typography>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)', fontWeight: 700 }}>
+                  Step 2 of 2: Checkout &amp; Payment
+                </span>
+                {order?.orderNumber && (
+                  <StatusBadge status="info" label={`Order: ${order.orderNumber}`} />
+                )}
+              </div>
               <Typography variant="h1" style={{ marginTop: 'var(--space-1)', fontSize: '1.75rem' }}>
-                Confirm Quote &amp; Submit Payment
+                Confirm Quote &amp; Submit Payment Proof
               </Typography>
             </div>
             <Button variant="ghost" size="sm" onClick={onBack || (() => onNavigate('sourcing-requests'))}>
