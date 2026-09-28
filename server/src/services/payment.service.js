@@ -170,6 +170,12 @@ export class PaymentService extends BaseService {
       status: REQUEST_STATUSES.PAYMENT_SUBMITTED,
     });
 
+    const { Order } = await import('../models/order.model.js');
+    await Order.findOneAndUpdate(
+      { $or: [{ _id: payment.order }, { productRequest: payment.productRequest }] },
+      { paymentSubmission: savedPayment._id }
+    );
+
     return savedPayment;
   }
 
