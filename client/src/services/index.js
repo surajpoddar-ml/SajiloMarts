@@ -6,4 +6,5 @@ export * from './productRequest.service.js';
 export * from './quote.service.js';
 export * from './payment.service.js';
 export * from './address.service.js';
+export * from './order.service.js';
 

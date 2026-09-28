@@ -39,6 +39,7 @@ export const MypayPaymentInterface = ({ amountPayableNpr, qrConfig = null }) => 
                 </div>
               </div>
             ) : (
+              <div>
                 <div style={{ fontSize: '2rem', marginBottom: '8px' }} aria-hidden="true">📲</div>
                 <Typography variant="body" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
                   MyPay Digital Wallet
@@ -46,6 +47,7 @@ export const MypayPaymentInterface = ({ amountPayableNpr, qrConfig = null }) => 
                 <Typography variant="caption" style={{ color: 'var(--text-secondary)' }}>
                   Transfer to official SajiloMarts MyPay account and submit reference code below.
                 </Typography>
+              </div>
             )}
           </div>
 
