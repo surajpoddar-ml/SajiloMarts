@@ -49,12 +49,26 @@ function AppContent() {
       if (path.includes('forgot-password')) {
         return 'forgot-password';
       }
+      if (path.includes('checkout') || params.get('view') === 'checkout' || params.get('orderId')) {
+        return 'checkout';
+      }
     }
     return 'register';
   });
 
   // Dynamic SEO Page Title
   useDocumentTitle(null, currentView);
+
+  // Restore URL orderId / requestId on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const orderIdParam = params.get('orderId');
+      const requestIdParam = params.get('requestId');
+      if (orderIdParam) setSelectedOrderId(orderIdParam);
+      if (requestIdParam) setSelectedRequestId(requestIdParam);
+    }
+  }, []);
 
   // When user is authenticated, if currentView is on auth gate, redirect to home
   useEffect(() => {
@@ -94,7 +108,13 @@ function AppContent() {
     checkHealth();
   }, []);
 
-  const handleNavigate = (view) => {
+  const handleNavigate = (view, payload = null) => {
+    if (typeof payload === 'string') {
+      setSelectedOrderId(payload);
+    } else if (payload && typeof payload === 'object') {
+      if (payload.orderId) setSelectedOrderId(payload.orderId);
+      if (payload.requestId) setSelectedRequestId(payload.requestId);
+    }
     setCurrentView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
