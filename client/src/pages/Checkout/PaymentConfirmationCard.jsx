@@ -122,7 +122,7 @@ export const PaymentConfirmationCard = ({
 
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
         <Button variant="primary" onClick={onViewRequests}>
-          View My Sourcing Requests
+          View My Orders
         </Button>
         <Button variant="outline" onClick={onGoHome}>
           Return to Homepage
