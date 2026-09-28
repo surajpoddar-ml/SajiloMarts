@@ -15,7 +15,7 @@ export const PaymentQrPresenter = ({
 }) => {
   if (!breakdown) return null;
 
-  const amountPayable = breakdown.amountPayableNowNpr;
+  const amountPayable = breakdown.payNowAmountNpr ?? breakdown.amountPayableNow ?? breakdown.amountPayableNowNpr ?? breakdown.finalAmountNpr ?? 0;
 
   return (
     <div className="payment-qr-presenter" style={{ display: 'grid', gap: 'var(--space-4)' }}>
