@@ -39,15 +39,13 @@ export const KhaltiPaymentInterface = ({ amountPayableNpr, qrConfig = null }) =>
                 </div>
               </div>
             ) : (
-              <div>
                 <div style={{ fontSize: '2rem', marginBottom: '8px' }} aria-hidden="true">💳</div>
                 <Typography variant="body" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  Payment QR is currently unavailable.
+                  Khalti Wallet Prepayment
                 </Typography>
                 <Typography variant="caption" style={{ color: 'var(--text-secondary)' }}>
-                  Please transfer to Khalti ID: <strong>9800000000</strong> (SajiloMarts Sourcing)
+                  Transfer to official SajiloMarts Khalti account and submit transaction ID below.
                 </Typography>
-              </div>
             )}
           </div>
 

@@ -39,15 +39,13 @@ export const MypayPaymentInterface = ({ amountPayableNpr, qrConfig = null }) => 
                 </div>
               </div>
             ) : (
-              <div>
                 <div style={{ fontSize: '2rem', marginBottom: '8px' }} aria-hidden="true">📲</div>
                 <Typography variant="body" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  Payment QR is currently unavailable.
+                  MyPay Digital Wallet
                 </Typography>
                 <Typography variant="caption" style={{ color: 'var(--text-secondary)' }}>
-                  Please transfer to MyPay Account: <strong>9800000000</strong> (SajiloMarts Nepal)
+                  Transfer to official SajiloMarts MyPay account and submit reference code below.
                 </Typography>
-              </div>
             )}
           </div>
 
