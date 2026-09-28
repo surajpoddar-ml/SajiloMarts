@@ -148,13 +148,16 @@ export class OrderService extends BaseService {
     const deliveryAddressSnapshot = createDeliveryAddressSnapshot(deliveryAddressDoc);
 
     // 6. Idempotency / Duplicate Check
-    const existingOrder = await Order.findOne({ productRequest: request._id });
+    const existingOrder = await Order.findOne({ productRequest: request._id, user: userId })
+      .populate('paymentSubmission', 'paymentMode paymentMethod paymentStatus amountPaidNpr remainingAmountNpr transactionCode submittedAt verifiedAt');
+
     if (existingOrder) {
       const serialized = serializeCustomerOrder(existingOrder);
-      const isPaymentRequired = (existingOrder.amountPayableNow > 0) && (!payment || payment.paymentStatus === PAYMENT_STATUSES.PENDING);
+      const existingPayment = existingOrder.paymentSubmission || payment;
+      const isPaymentRequired = (existingOrder.amountPayableNow > 0) && (!existingPayment || existingPayment.paymentStatus === PAYMENT_STATUSES.PENDING);
       const paymentState = {
         isPaymentRequired,
-        paymentStatus: payment?.paymentStatus || PAYMENT_STATUSES.PENDING,
+        paymentStatus: existingPayment?.paymentStatus || PAYMENT_STATUSES.PENDING,
         amountDueNpr: existingOrder.finalAmountNpr,
         amountPayableNow: existingOrder.amountPayableNow,
         remainingCodAmount: existingOrder.remainingCodAmount,
@@ -162,7 +165,7 @@ export class OrderService extends BaseService {
         currency: 'NPR',
       };
       const nextStep = {
-        type: isPaymentRequired ? 'payment' : 'order',
+        type: isPaymentRequired ? 'payment' : (['proof_submitted', 'under_review'].includes(existingPayment?.paymentStatus) ? 'verification' : 'order'),
         orderId: existingOrder._id,
         orderNumber: existingOrder.orderNumber,
         requestId: request._id,
