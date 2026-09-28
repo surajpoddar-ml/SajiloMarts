@@ -308,18 +308,56 @@ export const CheckoutPage = ({
     return (
       <Container size="narrow" style={{ padding: 'var(--space-8) 0' }}>
         <Card style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>⚠️</div>
           <Typography variant="h2" style={{ color: 'var(--color-error)', marginBottom: 'var(--space-2)' }}>
-            Checkout Unavailable
+            Payment Details Unavailable
           </Typography>
           <Typography variant="body" style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-            {error || 'Unable to retrieve sourcing request for checkout.'}
+            {error || 'Unable to retrieve authoritative order details for payment.'}
           </Typography>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <Button variant="outline" onClick={() => onNavigate('sourcing-requests')}>
-              &larr; Return to Sourcing Requests
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setError(null);
+                setIsLoading(true);
+                const targetId = orderId || activeOrderId || requestId;
+                if (targetId) {
+                  if (orderId || activeOrderId) {
+                    orderService.getOrderDetail(orderId || activeOrderId)
+                      .then((res) => {
+                        const orderData = res.data || res;
+                        setOrder(orderData);
+                        setRequest({
+                          _id: orderData.productRequest?._id || orderData.productRequest || orderData._id,
+                          id: orderData._id,
+                          orderId: orderData._id,
+                          orderNumber: orderData.orderNumber,
+                          productName: orderData.productName,
+                          productUrl: orderData.productUrl,
+                          marketplace: orderData.marketplace,
+                          quantity: orderData.quantity,
+                          variant: orderData.variant,
+                          notes: orderData.customerNotes,
+                          productPriceInr: orderData.productPriceInr,
+                          quote: orderData.quoteSnapshot,
+                          deliveryAddress: orderData.deliveryAddressSnapshot,
+                          payment: orderData.payment,
+                        });
+                      })
+                      .catch((err) => setError(err.message || 'Failed to reload payment details.'))
+                      .finally(() => setIsLoading(false));
+                  }
+                }
+              }}
+            >
+              🔄 Retry Loading
             </Button>
-            <Button variant="primary" onClick={() => onNavigate('home')}>
-              Go to Homepage
+            <Button variant="primary" onClick={() => onNavigate('current-orders')}>
+              View Current Orders
+            </Button>
+            <Button variant="ghost" onClick={() => onNavigate('sourcing-requests')}>
+              &larr; Return to Sourcing Requests
             </Button>
           </div>
         </Card>
