@@ -112,19 +112,27 @@ export class OrderService extends BaseService {
     }
     const quoteSnapshot = extractAuthoritativeQuoteSnapshot(request.quote);
 
-    // 4. Verify payment readiness
-    if (!request.paymentSubmission) {
-      throw new BadRequestError('Payment submission is required before order creation');
+    // 4. Resolve or initialize payment submission
+    let payment = null;
+    if (request.paymentSubmission) {
+      payment = await PaymentSubmission.findById(request.paymentSubmission);
     }
-    const payment = await PaymentSubmission.findById(request.paymentSubmission);
     if (!payment) {
-      throw new NotFoundError('Associated payment submission not found');
-    }
-    assertResourceOwnership(payment, userId, 'Payment submission', 'user');
-
-    // Payment must be submitted or verified (never uninitialized)
-    if (![PAYMENT_STATUSES.PROOF_SUBMITTED, PAYMENT_STATUSES.UNDER_REVIEW, PAYMENT_STATUSES.VERIFIED].includes(payment.paymentStatus)) {
-      throw new BadRequestError(`Payment is not in an eligible state for order creation (current status: ${payment.paymentStatus})`);
+      payment = new PaymentSubmission({
+        productRequest: request._id,
+        user: userId,
+        paymentMode: quoteSnapshot.paymentMode || 'online_100',
+        paymentMethod: 'esewa',
+        amountDueNpr: quoteSnapshot.finalAmountNpr,
+        amountPaidNpr: quoteSnapshot.payNowAmountNpr,
+        remainingAmountNpr: quoteSnapshot.remainingCodAmountNpr || 0,
+        paymentStatus: PAYMENT_STATUSES.PENDING,
+      });
+      await payment.save();
+      request.paymentSubmission = payment._id;
+      await request.save();
+    } else {
+      assertResourceOwnership(payment, userId, 'Payment submission', 'user');
     }
 
     // 5. Verify delivery address and create immutable snapshot
@@ -142,7 +150,29 @@ export class OrderService extends BaseService {
     // 6. Idempotency / Duplicate Check
     const existingOrder = await Order.findOne({ productRequest: request._id });
     if (existingOrder) {
-      return existingOrder; // Safe idempotent return
+      const serialized = serializeCustomerOrder(existingOrder);
+      const isPaymentRequired = (existingOrder.amountPayableNow > 0) && (!payment || payment.paymentStatus === PAYMENT_STATUSES.PENDING);
+      const paymentState = {
+        isPaymentRequired,
+        paymentStatus: payment?.paymentStatus || PAYMENT_STATUSES.PENDING,
+        amountDueNpr: existingOrder.finalAmountNpr,
+        amountPayableNow: existingOrder.amountPayableNow,
+        remainingCodAmount: existingOrder.remainingCodAmount,
+        paymentMode: existingOrder.paymentMode,
+        currency: 'NPR',
+      };
+      const nextStep = {
+        type: isPaymentRequired ? 'payment' : 'order',
+        orderId: existingOrder._id,
+        orderNumber: existingOrder.orderNumber,
+        requestId: request._id,
+      };
+      return {
+        ...serialized,
+        order: serialized,
+        payment: paymentState,
+        nextStep,
+      };
     }
 
     // 7. Generate safe customer-facing unique order number
@@ -187,9 +217,9 @@ export class OrderService extends BaseService {
     const session = await mongoose.startSession().catch(() => null);
     const useTransaction = session && typeof session.withTransaction === 'function';
 
+    let resultOrder;
     if (useTransaction) {
       try {
-        let resultOrder;
         await session.withTransaction(async () => {
           const [created] = await Order.create([order], { session });
           resultOrder = created;
@@ -207,49 +237,71 @@ export class OrderService extends BaseService {
           );
         });
         await session.endSession();
-        return resultOrder;
       } catch (txnError) {
         await session.endSession().catch(() => {});
         if (txnError.code === 11000) {
           const concurrentExisting = await Order.findOne({ productRequest: request._id });
-          if (concurrentExisting) return concurrentExisting;
-          throw new ConflictError('An order for this sourcing request already exists');
-        }
-        // If transactions aren't supported on current Mongo deployment, proceed to atomic fallback
-        if (!txnError.message?.includes('Transaction numbers are only allowed on a replica set member or mongos')) {
+          if (concurrentExisting) resultOrder = concurrentExisting;
+          else throw new ConflictError('An order for this sourcing request already exists');
+        } else if (!txnError.message?.includes('Transaction numbers are only allowed on a replica set member or mongos')) {
           throw txnError;
         }
       }
     }
 
     // Atomic sequential fallback for non-replica set deployments
-    let savedOrder;
-    try {
-      savedOrder = await order.save();
-    } catch (err) {
-      if (err.code === 11000) {
-        const concurrentExisting = await Order.findOne({ productRequest: request._id });
-        if (concurrentExisting) return concurrentExisting;
-        throw new ConflictError('An order for this sourcing request already exists');
+    if (!resultOrder) {
+      try {
+        resultOrder = await order.save();
+      } catch (err) {
+        if (err.code === 11000) {
+          const concurrentExisting = await Order.findOne({ productRequest: request._id });
+          if (concurrentExisting) resultOrder = concurrentExisting;
+          else throw new ConflictError('An order for this sourcing request already exists');
+        } else {
+          throw err;
+        }
       }
-      throw err;
+
+      // Update references on ProductRequest and PaymentSubmission
+      try {
+        request.order = resultOrder._id;
+        request.status = REQUEST_STATUSES.PROCESSING;
+        await request.save();
+
+        payment.order = resultOrder._id;
+        await payment.save();
+      } catch (cleanupErr) {
+        // Avoid orphan order in partial failure
+        await Order.findByIdAndDelete(resultOrder._id).catch(() => {});
+        throw cleanupErr;
+      }
     }
 
-    // Update references on ProductRequest and PaymentSubmission
-    try {
-      request.order = savedOrder._id;
-      request.status = REQUEST_STATUSES.PROCESSING;
-      await request.save();
+    const serialized = serializeCustomerOrder(resultOrder);
+    const isPaymentRequired = (resultOrder.amountPayableNow > 0) && (!payment || payment.paymentStatus === PAYMENT_STATUSES.PENDING);
+    const paymentState = {
+      isPaymentRequired,
+      paymentStatus: payment?.paymentStatus || PAYMENT_STATUSES.PENDING,
+      amountDueNpr: resultOrder.finalAmountNpr,
+      amountPayableNow: resultOrder.amountPayableNow,
+      remainingCodAmount: resultOrder.remainingCodAmount,
+      paymentMode: resultOrder.paymentMode,
+      currency: 'NPR',
+    };
+    const nextStep = {
+      type: isPaymentRequired ? 'payment' : 'order',
+      orderId: resultOrder._id,
+      orderNumber: resultOrder.orderNumber,
+      requestId: request._id,
+    };
 
-      payment.order = savedOrder._id;
-      await payment.save();
-    } catch (cleanupErr) {
-      // Avoid orphan order in partial failure
-      await Order.findByIdAndDelete(savedOrder._id).catch(() => {});
-      throw cleanupErr;
-    }
-
-    return savedOrder;
+    return {
+      ...serialized,
+      order: serialized,
+      payment: paymentState,
+      nextStep,
+    };
   }
 
 
