@@ -74,7 +74,11 @@ export const CheckoutPage = ({
           if (!isMounted) return;
           const orderData = res.data || res;
           setOrder(orderData);
-          setActiveOrderId(orderData._id || orderData.id);
+          const resolvedId = orderData._id || orderData.id;
+          setActiveOrderId(resolvedId);
+          if (typeof window !== 'undefined' && resolvedId) {
+            window.history.replaceState(null, '', `?view=checkout&orderId=${resolvedId}`);
+          }
           // Construct request view model from authoritative order
           setRequest({
             _id: orderData.productRequest?._id || orderData.productRequest || orderData._id,
