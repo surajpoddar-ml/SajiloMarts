@@ -13,6 +13,7 @@ import { DeliveryAddressReview } from './DeliveryAddressReview.jsx';
 import { PaymentSummaryCard } from './PaymentSummaryCard.jsx';
 import { PaymentConfirmationCard } from './PaymentConfirmationCard.jsx';
 import { productRequestService } from '../../services/productRequest.service.js';
+import { orderService } from '../../services/order.service.js';
 import { paymentService } from '../../services/payment.service.js';
 import { addressService } from '../../services/address.service.js';
 import { calculateAuthoritativePaymentBreakdown, PAYMENT_MODES } from '../../utils/paymentCalculations.js';
@@ -23,13 +24,16 @@ import { validatePaymentProofFile } from '../../utils/fileValidation.js';
  * Step-by-step customer checkout: Quote Review -> Payment Method -> Instructions & QR -> Proof Upload -> Address -> Submit
  */
 export const CheckoutPage = ({
+  orderId,
   requestId,
   user,
   onNavigate = () => {},
   onPaymentSubmitted,
   onBack,
 }) => {
+  const [order, setOrder] = useState(null);
   const [request, setRequest] = useState(null);
+  const [activeOrderId, setActiveOrderId] = useState(orderId || null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -48,10 +52,13 @@ export const CheckoutPage = ({
   const [submissionResult, setSubmissionResult] = useState(null);
   const [submissionError, setSubmissionError] = useState(null);
 
-  // Load Request Details
+  // Load Order or Request Details
   useEffect(() => {
-    if (!requestId) {
-      setError('No sourcing request selected for checkout.');
+    const targetOrderId = orderId || activeOrderId;
+    const targetRequestId = requestId;
+
+    if (!targetOrderId && !targetRequestId) {
+      setError('No order or sourcing request reference found for payment.');
       setIsLoading(false);
       return;
     }
@@ -60,26 +67,75 @@ export const CheckoutPage = ({
     setIsLoading(true);
     setError(null);
 
-    productRequestService.getRequestDetails(requestId)
-      .then((res) => {
-        if (isMounted) {
+    const loadData = async () => {
+      try {
+        if (targetOrderId) {
+          const res = await orderService.getOrderDetail(targetOrderId);
+          if (!isMounted) return;
+          const orderData = res.data || res;
+          setOrder(orderData);
+          setActiveOrderId(orderData._id || orderData.id);
+          // Construct request view model from authoritative order
+          setRequest({
+            _id: orderData.productRequest?._id || orderData.productRequest || orderData._id,
+            id: orderData._id,
+            orderId: orderData._id,
+            orderNumber: orderData.orderNumber,
+            productName: orderData.productName,
+            productUrl: orderData.productUrl,
+            marketplace: orderData.marketplace,
+            quantity: orderData.quantity,
+            variant: orderData.variant,
+            notes: orderData.customerNotes,
+            productPriceInr: orderData.productPriceInr,
+            quote: orderData.quoteSnapshot || {
+              productPriceInr: orderData.productPriceInr,
+              quantity: orderData.quantity,
+              subtotalInr: orderData.subtotalInr,
+              conversionMultiplier: orderData.conversionMultiplier,
+              feeRate: orderData.feeRate,
+              convertedAmountNpr: orderData.convertedAmountNpr,
+              finalAmountNpr: orderData.finalAmountNpr,
+              paymentMode: orderData.paymentMode,
+              amountPayableNow: orderData.amountPayableNow,
+              payNowAmountNpr: orderData.amountPayableNow,
+              remainingCodAmount: orderData.remainingCodAmount,
+              remainingCodAmountNpr: orderData.remainingCodAmount,
+            },
+            deliveryAddress: orderData.deliveryAddressSnapshot,
+            payment: orderData.payment,
+          });
+
+          if (orderData.deliveryAddressSnapshot) {
+            setSelectedAddress(orderData.deliveryAddressSnapshot);
+          }
+          if (orderData.paymentMode === 'cod_50_50') {
+            setSelectedMethod('cod_50_50');
+          }
+        } else if (targetRequestId) {
+          const res = await productRequestService.getRequestDetails(targetRequestId);
+          if (!isMounted) return;
           const reqData = res.data || res;
           setRequest(reqData);
+          if (reqData.order) {
+            setActiveOrderId(reqData.order._id || reqData.order);
+          }
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         if (isMounted) {
-          setError(err.message || 'Failed to load sourcing request for checkout.');
+          setError(err.message || 'Failed to load order details for payment.');
         }
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setIsLoading(false);
-      });
+      }
+    };
+
+    loadData();
 
     return () => {
       isMounted = false;
     };
-  }, [requestId]);
+  }, [orderId, requestId, activeOrderId]);
 
   // Load User Addresses
   useEffect(() => {

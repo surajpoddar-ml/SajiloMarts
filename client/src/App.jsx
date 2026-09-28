@@ -28,6 +28,7 @@ function AppContent() {
   const { user, isAuthenticated, role, isAdmin, isLoading: isAuthLoading, logout } = useAuth();
   const { showInfo } = useToast();
   const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentView, setCurrentView] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -281,12 +282,13 @@ function AppContent() {
             onRedirectToHome={() => handleNavigate('home')}
           >
             <CheckoutPage
+              orderId={selectedOrderId}
               requestId={selectedRequestId}
               user={user}
               onNavigate={handleNavigate}
               onBack={() => handleNavigate('sourcing-detail')}
               onPaymentSubmitted={(result) => {
-                handleNavigate('sourcing-detail');
+                handleNavigate('current-orders');
               }}
             />
           </ProtectedRoute>
