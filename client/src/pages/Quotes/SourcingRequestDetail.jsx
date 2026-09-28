@@ -359,17 +359,37 @@ export function SourcingRequestDetail({ requestId, onBack, onStatusUpdated, onPr
                 disabled={actionLoading}
                 onClick={handleConfirmQuote}
                 aria-busy={actionLoading}
+                aria-disabled={actionLoading}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               >
-                {actionLoading ? 'Confirming...' : 'Confirm Quote &amp; Proceed to Checkout &rarr;'}
+                {actionLoading ? (
+                  <>
+                    <Spinner size="sm" />
+                    <span>Submitting Order...</span>
+                  </>
+                ) : (
+                  <span>Submit Order &amp; Proceed to Payment &rarr;</span>
+                )}
               </Button>
             )}
 
             {request.status === 'customer_confirmed' && onProceedToCheckout && (
               <Button
                 variant="primary"
-                onClick={() => onProceedToCheckout(requestId)}
+                disabled={actionLoading}
+                onClick={handleConfirmQuote}
+                aria-busy={actionLoading}
+                aria-disabled={actionLoading}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               >
-                Proceed to Payment &amp; Proof Submission &rarr;
+                {actionLoading ? (
+                  <>
+                    <Spinner size="sm" />
+                    <span>Opening Payment Page...</span>
+                  </>
+                ) : (
+                  <span>Proceed to Payment &amp; Proof Submission &rarr;</span>
+                )}
               </Button>
             )}
 
