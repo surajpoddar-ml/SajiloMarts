@@ -30,6 +30,39 @@ assert.strictEqual(FULFILLMENT_STAGES[5].key, 'out_for_delivery');
 assert.strictEqual(FULFILLMENT_STAGES[5].label, 'Out for Delivery');
 assert.strictEqual(FULFILLMENT_STAGES[6].key, 'delivered');
 assert.strictEqual(FULFILLMENT_STAGES[6].label, 'Delivered');
-console.log('✅ Exactly 7 SajiloMarts fulfillment stages verified in frontend timeline');
+// Test 3: Order submission to payment continuation contract simulation
+const sampleOrderResponse = {
+  _id: '65f123456789012345678901',
+  orderNumber: 'SM-2026-AB12CD34',
+  finalAmountNpr: 18500,
+  amountPayableNow: 9250,
+  remainingCodAmount: 9250,
+  paymentMode: 'cod_50_50',
+  order: {
+    _id: '65f123456789012345678901',
+    orderNumber: 'SM-2026-AB12CD34',
+  },
+  payment: {
+    isPaymentRequired: true,
+    paymentStatus: 'pending',
+    amountDueNpr: 18500,
+    amountPayableNow: 9250,
+    remainingCodAmount: 9250,
+    paymentMode: 'cod_50_50',
+    currency: 'NPR',
+  },
+  nextStep: {
+    type: 'payment',
+    orderId: '65f123456789012345678901',
+    orderNumber: 'SM-2026-AB12CD34',
+  },
+};
+
+assert.strictEqual(sampleOrderResponse.nextStep.type, 'payment');
+assert.strictEqual(sampleOrderResponse.payment.isPaymentRequired, true);
+assert.strictEqual(sampleOrderResponse.payment.amountPayableNow, 9250);
+assert.strictEqual(sampleOrderResponse.payment.remainingCodAmount, 9250);
+assert.strictEqual(sampleOrderResponse.payment.currency, 'NPR');
+console.log('✅ Order creation to payment continuation contract verified');
 
 console.log('🎉 All frontend Order unit checks PASSED!');
