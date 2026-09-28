@@ -249,6 +249,14 @@ export const CheckoutPage = ({
 
     if (hasClientErrors) return;
 
+    // Derived eligibility flags
+    const rawPaymentStatus = order?.payment?.paymentStatus || request?.paymentSubmission?.paymentStatus || request?.payment?.paymentStatus;
+    const isAlreadyPaid = rawPaymentStatus === 'verified' || rawPaymentStatus === 'paid';
+    if (isAlreadyPaid) {
+      setSubmissionError('Payment for this order has already been completed and verified.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
