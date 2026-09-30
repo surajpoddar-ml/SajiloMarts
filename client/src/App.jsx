@@ -19,6 +19,8 @@ import { SourcingRequestForm, SourcingRequestList, SourcingRequestDetail } from 
 import { CheckoutPage } from './pages/Checkout';
 import { HomePage } from './pages/Home';
 import { TermsPage, PrivacyPage } from './pages/Legal';
+import { SupportPage } from './pages/Support';
+import { NotificationCenter } from './pages/Notifications';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
@@ -389,6 +391,26 @@ function AppContent() {
               </Button>
             </Card>
           </Container>
+        )}
+
+        {/* Customer Support */}
+        {currentView === 'support' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <SupportPage onNavigate={handleNavigate} />
+          </ProtectedRoute>
+        )}
+
+        {/* Notifications */}
+        {currentView === 'notifications' && (
+          <ProtectedRoute
+            onRedirectToLogin={() => handleNavigate('login')}
+            onRedirectToHome={() => handleNavigate('home')}
+          >
+            <NotificationCenter onNavigate={handleNavigate} />
+          </ProtectedRoute>
         )}
 
         {/* Real SajiloMarts Homepage */}

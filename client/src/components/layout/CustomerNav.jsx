@@ -44,6 +44,19 @@ const SecurityIcon = () => (
   </svg>
 );
 
+const SupportIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+const NotificationsIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
 /**
  * SajiloMarts Authenticated Customer Navigation Bar
  */
@@ -57,8 +70,10 @@ export const CustomerNav = ({
     { id: 'sourcing-requests', label: 'Sourcing Requests', icon: SourcingIcon },
     { id: 'current-orders', label: 'Current Orders', icon: CurrentOrdersIcon },
     { id: 'order-history', label: 'Order History', icon: OrderHistoryIcon },
+    { id: 'support', label: 'Support', icon: SupportIcon },
+    { id: 'notifications', label: 'Notifications', icon: NotificationsIcon },
     { id: 'addresses', label: 'Addresses', icon: AddressesIcon },
-    { id: 'account-security', label: 'Account Security', icon: SecurityIcon },
+    { id: 'account-security', label: 'Security', icon: SecurityIcon },
   ];
 
   return (
