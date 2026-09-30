@@ -21,6 +21,7 @@ import { HomePage } from './pages/Home';
 import { TermsPage, PrivacyPage } from './pages/Legal';
 import { SupportPage } from './pages/Support';
 import { NotificationCenter } from './pages/Notifications';
+import { TrackOrderPage } from './pages/Tracking';
 import { NotFoundPage } from './pages/NotFound/NotFoundPage.jsx';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { AdminRoute } from './routes/AdminRoute.jsx';
@@ -375,6 +376,9 @@ function AppContent() {
         {/* Legal Pages */}
         {currentView === 'terms' && <TermsPage onNavigate={handleNavigate} />}
         {currentView === 'privacy' && <PrivacyPage onNavigate={handleNavigate} />}
+
+        {/* Public Order Tracking */}
+        {currentView === 'track-order' && <TrackOrderPage />}
 
         {/* Admin nav placeholder views */}
         {['admin-requests', 'admin-users', 'admin-audit'].includes(currentView) && (
