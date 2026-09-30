@@ -3,17 +3,22 @@ import { Card, CardHeader, CardBody, Typography } from '../../../components/comm
 
 /**
  * EsewaPaymentInterface
- * Presentation and instructions for paying via eSewa digital wallet.
+ * Displays the configured eSewa QR code, account details, and payment instructions.
+ * Shows proper unavailable state when QR is not configured.
  */
-export const EsewaPaymentInterface = ({ amountPayableNpr, qrConfig = null }) => {
+export const EsewaPaymentInterface = ({ amountPayableNpr, providerConfig = null }) => {
+  const hasQr = providerConfig && providerConfig.qrImageData;
+  const accountName = providerConfig?.accountName || null;
+  const accountNumber = providerConfig?.accountNumber || null;
+
   return (
     <Card style={{ backgroundColor: 'var(--bg-surface)', borderColor: '#86EFAC' }}>
       <CardHeader
         title="🟢 eSewa Digital Wallet Prepayment"
-        description="Scan the official SajiloMarts eSewa QR or transfer to our verified merchant ID"
+        description="Scan the official SajiloMarts eSewa QR to complete your payment"
       />
       <CardBody>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', alignItems: 'start' }}>
           {/* QR Display or Unavailable State */}
           <div style={{
             display: 'flex',
@@ -21,31 +26,41 @@ export const EsewaPaymentInterface = ({ amountPayableNpr, qrConfig = null }) => 
             alignItems: 'center',
             justifyContent: 'center',
             padding: '20px',
-            backgroundColor: 'var(--bg-surface-secondary)',
+            backgroundColor: '#fff',
             borderRadius: 'var(--radius-md)',
-            border: '1px dashed #86EFAC',
-            minHeight: '220px',
+            border: hasQr ? '2px solid #86EFAC' : '1px dashed #86EFAC',
+            minHeight: '260px',
             textAlign: 'center',
           }}>
-            {qrConfig?.esewaQrUrl ? (
+            {hasQr ? (
               <div>
                 <img
-                  src={qrConfig.esewaQrUrl}
-                  alt="SajiloMarts eSewa QR"
-                  style={{ maxWidth: '180px', maxHeight: '180px', borderRadius: '8px' }}
+                  src={providerConfig.qrImageData}
+                  alt="SajiloMarts eSewa Payment QR Code"
+                  style={{ maxWidth: '220px', maxHeight: '220px', borderRadius: '8px', objectFit: 'contain' }}
                 />
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '10px', fontWeight: 500 }}>
                   Scan with eSewa App
                 </div>
+                {accountName && (
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: '8px' }}>
+                    {accountName}
+                  </div>
+                )}
+                {accountNumber && (
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
+                    {accountNumber}
+                  </div>
+                )}
               </div>
             ) : (
               <div>
-                <div style={{ fontSize: '2rem', marginBottom: '8px' }} aria-hidden="true">📱</div>
+                <div style={{ fontSize: '2.5rem', marginBottom: '8px' }} aria-hidden="true">📱</div>
                 <Typography variant="body" style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  Digital Wallet Transfer
+                  eSewa QR Not Configured
                 </Typography>
                 <Typography variant="caption" style={{ color: 'var(--text-secondary)' }}>
-                  Transfer to official SajiloMarts eSewa account and attach receipt screenshot below.
+                  The eSewa payment QR is currently being set up. Please contact support or try another payment method.
                 </Typography>
               </div>
             )}
@@ -66,9 +81,9 @@ export const EsewaPaymentInterface = ({ amountPayableNpr, qrConfig = null }) => 
               Amount to Transfer: NPR {Number(amountPayableNpr || 0).toLocaleString()}
             </div>
 
-            <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            <ol style={{ margin: 0, paddingLeft: '18px', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
               <li>Open your <strong>eSewa Mobile App</strong>.</li>
-              <li>Scan the SajiloMarts payment QR or enter Merchant ID.</li>
+              <li>Scan the SajiloMarts eSewa QR code shown here{accountNumber ? ` or send to ${accountNumber}` : ''}.</li>
               <li>Enter exact amount: <strong>NPR {Number(amountPayableNpr || 0).toLocaleString()}</strong>.</li>
               <li>In the remarks field, enter your <strong>Sourcing Request Reference</strong>.</li>
               <li>Complete payment and copy the <strong>Transaction Code / Reference ID</strong>.</li>
