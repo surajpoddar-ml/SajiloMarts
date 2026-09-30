@@ -30,6 +30,20 @@ export const orderService = {
   createOrder: async (data) => {
     return http.post('/orders/create', data);
   },
+
+  /**
+   * Retrieves tracking data for a specific customer order (authenticated).
+   */
+  getOrderTracking: async (orderId) => {
+    return http.get(`/orders/${orderId}/tracking`);
+  },
+
+  /**
+   * Public tracking lookup by order number (no auth required).
+   */
+  getPublicTracking: async (orderNumber) => {
+    return http.get(`/tracking/public/${encodeURIComponent(orderNumber)}`);
+  },
 };
 
 export default orderService;
