@@ -24,6 +24,7 @@ export * from './orderIdGenerator.js';
 export * from './orderAddressSnapshot.js';
 export * from './orderQuoteSnapshot.js';
 export * from './orderSerializer.js';
+export * from './trackingSerializer.js';
 
 
 
