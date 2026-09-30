@@ -28,6 +28,7 @@ export function validateInitializePaymentInput(data = {}) {
 
 /**
  * Validates payment proof submission payload.
+ * Enforces safe character set, minimum length, and rejects injection patterns.
  */
 export function validateSubmitProofInput(data = {}, hasFile = false) {
   const { transactionCode } = data;
@@ -41,12 +42,23 @@ export function validateSubmitProofInput(data = {}, hasFile = false) {
       throw new BadRequestError('Transaction code must be a string');
     }
     const trimmed = transactionCode.trim();
-    if (trimmed.length < 3 || trimmed.length > 100) {
-      throw new BadRequestError('Transaction code must be between 3 and 100 characters');
+    if (trimmed.length < 4) {
+      throw new BadRequestError('Transaction code must be at least 4 characters');
     }
-    // Prevent malicious scripts / tags in transaction codes
-    if (/[<>{}]/.test(trimmed)) {
-      throw new BadRequestError('Transaction code contains invalid characters');
+    if (trimmed.length > 100) {
+      throw new BadRequestError('Transaction code cannot exceed 100 characters');
+    }
+    // Only allow safe alphanumeric characters, dashes, underscores, and dots
+    if (!/^[a-zA-Z0-9\-_./\s]+$/.test(trimmed)) {
+      throw new BadRequestError('Transaction code contains invalid characters. Only letters, numbers, dashes, underscores, and dots are allowed.');
+    }
+    // Prevent HTML/script injection
+    if (/[<>{}()'"`;]/.test(trimmed)) {
+      throw new BadRequestError('Transaction code contains unsafe characters');
+    }
+    // Reject SQL injection patterns
+    if (/(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE)\b)/i.test(trimmed)) {
+      throw new BadRequestError('Transaction code contains invalid content');
     }
   }
 
