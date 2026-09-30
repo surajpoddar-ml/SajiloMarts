@@ -20,6 +20,7 @@ export const PAYMENT_STATUSES = Object.freeze({
   REJECTED: 'rejected',
 });
 
+
 export default {
   PAYMENT_MODES,
   PAYMENT_METHODS,
