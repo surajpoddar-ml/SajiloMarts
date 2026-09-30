@@ -14,6 +14,7 @@ import notificationRoutes from './notification.routes.js';
 import adminRoutes from './admin.routes.js';
 import productRequestRoutes from './productRequest.routes.js';
 import trackingRoutes from './tracking.routes.js';
+import supportRoutes from './support.routes.js';
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.use('/coupons', couponRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/admin', adminRoutes);
 router.use('/tracking', trackingRoutes);
+router.use('/support', supportRoutes);
 
 export const getV1RoutesList = () => [
   '/health',
@@ -50,6 +52,7 @@ export const getV1RoutesList = () => [
   '/notifications',
   '/admin',
   '/tracking',
+  '/support',
 ];
 
 export default router;
