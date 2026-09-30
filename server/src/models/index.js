@@ -11,5 +11,6 @@ export { PaymentSubmission } from './paymentSubmission.model.js';
 export { Order, deliveryAddressSnapshotSchema, orderStatusHistorySchema } from './order.model.js';
 export { SecurityToken } from './securityToken.model.js';
 export { PaymentConfig } from './paymentConfig.model.js';
+export { SupportConversation } from './supportConversation.model.js';
 export { default } from './user.model.js';
 
