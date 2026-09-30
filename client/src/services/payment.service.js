@@ -37,6 +37,21 @@ export const paymentService = {
       method: 'GET',
     });
   },
+
+  /**
+   * Retrieves the QR configuration for a specific payment provider.
+   * @param {string} provider - 'esewa' | 'khalti' | 'mypay'
+   */
+  getProviderConfig: async (provider) => {
+    return http.get(`/payments/config/${provider}`);
+  },
+
+  /**
+   * Retrieves all payment provider QR configurations.
+   */
+  getAllPaymentConfigs: async () => {
+    return http.get('/payments/config');
+  },
 };
 
 export default paymentService;

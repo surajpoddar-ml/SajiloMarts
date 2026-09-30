@@ -47,6 +47,9 @@ export const CheckoutPage = ({
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [allAddresses, setAllAddresses] = useState([]);
 
+  // Payment QR configuration state
+  const [providerConfigs, setProviderConfigs] = useState({});
+
   // Submission states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState(null);
@@ -140,6 +143,18 @@ export const CheckoutPage = ({
       isMounted = false;
     };
   }, [orderId, requestId, activeOrderId]);
+
+  // Load Payment QR Configurations
+  useEffect(() => {
+    paymentService.getAllPaymentConfigs()
+      .then((res) => {
+        const configs = res?.data || res || {};
+        setProviderConfigs(configs);
+      })
+      .catch(() => {
+        // Non-blocking — QR configs are optional, interfaces show fallback state
+      });
+  }, []);
 
   // Load User Addresses
   useEffect(() => {
@@ -498,6 +513,7 @@ export const CheckoutPage = ({
             <PaymentQrPresenter
               selectedMethod={selectedMethod}
               breakdown={breakdown}
+              providerConfigs={providerConfigs}
             />
 
             {/* 4. Payment Instruction Notice */}
