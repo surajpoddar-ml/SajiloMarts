@@ -27,7 +27,42 @@ export class PaymentVerificationService extends BaseService {
 
     // Prevent re-verification of already terminal states
     if (payment.paymentStatus === PAYMENT_STATUSES.VERIFIED) {
-      return { verified: true, payment, verificationResult: { status: 'already_verified' } };
+      return { verified: true, payment, verificationResult: { status: 'already_verified' }, replayed: false };
+    }
+
+    // Replay protection: check if this callback was already processed
+    const idempotencyKey = this.buildIdempotencyKey(payment.paymentMethod, providerData);
+    if (idempotencyKey && payment.callbackIdempotencyKey === idempotencyKey) {
+      recordSecurityEvent('PAYMENT_CALLBACK_REPLAY_BLOCKED', {
+        userId: String(payment.user),
+        success: false,
+        reason: `Duplicate callback blocked: ${idempotencyKey}`,
+      });
+      return {
+        verified: payment.paymentStatus === PAYMENT_STATUSES.VERIFIED,
+        payment,
+        verificationResult: { status: 'duplicate_callback' },
+        replayed: true,
+      };
+    }
+
+    // Timestamp-based replay window: reject callbacks for payments already processed within 5 mins
+    if (payment.callbackProcessedAt) {
+      const timeSinceLastCallback = Date.now() - new Date(payment.callbackProcessedAt).getTime();
+      const REPLAY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+      if (timeSinceLastCallback < REPLAY_WINDOW_MS && [PAYMENT_STATUSES.VERIFIED, PAYMENT_STATUSES.FAILED, PAYMENT_STATUSES.CANCELLED].includes(payment.paymentStatus)) {
+        recordSecurityEvent('PAYMENT_CALLBACK_REPLAY_WINDOW', {
+          userId: String(payment.user),
+          success: false,
+          reason: `Callback replay within ${REPLAY_WINDOW_MS}ms window, status: ${payment.paymentStatus}`,
+        });
+        return {
+          verified: payment.paymentStatus === PAYMENT_STATUSES.VERIFIED,
+          payment,
+          verificationResult: { status: 'replay_window_blocked' },
+          replayed: true,
+        };
+      }
     }
 
     const provider = providerRegistry.getProvider(payment.paymentMethod);
@@ -103,8 +138,14 @@ export class PaymentVerificationService extends BaseService {
       };
     }
 
+    // Store callback processing data for replay protection
+    if (idempotencyKey) {
+      payment.callbackIdempotencyKey = idempotencyKey;
+    }
+    payment.callbackProcessedAt = new Date();
+
     await payment.save();
-    return { verified: result.verified, payment, verificationResult: result };
+    return { verified: result.verified, payment, verificationResult: result, replayed: false };
   }
 
   /**
@@ -131,6 +172,25 @@ export class PaymentVerificationService extends BaseService {
         };
       default:
         return providerData;
+    }
+  }
+
+  /**
+   * Builds a deterministic idempotency key from provider callback data.
+   * @param {string} method - Payment method
+   * @param {object} providerData - Provider-specific callback data
+   * @returns {string|null}
+   */
+  buildIdempotencyKey(method, providerData = {}) {
+    switch (method) {
+      case 'esewa':
+        return providerData.transactionUuid ? `esewa:${providerData.transactionUuid}` : null;
+      case 'khalti':
+        return providerData.pidx ? `khalti:${providerData.pidx}` : null;
+      case 'mypay':
+        return providerData.mypayOrderId ? `mypay:${providerData.mypayOrderId}` : null;
+      default:
+        return null;
     }
   }
 }
