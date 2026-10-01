@@ -13,4 +13,11 @@ export class ApiResponse {
   static success(data, message = 'Success') {
     return new ApiResponse(200, data, message);
   }
+
+  /**
+   * Factory for 201 Created responses.
+   */
+  static created(data, message = 'Created successfully') {
+    return new ApiResponse(201, data, message);
+  }
 }
