@@ -77,6 +77,45 @@ const paymentSubmissionSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    // Provider integration fields
+    providerPaymentId: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+      index: true,
+    },
+    providerRefId: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+    },
+    providerPaymentUrl: {
+      type: String,
+      required: false,
+      default: null,
+      trim: true,
+    },
+    providerMetadata: {
+      type: mongoose.Schema.Types.Mixed,
+      required: false,
+      default: null,
+    },
+    verificationSource: {
+      type: String,
+      enum: ['provider_api', 'provider_callback', 'manual_admin', 'system', null],
+      default: null,
+    },
+    callbackProcessedAt: {
+      type: Date,
+      default: null,
+    },
+    callbackIdempotencyKey: {
+      type: String,
+      default: null,
+      trim: true,
+    },
     submittedAt: {
       type: Date,
       default: null,

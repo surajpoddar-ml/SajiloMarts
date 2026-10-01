@@ -3,12 +3,15 @@ import { BaseService } from './base.service.js';
 import { PaymentSubmission } from '../models/paymentSubmission.model.js';
 import { ProductRequest, REQUEST_STATUSES } from '../models/productRequest.model.js';
 import { quoteService } from './quote.service.js';
+import { providerRegistry } from '../providers/index.js';
 import {
   PAYMENT_MODES,
   PAYMENT_METHODS,
   PAYMENT_STATUSES,
+  VERIFICATION_SOURCES,
 } from '../constants/payment.constants.js';
 import { BadRequestError, NotFoundError, ForbiddenError, assertResourceOwnership } from '../utils/index.js';
+import { envConfig } from '../config/environment.js';
 
 /**
  * Payment Service
@@ -117,7 +120,52 @@ export class PaymentService extends BaseService {
     request.paymentSubmission = savedPayment._id;
     await request.save();
 
-    return savedPayment;
+    // Attempt provider payment initiation if provider is configured
+    let providerResult = null;
+    try {
+      if (providerRegistry.hasProvider(paymentMethod)) {
+        const provider = providerRegistry.getProvider(paymentMethod);
+        if (provider.isConfigured()) {
+          const serverUrl = envConfig.serverUrl || 'http://localhost:5000';
+          const clientUrl = envConfig.clientUrl || 'http://localhost:5173';
+
+          providerResult = await provider.initiatePayment({
+            paymentId: String(savedPayment._id),
+            amount: amountPaidNpr,
+            orderId: orderDoc ? String(orderDoc._id) : String(request._id),
+            productName: request.productName || 'SajiloMarts Order',
+            returnUrl: `${serverUrl}/api/v1/payments/callback/${paymentMethod}`,
+            failureUrl: `${clientUrl}/checkout?status=failed&paymentId=${savedPayment._id}`,
+          });
+
+          if (providerResult) {
+            savedPayment.providerPaymentId = providerResult.providerPaymentId || null;
+            savedPayment.providerPaymentUrl = providerResult.paymentUrl || null;
+            savedPayment.paymentStatus = PAYMENT_STATUSES.INITIATED;
+            savedPayment.providerMetadata = {
+              method: providerResult.method,
+              formData: providerResult.formData || undefined,
+              pidx: providerResult.pidx || undefined,
+              initiatedAt: new Date().toISOString(),
+            };
+            await savedPayment.save();
+          }
+        }
+      }
+    } catch (providerErr) {
+      // Provider initiation failure is non-fatal — manual proof flow still works
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn(`[PaymentService] Provider initiation failed for ${paymentMethod}: ${providerErr.message}`);
+      }
+    }
+
+    const result = savedPayment.toObject();
+    if (providerResult) {
+      result.providerPaymentUrl = providerResult.paymentUrl || null;
+      result.providerFormData = providerResult.formData || null;
+      result.providerMethod = providerResult.method || null;
+    }
+    return result;
   }
 
   /**
