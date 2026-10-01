@@ -6,4 +6,11 @@ export class ApiResponse {
     this.data = data;
     this.timestamp = new Date().toISOString();
   }
+
+  /**
+   * Factory for 200 OK responses.
+   */
+  static success(data, message = 'Success') {
+    return new ApiResponse(200, data, message);
+  }
 }
