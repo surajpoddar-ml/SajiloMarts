@@ -1,5 +1,6 @@
 import { BaseService } from './base.service.js';
 import { PaymentSubmission } from '../models/paymentSubmission.model.js';
+import { PaymentReconciliation } from '../models/paymentReconciliation.model.js';
 import { providerRegistry } from '../providers/index.js';
 import { PAYMENT_STATUSES, VERIFICATION_SOURCES } from '../constants/payment.constants.js';
 import { BadRequestError, NotFoundError } from '../utils/index.js';
@@ -145,6 +146,33 @@ export class PaymentVerificationService extends BaseService {
     payment.callbackProcessedAt = new Date();
 
     await payment.save();
+
+    // Create reconciliation record
+    try {
+      await PaymentReconciliation.create({
+        paymentSubmission: payment._id,
+        order: payment.order || null,
+        user: payment.user,
+        provider: payment.paymentMethod,
+        providerRefId: result.providerRefId || null,
+        providerPaymentId: payment.providerPaymentId || null,
+        expectedAmountNpr: expectedAmount,
+        receivedAmountNpr: result.amount || 0,
+        amountMatches: result.amountMatches !== false,
+        currency: 'NPR',
+        reconciliationStatus: result.verified ? 'matched' : (result.amountMatches === false ? 'mismatched' : 'failed'),
+        verificationSource: VERIFICATION_SOURCES.PROVIDER_API,
+        verifiedAt: result.verified ? new Date() : null,
+        providerStatus: result.rawResponse?.status || result.status || null,
+        providerResponse: result.rawResponse || null,
+      });
+    } catch (reconErr) {
+      // Reconciliation record creation is non-fatal
+      if (process.env.NODE_ENV !== 'test') {
+        console.warn(`[PaymentVerification] Reconciliation record creation failed: ${reconErr.message}`);
+      }
+    }
+
     return { verified: result.verified, payment, verificationResult: result, replayed: false };
   }
 
