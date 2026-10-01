@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { paymentController } from '../../controllers/payment.controller.js';
 import { paymentConfigController } from '../../controllers/paymentConfig.controller.js';
+import { paymentCallbackController } from '../../controllers/paymentCallback.controller.js';
 import { authenticate } from '../../middlewares/auth.middleware.js';
 import { requireActiveAccount, requireAdmin } from '../../middlewares/rbac.middleware.js';
 import { uploadProof } from '../../middlewares/upload.middleware.js';
@@ -8,7 +9,14 @@ import { paymentRateLimiter, paymentProofRateLimiter } from '../../middlewares/r
 
 const router = Router();
 
-// All payment routes require authentication and active account status
+// Provider callback routes — MUST be before auth middleware
+// These are called by payment providers (eSewa, Khalti, MyPay) during redirect-back
+router.get('/callback/esewa', paymentCallbackController.handleEsewaCallback);
+router.get('/callback/khalti', paymentCallbackController.handleKhaltiCallback);
+router.get('/callback/mypay', paymentCallbackController.handleMypayCallback);
+router.post('/callback/mypay', paymentCallbackController.handleMypayCallback);
+
+// All remaining payment routes require authentication and active account status
 router.use(authenticate, requireActiveAccount);
 
 // Payment QR Configuration (customer-facing read)
@@ -31,4 +39,5 @@ router.get('/:paymentId', paymentController.getPaymentDetails);
 router.get('/:paymentId/proof', paymentController.getPaymentProof);
 
 export default router;
+
 
