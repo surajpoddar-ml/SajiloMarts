@@ -208,6 +208,12 @@ export class PaymentService extends BaseService {
       payment.paymentProof = String(paymentProof).trim();
     }
 
+    // CRITICAL SECURITY RULE:
+    // Payment proof is EVIDENCE submitted by the customer (transaction code + screenshot).
+    // Submitting proof NEVER automatically means payment is verified.
+    // For provider-initiated payments: verification happens via provider API (verifyPayment).
+    // For manual proof-only payments: admin must manually review and verify via reviewPayment.
+    // The paymentStatus transitions to PROOF_SUBMITTED — NOT to VERIFIED.
     payment.paymentStatus = PAYMENT_STATUSES.PROOF_SUBMITTED;
     payment.submittedAt = new Date();
 
