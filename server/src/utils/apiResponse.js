@@ -20,4 +20,13 @@ export class ApiResponse {
   static created(data, message = 'Created successfully') {
     return new ApiResponse(201, data, message);
   }
+
+  /**
+   * Factory for paginated list responses.
+   */
+  static paginated(data, pagination, message = 'Success') {
+    const response = new ApiResponse(200, data, message);
+    response.pagination = pagination;
+    return response;
+  }
 }
