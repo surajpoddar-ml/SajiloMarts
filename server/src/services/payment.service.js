@@ -360,6 +360,30 @@ export class PaymentService extends BaseService {
     const { internalNotes, __v, verifiedBy, ...customerSafePayment } = payment;
     return customerSafePayment;
   }
+
+  /**
+   * Looks up a payment submission by provider reference.
+   * Enables mapping provider-specific IDs back to internal records.
+   * @param {string} providerRefId - Provider transaction reference
+   * @param {string} [paymentMethod] - Optional: filter by method
+   * @returns {Promise<import('mongoose').Document|null>}
+   */
+  async lookupByProviderRef(providerRefId, paymentMethod) {
+    if (!providerRefId) return null;
+
+    const query = {
+      $or: [
+        { providerPaymentId: providerRefId },
+        { providerRefId: providerRefId },
+      ],
+    };
+
+    if (paymentMethod) {
+      query.paymentMethod = paymentMethod;
+    }
+
+    return PaymentSubmission.findOne(query);
+  }
 }
 
 export const paymentService = new PaymentService();
