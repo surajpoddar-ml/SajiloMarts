@@ -22,11 +22,17 @@ export const PaymentQrPresenter = ({
 
   const amountPayable = breakdown.payNowAmountNpr ?? breakdown.amountPayableNow ?? breakdown.amountPayableNowNpr ?? breakdown.finalAmountNpr ?? 0;
 
-  // Get the correct provider config for the selected method
-  // For cod_50_50, the customer still needs to pay 50% via a digital wallet — default to esewa
-  const getCodPaymentProvider = () => {
-    // For COD mode, show eSewa as the default payment interface for the 50% advance
-    return providerConfigs.esewa || null;
+  // STRICT QR ISOLATION RULE:
+  // - eSewa QR is shown ONLY when selectedMethod === 'esewa'
+  // - Khalti QR is shown ONLY when selectedMethod === 'khalti'
+  // - MyPay QR is shown ONLY when selectedMethod === 'mypay'
+  // - cod_50_50 uses eSewa QR for the 50% advance payment only
+  // - NEVER display one provider's QR for another provider
+
+  const getProviderQrConfig = (method) => {
+    // Strict provider-to-QR mapping — never cross-reference
+    const config = providerConfigs[method] || null;
+    return config;
   };
 
   return (
@@ -36,7 +42,7 @@ export const PaymentQrPresenter = ({
           <CodModeInfoCard breakdown={breakdown} />
           <EsewaPaymentInterface
             amountPayableNpr={amountPayable}
-            providerConfig={getCodPaymentProvider()}
+            providerConfig={getProviderQrConfig('esewa')}
           />
         </>
       )}
@@ -44,21 +50,21 @@ export const PaymentQrPresenter = ({
       {selectedMethod === 'esewa' && (
         <EsewaPaymentInterface
           amountPayableNpr={amountPayable}
-          providerConfig={providerConfigs.esewa || null}
+          providerConfig={getProviderQrConfig('esewa')}
         />
       )}
 
       {selectedMethod === 'khalti' && (
         <KhaltiPaymentInterface
           amountPayableNpr={amountPayable}
-          providerConfig={providerConfigs.khalti || null}
+          providerConfig={getProviderQrConfig('khalti')}
         />
       )}
 
       {selectedMethod === 'mypay' && (
         <MypayPaymentInterface
           amountPayableNpr={amountPayable}
-          providerConfig={providerConfigs.mypay || null}
+          providerConfig={getProviderQrConfig('mypay')}
         />
       )}
     </div>
