@@ -2,6 +2,7 @@ import { BaseService } from './base.service.js';
 import { PaymentSubmission } from '../models/paymentSubmission.model.js';
 import { PaymentReconciliation } from '../models/paymentReconciliation.model.js';
 import { providerRegistry } from '../providers/index.js';
+import { paymentStateSync } from './paymentStateSync.service.js';
 import { PAYMENT_STATUSES, VERIFICATION_SOURCES } from '../constants/payment.constants.js';
 import { BadRequestError, NotFoundError } from '../utils/index.js';
 import { recordSecurityEvent } from '../utils/securityAudit.js';
@@ -172,6 +173,9 @@ export class PaymentVerificationService extends BaseService {
         console.warn(`[PaymentVerification] Reconciliation record creation failed: ${reconErr.message}`);
       }
     }
+
+    // Sync payment state to order and request lifecycle
+    await paymentStateSync.syncPaymentStateToOrder(payment);
 
     return { verified: result.verified, payment, verificationResult: result, replayed: false };
   }
