@@ -64,6 +64,8 @@ class DatabaseConnection {
       status,
       code,
       isConnected: code === 1,
+      hasUri: Boolean(databaseConfig.uri),
+      lastError: this.lastError ? sanitizeMongoUri(this.lastError) : null,
     };
   }
 
@@ -93,13 +95,14 @@ class DatabaseConnection {
     }
 
     if (!uri) {
+      this.lastError = 'MONGODB_URI environment variable is missing';
       const missingUriErr = new Error('MONGODB_URI is required to initialize database connection');
       missingUriErr.name = 'DatabaseConfigurationError';
       throw missingUriErr;
     }
 
-    // Ensure reliable DNS resolution for MongoDB Atlas SRV URIs on Windows
-    if (uri.startsWith('mongodb+srv://')) {
+    // Only apply custom public DNS on Windows machines that are NOT in cloud/Vercel
+    if (process.platform === 'win32' && !process.env.VERCEL && uri.startsWith('mongodb+srv://')) {
       try {
         dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
       } catch {
@@ -114,16 +117,18 @@ class DatabaseConnection {
         const conn = await mongoose.connect(uri, options);
         this.connection = conn.connection;
         this.isConnected = true;
+        this.lastError = null;
         this.connectingPromise = null;
         return this.connection;
       } catch (err) {
-        // If initial attempt failed with querySrv error, retry once with public DNS servers
-        if (err.message && err.message.includes('querySrv')) {
+        // If initial attempt failed on Windows with querySrv error, retry once with public DNS servers
+        if (process.platform === 'win32' && !process.env.VERCEL && err.message && err.message.includes('querySrv')) {
           try {
             dns.setServers(['8.8.8.8', '1.1.1.1']);
             const retryConn = await mongoose.connect(uri, options);
             this.connection = retryConn.connection;
             this.isConnected = true;
+            this.lastError = null;
             this.connectingPromise = null;
             return this.connection;
           } catch (retryErr) {
@@ -133,6 +138,7 @@ class DatabaseConnection {
 
         this.connection = null;
         this.isConnected = false;
+        this.lastError = err.message;
         this.connectingPromise = null;
         const safeErrorMessage = sanitizeMongoUri(err.message);
         const connectionErr = new Error(`Failed to connect to MongoDB: ${safeErrorMessage}`);

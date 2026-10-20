@@ -19,7 +19,7 @@ export const apiClient = async (endpoint, options = {}) => {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
-  const timeoutMs = options.timeout || 4000;
+  const timeoutMs = options.timeout || 15000;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 

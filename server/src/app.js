@@ -23,6 +23,16 @@ app.use(async (req, res, next) => {
       console.warn('⚠️ Serverless DB connection error:', err.message);
     }
   }
+
+  // Fast-fail if DB connection failed on API routes (except health), preventing long timeouts
+  if (!isDatabaseConnected() && req.path.startsWith('/api') && !req.path.includes('/health')) {
+    return res.status(503).json({
+      success: false,
+      statusCode: 503,
+      message: 'Database service is temporarily unavailable. Please verify MongoDB connection.',
+    });
+  }
+
   next();
 });
 
