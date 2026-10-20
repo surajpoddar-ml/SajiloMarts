@@ -13,7 +13,7 @@ const SERVICE_CHARACTERISTICS = [
   },
   {
     icon: '🧮 🔍',
-    title: 'Transparent Pricing',
+    title: 'Transparent Server Pricing',
     points: [
       'Fixed INR to NPR rate',
       'No surprise customs or taxes',
@@ -21,7 +21,7 @@ const SERVICE_CHARACTERISTICS = [
   },
   {
     icon: '🇳🇵 🚚',
-    title: 'Nepal-Wide Delivery',
+    title: 'Nepal Countrywide Delivery',
     points: [
       'Kathmandu valley & all provinces',
       'Doorstep delivery with tracking',

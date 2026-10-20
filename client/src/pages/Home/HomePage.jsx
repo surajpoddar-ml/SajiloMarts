@@ -1,71 +1,151 @@
 import React from 'react';
 import { HeroSection } from './HeroSection.jsx';
+import { SourcingPortalSection } from './SourcingPortalSection.jsx';
+import { SourcingRequestInteractiveForm } from './SourcingRequestInteractiveForm.jsx';
+import { RequestReviewCard } from './RequestReviewCard.jsx';
+import { ServerQuoteDisplay } from './ServerQuoteDisplay.jsx';
 import { HowItWorksSection } from './HowItWorksSection.jsx';
-import { Container, Section } from '../../components/layout';
-import { Typography, Button, Card } from '../../components/common';
+import { SupportedMarketplacesSection } from './SupportedMarketplacesSection.jsx';
+import { ServiceBenefitsSection } from './ServiceBenefitsSection.jsx';
+import { TrackOrderSection } from './TrackOrderSection.jsx';
+import { AccountEntrySection } from './AccountEntrySection.jsx';
+import { SupportEntrySection } from './SupportEntrySection.jsx';
+import { productRequestService } from '../../services/productRequest.service.js';
 
-/**
- * Minimal SastoMarts Official Public Landing Page
- * Clean, fast, modern, and uncluttered.
- */
 export function HomePage({
   onNavigate,
   user,
   isAuthenticated,
+  onRequestCreated,
+  onTrackOrder,
 }) {
+  const [productUrl, setProductUrl] = React.useState('');
+  const [activeStep, setActiveStep] = React.useState('form'); // 'form' | 'review' | 'quote'
+  const [requestDraft, setRequestDraft] = React.useState(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submissionError, setSubmissionError] = React.useState(null);
+  const [createdRequest, setCreatedRequest] = React.useState(null);
+
+  const handleReviewStep = (draft) => {
+    setRequestDraft(draft);
+    setActiveStep('review');
+    setSubmissionError(null);
+  };
+
+  const handleSubmitRequest = async () => {
+    if (!requestDraft) return;
+    setIsSubmitting(true);
+    setSubmissionError(null);
+
+    try {
+      const payload = {
+        productUrl: requestDraft.productUrl,
+        productName: requestDraft.productName,
+        quantity: requestDraft.quantity || 1,
+      };
+
+      if (requestDraft.variant) payload.variant = requestDraft.variant;
+      if (requestDraft.notes) payload.notes = requestDraft.notes;
+      if (requestDraft.productPriceInr) {
+        payload.productPriceInr = Number(requestDraft.productPriceInr);
+      }
+
+      const response = await productRequestService.createRequest(payload);
+      const reqData = response.data || response;
+      setCreatedRequest(reqData);
+      setActiveStep('quote');
+
+      if (onRequestCreated) {
+        onRequestCreated(reqData);
+      }
+    } catch (err) {
+      setSubmissionError(err.message || 'Failed to create sourcing request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="homepage" id="sastomarts-homepage">
-      {/* 1. Minimal Hero with Direct URL Input & Supported Stores */}
+      {/* 1. Hero / Brand Value Section */}
       <HeroSection
         onNavigate={onNavigate}
         isAuthenticated={isAuthenticated}
       />
 
-      {/* 2. Sleek 4-Step How It Works Flow */}
+      {/* 2. Sourcing Portal Section */}
+      <SourcingPortalSection
+        initialProductUrl={productUrl}
+        user={user}
+        isAuthenticated={isAuthenticated}
+        onNavigate={onNavigate}
+        onRequestCreated={onRequestCreated}
+      >
+        {activeStep === 'form' && (
+          <SourcingRequestInteractiveForm
+            initialProductUrl={productUrl}
+            onSubmitReview={handleReviewStep}
+          />
+        )}
+
+        {activeStep === 'review' && (
+          <RequestReviewCard
+            requestData={requestDraft}
+            onEdit={() => setActiveStep('form')}
+            onSubmit={handleSubmitRequest}
+            isSubmitting={isSubmitting}
+            error={submissionError}
+            isAuthenticated={isAuthenticated}
+            onLogin={() => onNavigate('login')}
+            onRegister={() => onNavigate('register')}
+          />
+        )}
+
+        {activeStep === 'quote' && createdRequest && (
+          <ServerQuoteDisplay
+            requestId={createdRequest._id || createdRequest.id}
+            initialQuote={createdRequest.quote}
+            onRequestConfirmed={(confirmedData) => {
+              if (onRequestCreated) {
+                onRequestCreated(confirmedData);
+              }
+            }}
+            onReset={() => {
+              setActiveStep('form');
+              setRequestDraft(null);
+              setCreatedRequest(null);
+              setProductUrl('');
+            }}
+          />
+        )}
+      </SourcingPortalSection>
+
+      {/* 3. How It Works Section */}
       <HowItWorksSection />
 
-      {/* 3. Minimal Bottom Action Strip */}
-      <Section size="md" style={{
-        backgroundColor: 'var(--bg-surface)',
-        borderBottom: '1px solid var(--border-subtle)',
-        paddingTop: 'var(--space-12)',
-        paddingBottom: 'var(--space-12)',
-      }}>
-        <Container size="standard">
-          <div style={{
-            maxWidth: '680px',
-            margin: '0 auto',
-            textAlign: 'center',
-            padding: 'var(--space-6) var(--space-4)',
-          }}>
-            <Typography variant="h2" style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: '8px' }}>
-              Ready to Order from India?
-            </Typography>
-            <p style={{ margin: '0 auto var(--space-6)', fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '480px' }}>
-              Create an account or sign in to submit your product links, get instant quotes, and track cross-border deliveries.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Button
-                variant="primary"
-                size="md"
-                onClick={() => onNavigate(isAuthenticated ? 'sourcing-new' : 'login')}
-              >
-                {isAuthenticated ? 'Create Sourcing Request' : 'Sign In / Register'}
-              </Button>
-              <Button
-                variant="outline"
-                size="md"
-                onClick={() => onNavigate('track-order')}
-              >
-                Track An Order
-              </Button>
-            </div>
-          </div>
-        </Container>
-      </Section>
+      {/* 4. Supported Marketplaces Section */}
+      <SupportedMarketplacesSection />
+
+      {/* 5. Service Benefits Section */}
+      <ServiceBenefitsSection />
+
+      {/* 6. Real Track Order Entry Section */}
+      <TrackOrderSection
+        onTrackOrder={onTrackOrder}
+        onNavigate={onNavigate}
+      />
+
+      {/* 7. Customer Account Entry Section */}
+      <AccountEntrySection
+        user={user}
+        isAuthenticated={isAuthenticated}
+        onNavigate={onNavigate}
+      />
+
+      {/* 8. Support Entry Section */}
+      <SupportEntrySection onNavigate={onNavigate} />
     </div>
   );
 }
 
 export default HomePage;
-

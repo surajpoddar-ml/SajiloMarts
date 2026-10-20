@@ -101,8 +101,8 @@ class DatabaseConnection {
       throw missingUriErr;
     }
 
-    // Only apply custom public DNS on Windows machines that are NOT in cloud/Vercel
-    if (process.platform === 'win32' && !process.env.VERCEL && uri.startsWith('mongodb+srv://')) {
+    // Ensure reliable DNS resolution for MongoDB Atlas SRV URIs across all platforms
+    if (uri.startsWith('mongodb+srv://')) {
       try {
         dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
       } catch {
@@ -121,8 +121,8 @@ class DatabaseConnection {
         this.connectingPromise = null;
         return this.connection;
       } catch (err) {
-        // If initial attempt failed on Windows with querySrv error, retry once with public DNS servers
-        if (process.platform === 'win32' && !process.env.VERCEL && err.message && err.message.includes('querySrv')) {
+        // If initial attempt failed with querySrv error, retry once with public DNS servers
+        if (err.message && err.message.includes('querySrv')) {
           try {
             dns.setServers(['8.8.8.8', '1.1.1.1']);
             const retryConn = await mongoose.connect(uri, options);

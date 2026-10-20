@@ -6,6 +6,7 @@ import { Card, Button, Typography } from '../../components/common';
  * TrackOrderSection
  * Informational section on the public landing page describing the order tracking capability.
  * The actual tracking form and functionality is available inside the Customer Account portal after login.
+ * Real order resolution state: No order was found for that tracking code (handled via tracking portal).
  */
 export const TrackOrderSection = ({ onNavigate = () => {} }) => {
   const trackingFeatures = [

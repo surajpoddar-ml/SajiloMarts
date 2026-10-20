@@ -16,6 +16,8 @@ export const getSystemHealth = () => {
       code: dbState.code,
       connected: isDbConnected,
       ready: isDbConnected,
+      hasUri: Boolean(dbState.hasUri),
+      error: dbState.lastError || null,
     },
     version: '1.0.0',
   };

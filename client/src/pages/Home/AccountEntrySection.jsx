@@ -57,7 +57,7 @@ export const AccountEntrySection = ({
             Customer Portal
           </Typography>
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
-            Your Personal Sourcing Dashboard
+            Customer Account & Sourcing History
           </Typography>
         </div>
 

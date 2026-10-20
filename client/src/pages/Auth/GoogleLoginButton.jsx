@@ -12,7 +12,8 @@ export const GoogleLoginButton = ({ onSuccess, onError, text = 'continue_with' }
   const [isLoading, setIsLoading] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+  const DEFAULT_GOOGLE_CLIENT_ID = '753247567662-m5j6djst82f545afd48t04fkr9c5v5mc.apps.googleusercontent.com';
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
 
   // Dynamically load Google Identity Services SDK
   useEffect(() => {

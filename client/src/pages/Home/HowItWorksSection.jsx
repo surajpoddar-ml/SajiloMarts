@@ -5,7 +5,7 @@ import { Typography } from '../../components/common';
 const WORKFLOW_STEPS = [
   {
     step: '01',
-    title: 'Find & Paste Link',
+    title: 'Find Product in India',
     description: 'Find any product on Amazon India, Flipkart, or Myntra and paste the link here.',
   },
   {
@@ -20,7 +20,7 @@ const WORKFLOW_STEPS = [
   },
   {
     step: '04',
-    title: 'Doorstep Delivery',
+    title: 'Procurement & Nepal Delivery',
     description: 'We procure in India, clear customs, and deliver safely right to your address in Nepal.',
   },
 ];
