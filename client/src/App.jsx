@@ -56,7 +56,7 @@ function AppContent() {
         return 'checkout';
       }
     }
-    return 'register';
+    return 'home';
   });
 
   // Dynamic SEO Page Title
@@ -122,18 +122,26 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Mandatory Auth Gate: Unauthenticated users must log in or sign up before accessing the main website
-  if (!isAuthenticated) {
-    const authViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];
-    const activeAuthView = authViews.includes(currentView) ? currentView : 'register';
+  const authViews = ['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'resend-verification'];
+
+  // Auth pages shell (Login / Register / Forgot Password / Verify)
+  if (!isAuthenticated && authViews.includes(currentView)) {
+    const activeAuthView = currentView;
 
     return (
       <div className="app-shell auth-gate-shell">
         <header className="site-header" style={{ borderBottom: '1px solid var(--border-subtle)', padding: '16px 0' }}>
           <Container size="wide">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Logo size="md" onClick={() => handleNavigate('register')} />
+              <Logo size="md" onClick={() => handleNavigate('home')} />
               <div style={{ display: 'flex', gap: '8px' }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleNavigate('home')}
+                >
+                  &larr; Back to Home
+                </Button>
                 <Button
                   variant={activeAuthView === 'login' ? 'primary' : 'ghost'}
                   size="sm"
@@ -205,7 +213,7 @@ function AppContent() {
     );
   }
 
-  // Authenticated Main Website
+  // Main Website (Landing Page for guests & full portal for authenticated users)
   return (
     <div className="app-shell">
       <Header
@@ -218,7 +226,7 @@ function AppContent() {
         onRegister={() => handleNavigate('register')}
         onLogout={async () => {
           await logout();
-          handleNavigate('login');
+          handleNavigate('home');
         }}
         onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         isMobileMenuOpen={isMobileMenuOpen}
@@ -235,19 +243,21 @@ function AppContent() {
         onRegister={() => handleNavigate('register')}
         onLogout={async () => {
           await logout();
-          handleNavigate('login');
+          handleNavigate('home');
         }}
       />
 
       {/* Role-Aware Sub-Navigation for Authenticated Users */}
-      {isAdmin ? (
-        <Container size="wide">
-          <AdminNav currentView={currentView} onNavigate={handleNavigate} />
-        </Container>
-      ) : (
-        <Container size="wide">
-          <CustomerNav currentView={currentView} onNavigate={handleNavigate} />
-        </Container>
+      {isAuthenticated && (
+        isAdmin ? (
+          <Container size="wide">
+            <AdminNav currentView={currentView} onNavigate={handleNavigate} />
+          </Container>
+        ) : (
+          <Container size="wide">
+            <CustomerNav currentView={currentView} onNavigate={handleNavigate} />
+          </Container>
+        )
       )}
 
       <main id="main-content" className="app-shell__main">
@@ -426,9 +436,6 @@ function AppContent() {
             onRequestCreated={(req) => {
               setSelectedRequestId(req._id || req.id);
               handleNavigate('sourcing-detail');
-            }}
-            onTrackOrder={(orderCode) => {
-              handleNavigate('track-order');
             }}
           />
         )}

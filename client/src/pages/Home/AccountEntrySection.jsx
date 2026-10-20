@@ -1,44 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Container, Section } from '../../components/layout';
-import { Card, CardHeader, CardBody, Button, Typography, StatusBadge } from '../../components/common';
-import { productRequestService } from '../../services/productRequest.service.js';
+import { Card, Button, Typography } from '../../components/common';
 
 /**
  * AccountEntrySection
- * Renders authenticated customer entry point displaying real recent requests or a clean empty state.
- * For guests, renders clean sign-in and register CTAs.
+ * Informational section on the public landing page describing account benefits.
+ * The actual sourcing request list, order management, and account features
+ * are available inside the Customer Account portal after login.
  */
 export const AccountEntrySection = ({
-  user,
-  isAuthenticated = false,
   onNavigate = () => {},
 }) => {
-  const [recentRequests, setRecentRequests] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      let isMounted = true;
-      setIsLoading(true);
-      productRequestService.getUserRequests({ limit: 3 })
-        .then((res) => {
-          if (isMounted) {
-            const list = res.data?.requests || res.requests || res.data || [];
-            setRecentRequests(Array.isArray(list) ? list : []);
-          }
-        })
-        .catch(() => {
-          if (isMounted) setRecentRequests([]);
-        })
-        .finally(() => {
-          if (isMounted) setIsLoading(false);
-        });
-
-      return () => {
-        isMounted = false;
-      };
-    }
-  }, [isAuthenticated]);
+  const accountBenefits = [
+    {
+      icon: '📦',
+      title: 'Sourcing Requests',
+      description: 'Submit product links from Indian marketplaces and receive official quotes with full cost breakdowns.',
+    },
+    {
+      icon: '🚚',
+      title: 'Order Management',
+      description: 'View active orders, track shipments, and manage your complete purchase history in one dashboard.',
+    },
+    {
+      icon: '📍',
+      title: 'Saved Addresses',
+      description: 'Store and manage multiple Nepal delivery addresses for faster checkout on future orders.',
+    },
+    {
+      icon: '🔒',
+      title: 'Account Security',
+      description: 'Manage your password, verify your email, and keep your account credentials secure.',
+    },
+  ];
 
   return (
     <Section id="customer-account-entry" size="md" style={{
@@ -48,98 +42,68 @@ export const AccountEntrySection = ({
       <Container size="standard">
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
           <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)', fontWeight: 600 }}>
-            Account Management
+            Customer Portal
           </Typography>
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
-            Customer Account & Sourcing History
+            Your Personal Sourcing Dashboard
+          </Typography>
+          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '540px', margin: 'var(--space-2) auto 0' }}>
+            Create a free account to manage sourcing requests, track cross-border deliveries, and access your complete order history.
           </Typography>
         </div>
 
-        {isAuthenticated ? (
-          <Card style={{ maxWidth: '640px', margin: '0 auto', backgroundColor: 'var(--bg-surface-secondary)' }}>
-            <CardHeader
-              title={`Welcome back, ${user?.name || 'Customer'}`}
-              description={`Account ID: ${user?.email || 'Verified Customer'}`}
-            />
-            <CardBody>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Recent Sourcing Requests</span>
-                  <Button variant="ghost" size="sm" onClick={() => onNavigate('sourcing-requests')}>
-                    View All &rarr;
-                  </Button>
-                </div>
-
-                {isLoading ? (
-                  <div style={{ textAlign: 'center', padding: '12px 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                    Loading your requests...
-                  </div>
-                ) : recentRequests.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {recentRequests.map((req) => (
-                      <div
-                        key={req._id || req.id}
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          padding: '10px 14px',
-                          backgroundColor: 'var(--bg-surface)',
-                          borderRadius: 'var(--radius-sm)',
-                          border: '1px solid var(--border-subtle)',
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontWeight: 500, fontSize: '0.875rem' }}>{req.productName}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Qty: {req.quantity || 1}</div>
-                        </div>
-                        <StatusBadge status={req.status || 'draft'} />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{
-                    padding: '16px',
-                    backgroundColor: 'var(--bg-surface)',
-                    borderRadius: 'var(--radius-sm)',
-                    textAlign: 'center',
-                    border: '1px dashed var(--border-subtle)',
-                    fontSize: '0.875rem',
-                    color: 'var(--text-secondary)',
-                  }}>
-                    No sourcing requests yet. Paste an Indian product link above to create your first request.
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
-                  <Button variant="outline" size="sm" onClick={() => onNavigate('account')}>
-                    Account Settings
-                  </Button>
-                  <Button variant="primary" size="sm" onClick={() => onNavigate('sourcing-new')}>
-                    + New Request
-                  </Button>
-                </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '20px',
+          maxWidth: '760px',
+          margin: '0 auto var(--space-6)',
+        }}>
+          {accountBenefits.map((benefit, idx) => (
+            <Card key={idx} style={{
+              backgroundColor: 'var(--bg-surface-secondary)',
+              border: '1px solid var(--border-subtle)',
+              padding: '24px 20px',
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: '1.8rem', marginBottom: '10px' }} aria-hidden="true">
+                {benefit.icon}
               </div>
-            </CardBody>
-          </Card>
-        ) : (
-          <Card style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center', backgroundColor: 'var(--bg-surface-secondary)', padding: '24px' }}>
-            <Typography variant="h3" style={{ fontSize: '1.1rem', marginBottom: '8px' }}>
-              Create an Account or Sign In
+              <Typography variant="h3" style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px' }}>
+                {benefit.title}
+              </Typography>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {benefit.description}
+              </p>
+            </Card>
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <Card style={{
+            maxWidth: '480px',
+            margin: '0 auto',
+            backgroundColor: 'var(--bg-page)',
+            padding: '24px',
+            textAlign: 'center',
+            border: '1px dashed var(--border-subtle)',
+          }}>
+            <Typography variant="h3" style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '8px' }}>
+              Ready to get started?
             </Typography>
-            <Typography variant="body" style={{ color: 'var(--text-secondary)', marginBottom: '16px', maxWidth: '440px', margin: '0 auto 16px' }}>
-              Manage multiple India sourcing requests, track live Nepal consignments, and securely communicate with fulfillment managers.
-            </Typography>
+            <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '360px', marginLeft: 'auto', marginRight: 'auto' }}>
+              Sign in to access your dashboard or create a free account to begin sourcing products from India.
+            </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Button variant="primary" onClick={() => onNavigate('login')}>
-                Sign In to SajiloMarts
+                Sign In
               </Button>
               <Button variant="outline" onClick={() => onNavigate('register')}>
-                Register Account
+                Create Free Account
               </Button>
             </div>
           </Card>
-        )}
+        </div>
       </Container>
     </Section>
   );

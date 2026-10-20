@@ -57,17 +57,11 @@ export const provisionAdmin = async () => {
 
 // Execute directly if run via CLI
 if (process.argv[1] && process.argv[1].endsWith('seedAdmin.js')) {
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.error('MONGODB_URI is required');
-    process.exit(1);
-  }
-
-  mongoose
-    .connect(mongoUri)
-    .then(async () => {
+  import('../database/connection.js')
+    .then(async ({ connectDatabase, disconnectDatabase }) => {
+      await connectDatabase();
       await provisionAdmin();
-      await mongoose.disconnect();
+      await disconnectDatabase();
       process.exit(0);
     })
     .catch((err) => {
