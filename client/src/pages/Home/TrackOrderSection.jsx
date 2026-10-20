@@ -12,17 +12,26 @@ export const TrackOrderSection = ({ onNavigate = () => {} }) => {
     {
       icon: '📍',
       title: 'Real-Time Location',
-      description: 'See exactly where your parcel is — from Indian warehouse to your Nepal doorstep.',
+      points: [
+        'India warehouse to Nepal updates',
+        'Live tracking milestones',
+      ],
     },
     {
       icon: '🛃',
-      title: 'Customs & Clearance',
-      description: 'Get live updates on customs processing, duty assessment, and border clearance status.',
+      title: 'Customs Clearance',
+      points: [
+        'Border processing status',
+        'Verified clearance confirmation',
+      ],
     },
     {
       icon: '🔔',
-      title: 'Delivery Notifications',
-      description: 'Receive instant alerts when your order ships, clears customs, and is out for delivery.',
+      title: 'Delivery Alerts',
+      points: [
+        'Out-for-delivery notifications',
+        'Direct status alerts',
+      ],
     },
   ];
 
@@ -39,15 +48,12 @@ export const TrackOrderSection = ({ onNavigate = () => {} }) => {
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
             Track Your Cross-Border Order
           </Typography>
-          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '540px', margin: 'var(--space-2) auto 0' }}>
-            Every SajiloMarts order includes full visibility — from Indian procurement through customs clearance to final delivery anywhere in Nepal.
-          </Typography>
         </div>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '20px',
+          gap: '16px',
           maxWidth: '760px',
           margin: '0 auto var(--space-6)',
         }}>
@@ -55,18 +61,29 @@ export const TrackOrderSection = ({ onNavigate = () => {} }) => {
             <Card key={idx} style={{
               backgroundColor: 'var(--bg-surface)',
               border: '1px solid var(--border-subtle)',
-              padding: '24px 20px',
+              padding: '20px 16px',
               textAlign: 'center',
             }}>
-              <div style={{ fontSize: '1.8rem', marginBottom: '10px' }} aria-hidden="true">
+              <div style={{ fontSize: '1.8rem', marginBottom: '8px' }} aria-hidden="true">
                 {feature.icon}
               </div>
-              <Typography variant="h3" style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px' }}>
+              <Typography variant="h3" style={{ fontSize: '0.975rem', fontWeight: 600, marginBottom: '8px' }}>
                 {feature.title}
               </Typography>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                {feature.description}
-              </p>
+              <ul style={{
+                margin: 0,
+                paddingLeft: '1.1rem',
+                fontSize: '0.825rem',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+                textAlign: 'left',
+              }}>
+                {feature.points.map((pt, pIdx) => (
+                  <li key={pIdx} style={{ marginBottom: '3px' }}>
+                    {pt}
+                  </li>
+                ))}
+              </ul>
             </Card>
           ))}
         </div>

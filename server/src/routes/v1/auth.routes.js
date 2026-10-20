@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   register,
   login,
+  googleAuth,
   verifyEmail,
   resendVerification,
   forgotPassword,
@@ -32,9 +33,10 @@ import {
 
 const router = Router();
 
-// Public registration & login with input validation and rate limiting
+// Public registration, login & Google OAuth with rate limiting
 router.post('/register', authRateLimiter, validateBody(validateRegistrationInput), register);
 router.post('/login', authRateLimiter, validateBody(validateLoginInput), login);
+router.post('/google', authRateLimiter, googleAuth);
 
 // Email verification & resend
 router.post('/verify-email', verificationRateLimiter, validateBody(validateVerifyEmailInput), verifyEmail);

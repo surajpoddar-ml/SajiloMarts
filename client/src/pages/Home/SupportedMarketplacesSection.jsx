@@ -65,15 +65,12 @@ export const SupportedMarketplacesSection = ({ onSelectMarketplace }) => {
       borderBottom: '1px solid var(--border-subtle)',
     }}>
       <Container size="wide">
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
           <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)', fontWeight: 600 }}>
             India Marketplace Sourcing Coverage
           </Typography>
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
             Supported Indian Online Stores
-          </Typography>
-          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '580px', margin: 'var(--space-2) auto 0' }}>
-            Paste links from any of these major Indian marketplaces. Our procurement network sources directly from verified sellers across India.
           </Typography>
         </div>
 

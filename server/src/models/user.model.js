@@ -40,10 +40,27 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: function () {
+        return !this.googleId;
+      },
       minlength: [8, 'Password must be at least 8 characters long'],
       maxlength: [128, 'Password cannot exceed 128 characters'],
       select: false,
+    },
+    googleId: {
+      type: String,
+      default: null,
+      sparse: true,
+      index: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
+    avatar: {
+      type: String,
+      default: null,
     },
     phone: {
       type: String,
@@ -107,7 +124,7 @@ const userSchema = new mongoose.Schema(
  * Preserves existing hash untouched during profile, email, or role updates.
  */
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) {
+  if (!this.password || !this.isModified('password')) {
     return;
   }
   if (!this.isNew) {

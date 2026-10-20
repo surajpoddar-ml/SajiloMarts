@@ -15,22 +15,34 @@ export const AccountEntrySection = ({
     {
       icon: '📦',
       title: 'Sourcing Requests',
-      description: 'Submit product links from Indian marketplaces and receive official quotes with full cost breakdowns.',
+      points: [
+        'Submit Indian store links',
+        'Receive official NPR quotes',
+      ],
     },
     {
       icon: '🚚',
       title: 'Order Management',
-      description: 'View active orders, track shipments, and manage your complete purchase history in one dashboard.',
+      points: [
+        'Track active cross-border orders',
+        'Complete purchase history',
+      ],
     },
     {
       icon: '📍',
       title: 'Saved Addresses',
-      description: 'Store and manage multiple Nepal delivery addresses for faster checkout on future orders.',
+      points: [
+        'Save multiple delivery spots',
+        'Faster 1-click checkout',
+      ],
     },
     {
       icon: '🔒',
       title: 'Account Security',
-      description: 'Manage your password, verify your email, and keep your account credentials secure.',
+      points: [
+        'Verified account protection',
+        'Secure password & Google login',
+      ],
     },
   ];
 
@@ -47,15 +59,12 @@ export const AccountEntrySection = ({
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
             Your Personal Sourcing Dashboard
           </Typography>
-          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '540px', margin: 'var(--space-2) auto 0' }}>
-            Create a free account to manage sourcing requests, track cross-border deliveries, and access your complete order history.
-          </Typography>
         </div>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '20px',
+          gap: '16px',
           maxWidth: '760px',
           margin: '0 auto var(--space-6)',
         }}>
@@ -63,18 +72,29 @@ export const AccountEntrySection = ({
             <Card key={idx} style={{
               backgroundColor: 'var(--bg-surface-secondary)',
               border: '1px solid var(--border-subtle)',
-              padding: '24px 20px',
+              padding: '20px 16px',
               textAlign: 'center',
             }}>
-              <div style={{ fontSize: '1.8rem', marginBottom: '10px' }} aria-hidden="true">
+              <div style={{ fontSize: '1.6rem', marginBottom: '8px' }} aria-hidden="true">
                 {benefit.icon}
               </div>
-              <Typography variant="h3" style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px' }}>
+              <Typography variant="h3" style={{ fontSize: '0.975rem', fontWeight: 600, marginBottom: '8px' }}>
                 {benefit.title}
               </Typography>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                {benefit.description}
-              </p>
+              <ul style={{
+                margin: 0,
+                paddingLeft: '1.1rem',
+                fontSize: '0.825rem',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.5,
+                textAlign: 'left',
+              }}>
+                {benefit.points.map((pt, pIdx) => (
+                  <li key={pIdx} style={{ marginBottom: '3px' }}>
+                    {pt}
+                  </li>
+                ))}
+              </ul>
             </Card>
           ))}
         </div>

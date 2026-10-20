@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth.js';
+import { GoogleLoginButton } from './GoogleLoginButton.jsx';
 import './Auth.css';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -133,6 +134,21 @@ export const LoginPage = ({
             {isSubmitting ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
+
+        {Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID) && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0', color: 'var(--text-secondary, #64748b)', fontSize: '0.8rem' }}>
+              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-subtle, #e2e8f0)' }} />
+              <span style={{ padding: '0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OR</span>
+              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border-subtle, #e2e8f0)' }} />
+            </div>
+
+            <GoogleLoginButton
+              onSuccess={onLoginSuccess}
+              onError={(errMsg) => setApiError(errMsg)}
+            />
+          </>
+        )}
 
         <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div>

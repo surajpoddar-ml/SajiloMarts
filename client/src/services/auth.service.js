@@ -20,6 +20,15 @@ export const authService = {
   },
 
   /**
+   * Logs in or signs up customer via Google ID token.
+   * @param {string} credential - Google OAuth credential JWT
+   * @returns {Promise<Object>} API response data
+   */
+  googleLogin: async (credential) => {
+    return http.post('/auth/google', { credential });
+  },
+
+  /**
    * Retrieves the currently authenticated user's safe profile.
    * @returns {Promise<Object>} API response data
    */

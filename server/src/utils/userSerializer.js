@@ -19,6 +19,8 @@ export const toSafeUser = (user) => {
     role: raw.role,
     isActive: Boolean(raw.isActive),
     isEmailVerified: Boolean(raw.isEmailVerified),
+    avatar: raw.avatar || null,
+    authProvider: raw.authProvider || 'local',
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
   };

@@ -177,9 +177,89 @@ export const updateCustomerProfile = async (userId, updateData) => {
   return toSafeUser(user);
 };
 
+/**
+ * Service to authenticate or register user via Google ID token credential.
+ *
+ * @param {string} credential - Google OAuth ID Token JWT
+ * @returns {Promise<{user: Object, token: string}>} Safe user object and fresh auth token
+ */
+export const loginWithGoogle = async (credential) => {
+  if (!credential || typeof credential !== 'string') {
+    throw new BadRequestError('Google credential token is required');
+  }
+
+  // Verify Google token using Google's tokeninfo API
+  let googlePayload;
+  try {
+    const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+    if (!response.ok) {
+      throw new Error('Google token verification rejected token');
+    }
+    googlePayload = await response.json();
+  } catch (err) {
+    throw new UnauthorizedError('Invalid or expired Google authentication token');
+  }
+
+  const { sub: googleId, email, name, picture, email_verified } = googlePayload;
+
+  if (!email) {
+    throw new BadRequestError('Google account does not provide an email address');
+  }
+
+  const normalizedEmail = normalizeEmail(email);
+
+  // Find user by googleId or email
+  let user = await User.findOne({
+    $or: [{ googleId }, { email: normalizedEmail }],
+  });
+
+  if (user) {
+    if (!user.isActive) {
+      throw new UnauthorizedError(AUTH_ERRORS.ACCOUNT_DEACTIVATED);
+    }
+    let modified = false;
+    if (!user.googleId) {
+      user.googleId = googleId;
+      modified = true;
+    }
+    if (!user.isEmailVerified && (email_verified === 'true' || email_verified === true)) {
+      user.isEmailVerified = true;
+      modified = true;
+    }
+    if (!user.avatar && picture) {
+      user.avatar = picture;
+      modified = true;
+    }
+    if (modified) {
+      await user.save();
+    }
+  } else {
+    user = new User({
+      name: name || normalizedEmail.split('@')[0],
+      email: normalizedEmail,
+      googleId,
+      authProvider: 'google',
+      role: USER_ROLES.CUSTOMER,
+      isActive: true,
+      isEmailVerified: email_verified === 'true' || email_verified === true,
+      avatar: picture || null,
+    });
+    await user.save();
+  }
+
+  const safeUser = toSafeUser(user);
+  const token = createAuthToken(safeUser);
+
+  return {
+    user: safeUser,
+    token,
+  };
+};
+
 export default {
   normalizeEmail,
   registerCustomer,
   loginCustomer,
+  loginWithGoogle,
   updateCustomerProfile,
 };

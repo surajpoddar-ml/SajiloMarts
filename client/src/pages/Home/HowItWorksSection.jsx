@@ -1,94 +1,88 @@
 import React from 'react';
 import { Container, Section } from '../../components/layout';
-import { Card, CardBody, Typography } from '../../components/common';
+import { Typography } from '../../components/common';
 
 const WORKFLOW_STEPS = [
   {
-    step: '1',
-    title: 'Find Product in India',
-    description: 'Browse Amazon India, Flipkart, Myntra, Meesho, or Tata 1mg to find the specific item or variant you want.',
+    step: '01',
+    title: 'Find & Paste Link',
+    description: 'Find any product on Amazon India, Flipkart, or Myntra and paste the link here.',
   },
   {
-    step: '2',
-    title: 'Paste Product URL',
-    description: 'Paste the direct product web link into SajiloMarts. We verify the marketplace listing and capture product parameters.',
+    step: '02',
+    title: 'Instant NPR Quote',
+    description: 'Get an automatic breakdown with currency conversion, customs, and shipping included.',
   },
   {
-    step: '3',
-    title: 'Receive Server Quote',
-    description: 'Our backend pricing engine calculates the transparent converted cost in NPR, including shipping, customs, and applicable fees.',
+    step: '03',
+    title: 'Pay Locally',
+    description: 'Pay safely in Nepali Rupees via eSewa, Khalti, Bank Transfer, or partial COD.',
   },
   {
-    step: '4',
-    title: 'Confirm Request & Payment',
-    description: 'Review the authoritative quote breakdown, choose online prepayment or 50/50 COD, and confirm your request.',
-  },
-  {
-    step: '5',
-    title: 'Procurement & Nepal Delivery',
-    description: 'Our Kathmandu logistics center purchases the item in India, inspects customs clearance, and delivers directly to your address in Nepal.',
+    step: '04',
+    title: 'Doorstep Delivery',
+    description: 'We procure in India, clear customs, and deliver safely right to your address in Nepal.',
   },
 ];
 
 /**
- * HowItWorksSection
- * Concisely and factually explains the 5-step cross-border sourcing & delivery process.
+ * Minimal HowItWorksSection
  */
 export const HowItWorksSection = () => {
   return (
     <Section id="how-it-works" size="md" style={{
       backgroundColor: 'var(--bg-page)',
       borderBottom: '1px solid var(--border-subtle)',
+      paddingTop: 'var(--space-12)',
+      paddingBottom: 'var(--space-12)',
     }}>
       <Container size="wide">
-        <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-          <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--color-brand)', fontWeight: 600 }}>
-            Simple 5-Step Process
+        <div style={{ textAlign: 'center', marginBottom: 'var(--space-10)' }}>
+          <Typography variant="caption" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-brand)', fontWeight: 600, fontSize: '0.75rem' }}>
+            Simple Workflow
           </Typography>
-          <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
-            How SajiloMarts Works
-          </Typography>
-          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '580px', margin: 'var(--space-2) auto 0' }}>
-            We bridge the gap between Indian e-commerce platforms and customers across Nepal with full pricing transparency.
+          <Typography variant="h2" style={{ marginTop: 'var(--space-2)', fontSize: '1.75rem', fontWeight: 700 }}>
+            How SastoMarts Works
           </Typography>
         </div>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '24px',
+          maxWidth: '1000px',
+          margin: '0 auto',
         }}>
           {WORKFLOW_STEPS.map((item) => (
-            <Card key={item.step} style={{
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              position: 'relative',
-              padding: '20px 16px',
+            <div key={item.step} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '16px',
             }}>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--color-brand)',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: '0.9rem',
-                marginBottom: '12px',
+              <span style={{
+                fontSize: '1.75rem',
+                fontWeight: 800,
+                color: 'var(--color-brand)',
+                letterSpacing: '-0.03em',
+                marginBottom: '8px',
+                opacity: 0.85,
               }}>
                 {item.step}
-              </div>
+              </span>
 
-              <Typography variant="h3" style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: 'var(--text-primary)' }}>
+              <Typography variant="h3" style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '6px', color: 'var(--text-primary)' }}>
                 {item.title}
               </Typography>
 
-              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              <p style={{
+                margin: 0,
+                fontSize: '0.875rem',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.55,
+              }}>
                 {item.description}
               </p>
-            </Card>
+            </div>
           ))}
         </div>
       </Container>
@@ -97,3 +91,4 @@ export const HowItWorksSection = () => {
 };
 
 export default HowItWorksSection;
+

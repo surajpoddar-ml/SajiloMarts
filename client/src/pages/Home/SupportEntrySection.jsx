@@ -22,15 +22,12 @@ export const SupportEntrySection = ({ onNavigate = () => {} }) => {
           <Typography variant="h2" style={{ marginTop: 'var(--space-2)' }}>
             Need Help with a Product or Sourcing?
           </Typography>
-          <Typography variant="body" style={{ color: 'var(--text-secondary)', maxWidth: '540px', margin: 'var(--space-2) auto 0' }}>
-            Our Kathmandu support team is available to assist with custom quotes, customs inquiries, or delivery updates.
-          </Typography>
         </div>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '20px',
+          gap: '16px',
           maxWidth: '680px',
           margin: '0 auto',
         }}>
@@ -38,18 +35,26 @@ export const SupportEntrySection = ({ onNavigate = () => {} }) => {
           <Card style={{
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
-            padding: '24px 20px',
+            padding: '20px 18px',
             textAlign: 'center',
           }}>
             <div style={{ fontSize: '1.8rem', marginBottom: '8px' }} aria-hidden="true">
               📧
             </div>
-            <Typography variant="h3" style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '6px' }}>
+            <Typography variant="h3" style={{ fontSize: '1.025rem', fontWeight: 600, marginBottom: '6px' }}>
               Direct Email Helpdesk
             </Typography>
-            <p style={{ margin: '0 0 16px 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Send product links, bulk purchase requests, or general inquiries directly to our support desk.
-            </p>
+            <ul style={{
+              margin: '0 0 14px 0',
+              paddingLeft: '1.1rem',
+              fontSize: '0.825rem',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              textAlign: 'left',
+            }}>
+              <li style={{ marginBottom: '3px' }}>Send direct product links &amp; bulk requests</li>
+              <li>Responses within 24 business hours</li>
+            </ul>
             <a
               href={`mailto:${PUBLIC_CONFIG.SUPPORT_EMAIL}`}
               style={{

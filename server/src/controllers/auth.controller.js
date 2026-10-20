@@ -1,6 +1,6 @@
 import { asyncHandler, ApiResponse, setAuthCookie, clearAuthCookie, toSafeUser, createAuthToken } from '../utils/index.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
-import { registerCustomer, loginCustomer, updateCustomerProfile } from '../services/auth.service.js';
+import { registerCustomer, loginCustomer, loginWithGoogle, updateCustomerProfile } from '../services/auth.service.js';
 import {
   verifyCustomerEmail,
   resendVerificationToken,
@@ -58,6 +58,27 @@ export const login = asyncHandler(async (req, res) => {
       HTTP_STATUS.OK,
       { user, token },
       'Login successful'
+    )
+  );
+});
+
+/**
+ * Controller to handle Google OAuth authentication.
+ * Verifies ID token credential, sets HTTP-only cookie, and logs in user.
+ *
+ * @route POST /api/v1/auth/google
+ */
+export const googleAuth = asyncHandler(async (req, res) => {
+  const { credential } = req.body || {};
+  const { user, token } = await loginWithGoogle(credential);
+
+  setAuthCookie(res, token);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      { user, token },
+      'Google authentication successful'
     )
   );
 });

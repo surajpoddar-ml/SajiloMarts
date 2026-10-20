@@ -13,6 +13,7 @@ export const AuthContext = createContext({
   isLoading: false,
   error: null,
   login: async () => {},
+  loginWithGoogle: async () => {},
   register: async () => {},
   logout: async () => {},
   refreshUser: async () => {},
@@ -101,6 +102,29 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (credential) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await authService.googleLogin(credential);
+      const userData = res.data?.user || res.data;
+      const token = res.data?.token || res.token;
+      if (token && typeof localStorage !== 'undefined') {
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.AUTH_TOKEN, token);
+      }
+      if (userData && typeof localStorage !== 'undefined') {
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
+      }
+      setUser(userData);
+      return { success: true, user: userData };
+    } catch (err) {
+      setError(err.message || 'Google sign-in failed');
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const register = async (customerData) => {
     setIsLoading(true);
     setError(null);
@@ -158,6 +182,7 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     error,
     login,
+    loginWithGoogle,
     register,
     logout,
     refreshUser,

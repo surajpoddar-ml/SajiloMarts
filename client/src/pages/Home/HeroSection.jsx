@@ -8,85 +8,116 @@ import { PUBLIC_CONFIG } from '../../config/public.js';
  * Communicates the core service value proposition and provides quick CTAs.
  */
 export const HeroSection = ({ onNavigate, isAuthenticated, children }) => {
-  const handleStartSourcing = () => {
-    if (onNavigate) {
-      onNavigate(isAuthenticated ? 'sourcing-new' : 'login');
-    }
-  };
-
-  const scrollToHowItWorks = () => {
-    const el = document.getElementById('how-it-works');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <section className="hero-section" style={{
       backgroundColor: 'var(--bg-surface)',
       borderBottom: '1px solid var(--border-subtle)',
-      paddingTop: 'var(--space-12)',
-      paddingBottom: 'var(--space-12)',
+      paddingTop: 'var(--space-16)',
+      paddingBottom: 'var(--space-16)',
       position: 'relative',
     }}>
       <Container size="standard">
-        <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto' }}>
+          {/* Minimal Pill Badge */}
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '6px 16px',
+            padding: '5px 14px',
             borderRadius: '9999px',
             backgroundColor: 'var(--bg-surface-secondary)',
             border: '1px solid var(--border-subtle)',
-            marginBottom: 'var(--space-4)',
+            marginBottom: 'var(--space-5)',
           }}>
             <span style={{
-              width: '8px',
-              height: '8px',
+              width: '6px',
+              height: '6px',
               borderRadius: '50%',
               backgroundColor: 'var(--color-brand)',
               display: 'inline-block',
             }} />
-            <Typography variant="caption" style={{ fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
-              Seamless Cross-Border Sourcing: India &rarr; Nepal
+            <Typography variant="caption" style={{ fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
+              India &rarr; Nepal Cross-Border Delivery
             </Typography>
           </div>
 
+          {/* Minimal Headline */}
           <Typography variant="display" style={{
             color: 'var(--text-primary)',
-            letterSpacing: '-0.025em',
+            letterSpacing: '-0.03em',
             marginBottom: 'var(--space-4)',
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
             lineHeight: 1.15,
+            fontWeight: 800,
           }}>
-            Shop Anything from India. <br />
-            <span style={{ color: 'var(--color-brand)' }}>We Deliver Right to Your Doorstep in Nepal.</span>
+            Shop from India. <br />
+            <span style={{ color: 'var(--color-brand)' }}>Delivered to your doorstep in Nepal.</span>
           </Typography>
 
+          <Typography variant="body" style={{
+            color: 'var(--text-secondary)',
+            maxWidth: '560px',
+            margin: '0 auto var(--space-8)',
+            fontSize: '1rem',
+            lineHeight: 1.6,
+          }}>
+            Paste any product link from top Indian marketplaces. We handle international purchasing, customs clearance, and insured delivery in Nepal.
+          </Typography>
+
+          {/* Action Buttons: Get Started & Sign In */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '12px',
             flexWrap: 'wrap',
-            marginTop: 'var(--space-6)',
-            marginBottom: 'var(--space-4)',
+            margin: '0 auto var(--space-8)',
           }}>
             <Button
               variant="primary"
               size="lg"
-              onClick={handleStartSourcing}
+              onClick={() => onNavigate(isAuthenticated ? 'sourcing-new' : 'register')}
+              style={{ minWidth: '160px', borderRadius: '10px' }}
             >
-              {isAuthenticated ? 'Create Sourcing Request' : 'Get Started / Sign In'}
+              {isAuthenticated ? 'Start Sourcing' : 'Get Started'}
             </Button>
             <Button
               variant="outline"
               size="lg"
-              onClick={scrollToHowItWorks}
+              onClick={() => onNavigate(isAuthenticated ? 'account' : 'login')}
+              style={{ minWidth: '140px', borderRadius: '10px' }}
             >
-              Learn How It Works &darr;
+              {isAuthenticated ? 'My Account' : 'Sign In'}
             </Button>
           </div>
+
+          {/* Supported Stores Minimal Tag Strip */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
+            color: 'var(--text-secondary)',
+            fontSize: '0.8rem',
+            fontWeight: 500,
+          }}>
+            <span style={{ opacity: 0.6 }}>Supports:</span>
+            <span>Amazon.in</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <span>Flipkart</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <span>Myntra</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <span>Nykaa</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <span>Meesho</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <span>Tata 1mg</span>
+            <span style={{ opacity: 0.4 }}>•</span>
+            <span>AJIO</span>
+          </div>
+
           {children}
         </div>
       </Container>
@@ -95,4 +126,5 @@ export const HeroSection = ({ onNavigate, isAuthenticated, children }) => {
 };
 
 export default HeroSection;
+
 
